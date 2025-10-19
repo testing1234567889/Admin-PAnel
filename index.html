@@ -1,225 +1,213 @@
-<!DOCTYPE html>
-<html lang="id">
+<!doctype html>
+<html lang="id" translate="no">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>GxMods Admin Panel</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>AnimePlay Admin Panel</title>
+  <meta name="color-scheme" content="dark light">
   <style>
-    :root{
-      --bg:#0f141a;
-      --card:#161b22;
-      --muted:#a3b1c6;
-      --text:#e6edf3;
-      --primary:#1f6feb;
-      --primary-2:#1a5ccc;
-      --danger:#ef5350;
-      --success:#2eb872;
-      --chip:#0b1620;
-      --stroke:#263041;
+    :root {
+      --bg: #0f1115;
+      --card: #171a21;
+      --muted: #212734;
+      --text: #e9eefc;
+      --text-dim: #9fb0d0;
+      --pri: #4f8cff;
+      --pri-700:#3a6fd6;
+      --ok: #2eb872;
+      --warn: #f8b84e;
+      --err: #ef5350;
+      --stroke: #2a3344;
+      --focus: #7fb0ff;
+    }
+    @media (prefers-color-scheme: light) {
+      :root {
+        --bg:#f6f8ff; --card:#ffffff; --muted:#eef2ff; --text:#0f172a;
+        --text-dim:#41506b; --pri:#1e88ff; --pri-700:#166ad9; --stroke:#d9e0ef;
+      }
     }
     *{box-sizing:border-box}
-    html,body{height:100%}
-    body{
-      margin:0;
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
-      background:var(--bg);
-      color:var(--text);
+    html,body{margin:0;height:100%;background:var(--bg);color:var(--text);font:14px/1.35 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu}
+    a{color:var(--pri);text-decoration:none}
+    .wrap{max-width:1100px;margin:auto;padding:16px}
+    .grid{display:grid;gap:12px}
+    .card{background:var(--card);border:1px solid var(--stroke);border-radius:14px;padding:14px}
+    .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+    .row > *{flex:1 1 auto}
+    .row.right{justify-content:flex-end}
+    .title{font-weight:700;font-size:16px}
+    .muted{color:var(--text-dim)}
+    .pill{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;background:var(--muted);border:1px solid var(--stroke);font-size:12px}
+    .ok{background:color-mix(in oklab, var(--ok) 18%, transparent);border-color:color-mix(in oklab, var(--ok) 55%, var(--stroke))}
+    .err{background:color-mix(in oklab, var(--err) 18%, transparent);border-color:color-mix(in oklab, var(--err) 55%, var(--stroke))}
+    label{font-size:12px;color:var(--text-dim)}
+    input,select,button,textarea{
+      font:inherit;color:inherit;background:var(--muted);border:1px solid var(--stroke);
+      border-radius:10px;padding:10px 12px;outline:none;min-height:42px
     }
-    .wrap{max-width:1220px; margin:28px auto; padding:0 16px;}
-    .row{display:grid; grid-template-columns: 1fr; gap:16px;}
-    @media (min-width: 980px){
-      .row{grid-template-columns: 1fr 1fr;}
-    }
-    .card{
-      background:linear-gradient(180deg, rgba(45,62,80,.35), rgba(22,27,34,.75));
-      border:1px solid var(--stroke);
-      border-radius:14px;
-      padding:18px;
-      box-shadow: 0 6px 22px rgba(0,0,0,.35);
-    }
-    h1{font-size:18px; margin:0 0 10px 0}
-    .toolbar{
-      display:flex; gap:10px; align-items:center; flex-wrap:wrap;
-      background:var(--card); border:1px solid var(--stroke);
-      border-radius:16px; padding:12px 14px; margin-bottom:16px;
-    }
-    .chip{
-      background:var(--chip);
-      border:1px solid var(--stroke);
-      color:var(--text);
-      border-radius:999px; padding:8px 12px; font-size:13px;
-    }
-    .chip.k{background:#10233a}
-    .muted{color:var(--muted)}
-    .row2{display:grid; grid-template-columns:1fr 1fr; gap:8px}
-    .field{display:flex; gap:8px; align-items:center}
-    .field input, .field select, .field textarea{
-      width:100%;
-      background:#0b1620;
-      border:1px solid var(--stroke);
-      color:var(--text);
-      border-radius:12px;
-      padding:12px 12px;
-      font-size:14px;
-      outline:none;
-    }
-    textarea{min-height:96px; resize:vertical}
-    .btn{
-      border-radius:12px;
-      border:1px solid var(--stroke);
-      padding:10px 14px;
-      font-size:14px; color:var(--text); background:#0b1620;
-      cursor:pointer; transition:.15s;
-    }
-    .btn:hover{transform:translateY(-1px);}
-    .btn.primary{background:var(--primary); border-color:var(--primary-2)}
-    .btn.success{background:var(--success); border-color:#1a7a54}
-    .btn.danger{background:var(--danger); border-color:#c62828}
-    .btn.ghost{background:transparent}
-    .btn.small{padding:8px 10px; font-size:13px; border-radius:10px}
-    .grid-2{display:grid; grid-template-columns: 1fr auto; gap:8px; align-items:center}
-    .right{margin-left:auto}
-    .table-wrap{border:1px solid var(--stroke); border-radius:12px; overflow:auto; background:#0b1620}
-    table{width:100%; border-collapse:collapse; min-width:760px}
-    thead th{
-      position:sticky; top:0; z-index:2;
-      background:#0f2238; color:#bcd2f7; text-align:left; font-weight:600; font-size:13px;
-      border-bottom:1px solid var(--stroke);
-      padding:12px 10px;
-    }
-    tbody td{
-      border-bottom:1px solid #182334;
-      padding:10px; font-size:14px; color:#dbe7ff;
-    }
-    tbody tr:hover{background:#112030}
-    .row-actions{display:flex; gap:10px; flex-wrap:wrap; padding:10px 0}
-    .help{font-size:12.5px; color:#9fb0c7}
+    input:focus,select:focus,textarea:focus{border-color:var(--focus);box-shadow:0 0 0 3px color-mix(in oklab,var(--focus) 25%, transparent)}
+    button{background:var(--pri);border-color:var(--pri-700);cursor:pointer}
+    button:disabled{opacity:.6;cursor:not-allowed}
+    .btn-gray{background:var(--muted);border-color:var(--stroke)}
+    .btn-ok{background:var(--ok);border-color:color-mix(in oklab, var(--ok) 70%, #000)}
+    .btn-err{background:var(--err);border-color:color-mix(in oklab, var(--err) 70%, #000)}
+    .split{display:grid;gap:12px;grid-template-columns:1fr}
+    @media (min-width: 980px){ .split{grid-template-columns:320px 1fr} }
+    .section-head{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:8px}
+    .table{width:100%;border-collapse:collapse}
+    .table th,.table td{border-bottom:1px solid var(--stroke);padding:8px 6px;text-align:left;vertical-align:top}
+    .table th{position:sticky;top:0;background:var(--card);z-index:1}
+    .t-actions{display:flex;gap:6px;flex-wrap:wrap}
+    .badge{font-size:12px;padding:6px 8px;border-radius:8px;background:var(--muted);border:1px solid var(--stroke)}
     .hidden{display:none !important}
-    .pill{border-radius:999px; padding:6px 10px; font-size:12px; border:1px solid var(--stroke);}
-    .pill.true{background:#103b22; color:#b1ffd3; border-color:#1e7247}
-    .pill.false{background:#3b1010; color:#ffd1d1; border-color:#7a2424}
-    .flex{display:flex; gap:8px; align-items:center; flex-wrap:wrap}
-    .grow{flex:1}
+    .w-100{width:100%}
+    .w-50{width:50%}
+    .nowrap{white-space:nowrap}
+    .footer-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:flex-end}
+    /* Mobile-first comfortable hit targets */
+    @media (max-width: 640px){
+      .row > *{flex-basis:100%}
+      .footer-actions > *{flex:1 1 auto}
+      .table th:nth-child(4), .table td:nth-child(4){display:none} /* hide UpdatedAt on very small */
+      .t-actions button{flex:1 1 48%}
+    }
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <div class="toolbar" id="topbar">
-      <span class="chip">UID: <b id="uidChip" class="muted">-</b></span>
-      <span class="chip">Admin: <b id="adminChip" class="muted">false</b></span>
-      <span class="chip">Owner: <b id="ownerChip" class="muted">false</b></span>
-
-      <div class="flex right" id="loginPanel">
-        <input id="emailInput" placeholder="email admin" class="chip k" />
-        <input id="passInput" placeholder="password" type="password" class="chip k" />
-        <button class="btn primary" id="loginBtn">Login</button>
+  <div class="wrap grid">
+    <!-- AUTH CARD -->
+    <div id="authCard" class="card">
+      <div class="section-head">
+        <div class="title">Login Admin</div>
+        <div class="row right">
+          <span class="badge" id="badgeOwner" title="Owner">Owner</span>
+          <span class="badge" id="badgeAdmin" title="Admin">Admin</span>
+          <span class="badge" id="badgeUid">UID: -</span>
+        </div>
       </div>
-      <div class="flex right hidden" id="logoutPanel">
-        <button class="btn ghost" id="logoutBtn">Logout</button>
+      <div class="row">
+        <div class="w-100">
+          <label>Email</label>
+          <input id="email" type="email" autocomplete="username" placeholder="you@example.com">
+        </div>
+        <div class="w-100">
+          <label>Password</label>
+          <input id="password" type="password" autocomplete="current-password" placeholder="••••••••">
+        </div>
       </div>
+      <div class="row right">
+        <button id="btnLogin">Login</button>
+      </div>
+      <p class="muted" style="margin:6px 0 0">Hanya akun yang ada di <code>/admins</code> yang diizinkan.</p>
     </div>
 
-    <div class="row">
-      <!-- Add / Edit -->
-      <div class="card">
-        <h1>Add / Edit User</h1>
-        <div class="field">
-          <label style="width:120px">Android ID</label>
-          <input id="f_id" placeholder="contoh: a1b2c3d4e5f6abcd" />
-          <button class="btn small" id="btnCopyId">Copy</button>
+    <!-- PANEL MAIN -->
+    <div id="panel" class="grid hidden">
+      <div class="split">
+        <!-- Create / Edit quick form -->
+        <div class="card">
+          <div class="section-head"><div class="title">Buat / Ubah User</div></div>
+          <div class="row">
+            <div class="w-100">
+              <label>Android ID</label>
+              <input id="f_androidId" placeholder="contoh: a1b2c3d4e5f6abcd">
+            </div>
+            <div class="w-100">
+              <label>Key</label>
+              <input id="f_key" placeholder="contoh: ZXCV-5R3K-PAID">
+            </div>
+            <div class="w-100">
+              <label>Alasan (opsional)</label>
+              <input id="f_reason" placeholder="Misal: Abuse">
+            </div>
+            <div class="w-100">
+              <label>Sampai (opsional, 25-12-2025 / 1735171200000)</label>
+              <input id="f_until" placeholder="dd-mm-yyyy ATAU epoch(ms)">
+            </div>
+            <div class="row">
+              <button id="btnSave" class="btn-ok">Simpan</button>
+              <button id="btnDelete" class="btn-err">Hapus</button>
+            </div>
+          </div>
+          <p class="muted" style="margin:6px 0 0">Kolom “Android ID” & “Key” wajib. Tanpa tombol copy & tanpa generate sesuai permintaan.</p>
         </div>
-        <div class="field" style="margin-top:8px">
-          <label style="width:120px">Key</label>
-          <input id="f_key" placeholder="ZXCV-9999-PAID" />
-          <div class="flex">
-            <button class="btn small" id="btnGenKey">Generate</button>
-            <button class="btn small" id="btnCopyKey">Copy</button>
+
+        <!-- Users List -->
+        <div class="card">
+          <div class="section-head">
+            <div class="title">Users List</div>
+            <div class="row right">
+              <button id="btnLogout" class="btn-gray">Logout</button>
+            </div>
+          </div>
+
+          <!-- Hanya dua kontrol: pencarian & prefix -->
+          <div class="row">
+            <div class="w-100">
+              <label>Pencarian (Android ID penuh)</label>
+              <input id="q_exact" placeholder="tempel Android ID untuk cari 1 user">
+            </div>
+            <div class="w-100">
+              <label>Search Prefix</label>
+              <input id="q_prefix" placeholder="misal: a1b2">
+            </div>
+          </div>
+          <div class="row right" style="margin-top:6px">
+            <button id="btnRunSearch" class="btn-gray">Search</button>
+          </div>
+
+          <div style="margin-top:10px;max-height:60vh;overflow:auto;border-radius:10px;border:1px solid var(--stroke)">
+            <table class="table" id="tbl">
+              <thead>
+                <tr>
+                  <th>Android ID</th>
+                  <th>Key</th>
+                  <th>Banned</th>
+                  <th class="nowrap">Updated</th>
+                  <th>Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="tbody">
+                <tr id="rowEmpty"><td colspan="5" class="muted">Memuat…</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="footer-actions" style="margin-top:8px">
+            <button id="btnMore" class="btn-gray">Muat lebih</button>
           </div>
         </div>
-        <div class="field" style="margin-top:8px">
-          <label style="width:120px">Banned</label>
-          <select id="f_banned">
-            <option value="false">false</option>
-            <option value="true">true</option>
-          </select>
-        </div>
-        <div class="field" style="margin-top:8px">
-          <label style="width:120px">Until</label>
-          <input id="f_until" placeholder="dd-MM-yyyy atau epoch/ms, kosongkan jika tidak" />
-        </div>
-        <div class="field" style="margin-top:8px">
-          <label style="width:120px">Reason</label>
-          <textarea id="f_reason" placeholder="opsional"></textarea>
-        </div>
-        <div class="row-actions">
-          <button class="btn primary" id="btnCreate">Create / Overwrite</button>
-          <button class="btn" id="btnReset">Reset</button>
-        </div>
-        <div class="help">Kompat: bila node <code>/users/{androidId}</code> berupa <b>string</b>, panel tetap menampilkan (sebagai <i>key</i>). Saat menyimpan, panel menulis <b>object</b> lengkap.</div>
       </div>
 
-      <!-- Users List -->
-      <div class="card">
-        <h1>Users List</h1>
-        <div class="flex" style="margin-bottom:10px">
-          <button class="btn small" id="btnList">List (100)</button>
-          <button class="btn small" id="btnListBanned">List Banned</button>
-          <span class="grow"></span>
-          <input id="searchPrefix" placeholder="Cari prefix Android (mis. a1b2)" class="chip k grow" />
-          <button class="btn small" id="btnSearchPrefix">Search Prefix</button>
-          <button class="btn small" id="btnClear">Clear</button>
+      <!-- Owner only: admins -->
+      <div class="card" id="ownerBox">
+        <div class="section-head"><div class="title">Kelola Admin (Owner saja)</div></div>
+        <div class="row">
+          <div class="w-100">
+            <label>UID</label>
+            <input id="adm_uid" placeholder="tempel UID untuk grant / revoke">
+          </div>
         </div>
-
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th style="width:48px">Sel</th>
-                <th>Android ID</th>
-                <th>Key</th>
-                <th style="width:100px">Banned</th>
-                <th>Until</th>
-                <th style="width:160px">Updated</th>
-              </tr>
-            </thead>
-            <tbody id="tbody"></tbody>
-          </table>
+        <div class="row">
+          <button id="btnGrant" class="btn-ok">Grant Admin</button>
+          <button id="btnRevoke" class="btn-err">Revoke Admin</button>
         </div>
-
-        <div class="row-actions">
-          <button class="btn small" id="btnPrev">Prev</button>
-          <button class="btn small" id="btnNext">Next</button>
-          <span class="grow"></span>
-          <button class="btn danger" id="btnBanSel">Ban Selected</button>
-          <button class="btn success" id="btnUnbanSel">Unban Selected</button>
-          <button class="btn danger" id="btnDeleteSel">Delete Selected</button>
-        </div>
+        <p class="muted" style="margin:6px 0 0">Owner: <code>SjEQCMqzEMb2PQclx8Iidde3reA3</code></p>
       </div>
     </div>
-
-    <div class="card" style="margin-top:16px">
-      <h1>Kelola Admin (Owner only)</h1>
-      <div class="flex">
-        <input id="adm_uid" placeholder="UID Firebase" class="chip k grow" />
-        <button class="btn small" id="btnGrant">Grant Admin</button>
-        <button class="btn small danger" id="btnRevoke">Revoke Admin</button>
-      </div>
-      <div class="help" style="margin-top:8px">Owner: <code>SjEQCMqzEMb2PQclx8Iidde3reA3</code>. Hanya owner yang bisa ubah daftar admin.</div>
-    </div>
-
-    <div class="help" id="toast" style="margin-top:12px"></div>
   </div>
 
   <script type="module">
-    // ===== Firebase SDK (v10) via CDN =====
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    // ===== Firebase SDK v10 (modules) =====
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
     import {
-      getDatabase, ref, child, get, set, update, remove, query,
-      orderByKey, startAt, endAt, limitToFirst, orderByChild, equalTo
-    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+      getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut
+    } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+    import {
+      getDatabase, ref, child, get, set, update, remove,
+      query, orderByKey, orderByChild, startAt, endAt, limitToFirst, equalTo
+    } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-database.js";
 
-    // ====== CONFIG: sesuaikan punyamu di sini ======
+    // ===== Config kamu =====
     const firebaseConfig = {
       apiKey: "AIzaSyBpsA9-X9ckiyz2erxurJdLOzv-Deoi7R0",
       authDomain: "animeplay-738a4.firebaseapp.com",
@@ -236,347 +224,366 @@
     const auth = getAuth(app);
     const db = getDatabase(app);
 
-    // ====== STATE ======
-    const STATE = {
-      authUser: null,
+    // ===== DOM =====
+    const authCard = document.getElementById("authCard");
+    const panel = document.getElementById("panel");
+    const badgeUid = document.getElementById("badgeUid");
+    const badgeAdmin = document.getElementById("badgeAdmin");
+    const badgeOwner = document.getElementById("badgeOwner");
+    const ownerBox = document.getElementById("ownerBox");
+
+    const emailEl = document.getElementById("email");
+    const passEl = document.getElementById("password");
+    const btnLogin = document.getElementById("btnLogin");
+    const btnLogout = document.getElementById("btnLogout");
+
+    const f_androidId = document.getElementById("f_androidId");
+    const f_key = document.getElementById("f_key");
+    const f_reason = document.getElementById("f_reason");
+    const f_until = document.getElementById("f_until");
+    const btnSave = document.getElementById("btnSave");
+    const btnDelete = document.getElementById("btnDelete");
+
+    const q_exact = document.getElementById("q_exact");
+    const q_prefix = document.getElementById("q_prefix");
+    const btnRunSearch = document.getElementById("btnRunSearch");
+    const btnMore = document.getElementById("btnMore");
+
+    const tbody = document.getElementById("tbody");
+    const rowEmpty = document.getElementById("rowEmpty");
+
+    const adm_uid = document.getElementById("adm_uid");
+    const btnGrant = document.getElementById("btnGrant");
+    const btnRevoke = document.getElementById("btnRevoke");
+
+    // ===== State =====
+    let state = {
+      current: null,
       isAdmin: false,
       isOwner: false,
-      pageMode: "all",   // all | search | banned
-      prefix: "",
-      pageSize: 100,
-      cursor: null,
-      prevStack: [],
-      selection: new Set(),
-      cachedBanned: null,
+      lastKey: null,
+      busy: false
     };
 
-    // ====== UI helpers ======
-    const $ = (sel)=>document.querySelector(sel);
-    const $$ = (sel)=>document.querySelectorAll(sel);
-    function toast(msg, isErr=false){
-      const el = $("#toast");
-      el.textContent = msg || "";
-      el.style.color = isErr ? "#ff9b9b" : "#9fb0c7";
-    }
-    function setChips(){
-      $("#uidChip").textContent  = STATE.authUser ? STATE.authUser.uid : "-";
-      $("#adminChip").textContent = String(STATE.isAdmin);
-      $("#ownerChip").textContent = String(STATE.isOwner);
-    }
-    function toggleAuthUI(){
-      const logged = !!STATE.authUser;
-      $("#loginPanel").classList.toggle("hidden", logged);
-      $("#logoutPanel").classList.toggle("hidden", !logged);
-    }
-    function fmtTime(ms){
-      if(!ms) return "";
-      try{
-        const d = new Date(ms);
-        const z = (n)=> String(n).padStart(2,"0");
-        return `${z(d.getDate())}/${z(d.getMonth()+1)}/${d.getFullYear()}, ${z(d.getHours())}.${z(d.getMinutes())}.${z(d.getSeconds())}`;
-      }catch(_){return ""}
-    }
+    function show(el){ el.classList.remove("hidden"); }
+    function hide(el){ el.classList.add("hidden"); }
 
-    // ====== Data mapping (string node compatible) ======
-    function normalizeUser(androidId, val){
-      if (typeof val === "string"){
-        return { id: androidId, key: val, banned: false, until: "", reason: "", updatedAt: null };
+    function fmtTime(ms){
+      if(!ms) return "-";
+      try{
+        const d = new Date(Number(ms));
+        return d.toLocaleString();
+      }catch{ return String(ms); }
+    }
+    function isValidKeyPath(k){
+      return !!k && !(/[.#$[\]/]/.test(k));
+    }
+    function normalizeUser(aid, val){
+      if(val == null) return null;
+      if(typeof val === "string"){
+        return { androidId: aid, key: val, banned: false, reason: "", until: "", updatedAt: 0 };
       }
-      val = val || {};
       return {
-        id: androidId,
-        key: String(val.key || ""),
-        banned: Boolean(val.banned || false),
-        until: (val.until ?? ""),
-        reason: String(val.reason || ""),
-        updatedAt: Number(val.updatedAt || 0)
+        androidId: aid,
+        key: String(val.key ?? ""),
+        banned: Boolean(val.banned ?? false),
+        reason: String(val.reason ?? ""),
+        until: String(val.until ?? ""),
+        updatedAt: Number(val.updatedAt ?? 0)
       };
     }
 
-    // ====== Queries ======
-    async function fetchPageAll(startKey){
-      // orderByKey + limitToFirst; untuk pagination pakai startAt + skip duplikat pertama
-      let q = query(ref(db, "users"), orderByKey(), limitToFirst(STATE.pageSize + (startKey ? 1 : 0)));
-      if(startKey) q = query(ref(db, "users"), orderByKey(), startAt(startKey), limitToFirst(STATE.pageSize + 1));
-      const snap = await get(q);
-      if (!snap.exists()) return {items:[], nextCursor:null};
-      const items = [];
-      let firstKey = null, count=0;
-      snap.forEach(childSnap => {
-        const k = childSnap.key;
-        if(count===0) firstKey = k;
-        items.push(normalizeUser(k, childSnap.val()));
-        count++;
-      });
-      if(startKey && items.length>0 && items[0].id===startKey){
-        items.shift(); // buang duplikat
+    // ===== Auth flow =====
+    onAuthStateChanged(auth, async (user) => {
+      state.current = user;
+      const uid = user?.uid ?? "-";
+      badgeUid.textContent = "UID: " + uid;
+
+      if(!user){
+        hide(panel);
+        show(authCard);
+        badgeAdmin.textContent = "Admin: -";
+        badgeOwner.textContent = "Owner";
+        ownerBox.classList.add("hidden");
+        return;
       }
-      let nextCursor = null;
-      if(items.length === STATE.pageSize){
-        nextCursor = items[items.length-1].id;
+
+      // Check admin flag
+      const snap = await get(ref(db, "admins/" + uid));
+      const isAdmin = snap.exists() && snap.val() === true;
+      const isOwner = uid === OWNER_UID;
+      state.isAdmin = isAdmin || isOwner;
+      state.isOwner = isOwner;
+
+      badgeAdmin.textContent = "Admin: " + (state.isAdmin ? "true" : "false");
+      badgeOwner.classList.toggle("ok", isOwner);
+      ownerBox.classList.toggle("hidden", !isOwner);
+
+      if(!state.isAdmin){
+        alert("Akun ini bukan admin. Minta owner untuk grant di /admins.");
+        await signOut(auth);
+        return;
       }
-      return {items, nextCursor, firstKey};
-    }
 
-    async function fetchPrefix(prefix){
-      const q = query(ref(db,"users"), orderByKey(), startAt(prefix), endAt(prefix+"\\uf8ff"), limitToFirst(STATE.pageSize));
-      const snap = await get(q);
-      if(!snap.exists()) return [];
-      const arr = [];
-      snap.forEach(s=>arr.push(normalizeUser(s.key, s.val())));
-      return arr;
-    }
+      // Success → tampilkan panel, sembunyikan login
+      hide(authCard);
+      show(panel);
 
-    async function fetchBanned(){
-      if (STATE.cachedBanned){ return STATE.cachedBanned; }
-      // NOTE: RTDB query equalTo(true) tidak bisa dipaginasi enak; ambil semua lalu client-side slice
-      const q = query(ref(db,"users"), orderByChild("banned"), equalTo(true));
-      const snap = await get(q);
-      if(!snap.exists()) return [];
-      const arr = [];
-      snap.forEach(s=>arr.push(normalizeUser(s.key, s.val())));
-      // sort by updatedAt desc then by id
-      arr.sort((a,b)=> (b.updatedAt||0)-(a.updatedAt||0) || a.id.localeCompare(b.id));
-      STATE.cachedBanned = arr;
-      return arr;
-    }
+      // Muat awal (tanpa tombol List)
+      clearTable();
+      state.lastKey = null;
+      await loadFirstPage();
+    });
 
-    // ====== Render ======
-    function renderTable(items){
-      const tb = $("#tbody");
-      tb.innerHTML = "";
-      STATE.selection.clear();
-      for(const it of items){
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-          <td><input type="checkbox" data-id="${it.id}"></td>
-          <td>${it.id}</td>
-          <td>${it.key || "<span class='muted'>-</span>"}</td>
-          <td><span class="pill ${it.banned}">${it.banned}</span></td>
-          <td>${it.until ? it.until : "<span class='muted'>-</span>"}</td>
-          <td>${fmtTime(it.updatedAt)}</td>
-        `;
-        tb.appendChild(tr);
-      }
-      tb.querySelectorAll("input[type=checkbox]").forEach(ch=>{
-        ch.addEventListener("change", e=>{
-          const id = e.target.getAttribute("data-id");
-          if(e.target.checked) STATE.selection.add(id); else STATE.selection.delete(id);
-        });
-      });
-    }
-
-    // ====== Paging helpers ======
-    async function loadAll(first=false){
+    // Login / Logout
+    btnLogin.addEventListener("click", async ()=>{
       try{
-        STATE.pageMode = "all";
-        if(first){ STATE.prevStack = []; STATE.cursor = null; }
-        const {items, nextCursor, firstKey} = await fetchPageAll(STATE.cursor);
-        if(firstKey && STATE.cursor && firstKey !== STATE.prevStack[STATE.prevStack.length-1]){
-          STATE.prevStack.push(firstKey);
-        } else if(first && firstKey){
-          STATE.prevStack = [firstKey];
-        }
-        STATE.cursor = nextCursor;
-        renderTable(items);
-        toast(`Memuat ${items.length} user`);
-      }catch(err){
-        console.error(err);
-        toast("Gagal memuat data (all): "+(err?.message||err), true);
-      }
-    }
-    async function nextPage(){
-      if(STATE.pageMode!=="all") return;
-      if(!STATE.cursor){ toast("Sudah di halaman terakhir"); return; }
-      const {items, nextCursor, firstKey} = await fetchPageAll(STATE.cursor);
-      if(firstKey) STATE.prevStack.push(firstKey);
-      STATE.cursor = nextCursor;
-      renderTable(items);
-    }
-    async function prevPage(){
-      if(STATE.pageMode!=="all") return;
-      if(STATE.prevStack.length < 2){ toast("Sudah di halaman pertama"); return; }
-      // Ambil cursor sebelum yang sekarang
-      STATE.prevStack.pop(); // buang current
-      const prevKey = STATE.prevStack.pop(); // ambil prev prev, nanti fetchPageAll akan push lagi
-      STATE.cursor = prevKey;
-      await loadAll(false);
-    }
+        btnLogin.disabled = true;
+        await signInWithEmailAndPassword(auth, emailEl.value.trim(), passEl.value.trim());
+      }catch(e){
+        console.error(e); alert("Login gagal: " + e.message);
+      }finally{ btnLogin.disabled = false; }
+    });
+    btnLogout.addEventListener("click", async ()=>{
+      await signOut(auth);
+    });
 
-    // ====== Actions ======
-    async function doCreate(){
-      if(!STATE.isAdmin){ toast("Butuh admin untuk menulis.", true); return; }
-      const id = $("#f_id").value.trim();
-      if(!id){ toast("Android ID kosong.", true); return; }
-      if(/[.$#[\\]\\]/.test(id)){ toast("Android ID tidak boleh mengandung .$#[]/", true); return; }
+    // ===== CRUD quick form =====
+    btnSave.addEventListener("click", async ()=>{
+      const aid = f_androidId.value.trim();
+      const key = f_key.value.trim();
+      const reason = f_reason.value.trim();
+      const until = f_until.value.trim();
+
+      if(!isValidKeyPath(aid)){
+        alert("Android ID tidak valid. Tidak boleh mengandung . $ # [ ] /");
+        return;
+      }
+      if(!key){
+        alert("Key wajib diisi."); return;
+      }
       const data = {
-        key: ($("#f_key").value||"").trim(),
-        banned: $("#f_banned").value === "true",
-        until: ($("#f_until").value||"").trim(),
-        reason: ($("#f_reason").value||"").trim(),
+        key, banned: false,
+        reason: reason || "",
+        until: until || "",
         updatedAt: Date.now()
       };
       try{
-        await set(ref(db, "users/"+id), data);
+        await update(ref(db, "users/" + aid), data);
         toast("Tersimpan.");
-        await reloadAfterWrite(id);
-      }catch(err){
-        console.error(err); toast("Gagal menyimpan: "+(err?.message||err), true);
-      }
-    }
-    async function reloadAfterWrite(idFocus){
-      STATE.cachedBanned = null; // reset cache
-      if(STATE.pageMode==="search"){
-        const prefix = STATE.prefix;
-        if(prefix){ renderTable(await fetchPrefix(prefix)); }
-      }else if(STATE.pageMode==="banned"){
-        const bans = await fetchBanned();
-        renderTable(bans.slice(0, STATE.pageSize));
-      }else{
-        await loadAll(true);
-      }
-      // auto isi form untuk idFocus
-      try{
-        const s = await get(ref(db,"users/"+idFocus));
-        if(s.exists()){
-          const u = normalizeUser(idFocus, s.val());
-          $("#f_id").value = u.id;
-          $("#f_key").value = u.key;
-          $("#f_banned").value = String(u.banned);
-          $("#f_until").value = u.until || "";
-          $("#f_reason").value = u.reason || "";
+        // refresh row spesifik kalau ada di table
+        const row = document.querySelector(`tr[data-id="${aid}"]`);
+        if(row){ await reloadRow(aid, row); }
+        else {
+          // push ke atas
+          prependRow(aid, data);
         }
-      }catch{}
-    }
-
-    async function bulkUpdate(newVals){
-      if(!STATE.isAdmin){ toast("Butuh admin untuk aksi ini.", true); return; }
-      const ids = Array.from(STATE.selection);
-      if(ids.length===0){ toast("Tidak ada yang dipilih."); return; }
-      const updates = {};
-      const now = Date.now();
-      ids.forEach(id=>{
-        Object.keys(newVals).forEach(k=>{
-          updates["users/"+id+"/"+k] = newVals[k];
-        });
-        updates["users/"+id+"/updatedAt"] = now;
-      });
-      try{
-        await update(ref(db), updates);
-        toast("Berhasil update "+ids.length+" user.");
-        await reloadAfterWrite(ids[0]);
-      }catch(err){ console.error(err); toast("Gagal update: "+(err?.message||err), true); }
-    }
-    async function bulkDelete(){
-      if(!STATE.isAdmin){ toast("Butuh admin untuk aksi ini.", true); return; }
-      const ids = Array.from(STATE.selection);
-      if(ids.length===0){ toast("Tidak ada yang dipilih."); return; }
-      try{
-        const obj = {};
-        ids.forEach(id=> obj["users/"+id] = null);
-        await update(ref(db), obj);
-        toast("Hapus "+ids.length+" user.");
-        await reloadAfterWrite("");
-      }catch(err){ console.error(err); toast("Gagal hapus: "+(err?.message||err), true); }
-    }
-
-    // ====== Admin mgmt ======
-    async function grantAdmin(){
-      if(!STATE.isOwner){ toast("Hanya owner yang boleh Grant.", true); return; }
-      const uid = $("#adm_uid").value.trim();
-      if(!uid) return toast("UID kosong.", true);
-      try{
-        await set(ref(db, "admins/"+uid), true);
-        toast("Grant admin OK.");
-      }catch(err){ console.error(err); toast("Gagal grant: "+(err?.message||err), true); }
-    }
-    async function revokeAdmin(){
-      if(!STATE.isOwner){ toast("Hanya owner yang boleh Revoke.", true); return; }
-      const uid = $("#adm_uid").value.trim();
-      if(!uid) return toast("UID kosong.", true);
-      try{
-        await remove(ref(db, "admins/"+uid));
-        toast("Revoke admin OK.");
-      }catch(err){ console.error(err); toast("Gagal revoke: "+(err?.message||err), true); }
-    }
-
-    // ====== Auth ======
-    $("#loginBtn").addEventListener("click", async ()=>{
-      const email = $("#emailInput").value.trim();
-      const pass = $("#passInput").value.trim();
-      if(!email || !pass){ return toast("Email/password kosong.", true); }
-      try{
-        await signInWithEmailAndPassword(auth, email, pass);
-      }catch(err){ console.error(err); toast("Login gagal: "+(err?.message||err), true); }
-    });
-    $("#logoutBtn").addEventListener("click", ()=> signOut(auth));
-
-    async function checkAdmin(uid){
-      try{
-        const s = await get(ref(db, "admins/"+uid));
-        return s.exists() && s.val()===true;
-      }catch(_){ return false }
-    }
-
-    onAuthStateChanged(auth, async (user)=>{
-      STATE.authUser = user || null;
-      STATE.isOwner = Boolean(user && user.uid === OWNER_UID);
-      STATE.isAdmin = false;
-      if(user){
-        STATE.isAdmin = await checkAdmin(user.uid);
+      }catch(e){
+        console.error(e); alert("Gagal simpan: " + e.message);
       }
-      setChips();
-      toggleAuthUI();
-      // refresh list state (supaya tombol enable/disable sesuai hak)
-      toast(user? "Login sebagai "+user.email : "Tidak login");
     });
 
-    // ====== Wire UI ======
-    $("#btnList").addEventListener("click", ()=>{ STATE.cursor=null; STATE.prefix=""; $("#searchPrefix").value=""; STATE.cachedBanned=null; loadAll(true); });
-    $("#btnNext").addEventListener("click", nextPage);
-    $("#btnPrev").addEventListener("click", prevPage);
-    $("#btnClear").addEventListener("click", ()=>{ $("#searchPrefix").value=""; STATE.prefix=""; loadAll(true); });
-
-    $("#btnSearchPrefix").addEventListener("click", async ()=>{
-      const prefix = $("#searchPrefix").value.trim();
-      STATE.pageMode = "search";
-      STATE.prefix = prefix;
+    btnDelete.addEventListener("click", async ()=>{
+      const aid = f_androidId.value.trim();
+      if(!isValidKeyPath(aid)){ alert("Android ID tidak valid."); return; }
+      if(!confirm("Hapus user ini?")) return;
       try{
-        const arr = await fetchPrefix(prefix);
-        renderTable(arr);
-        toast(`Hasil pencarian: ${arr.length}`);
-      }catch(err){ console.error(err); toast("Gagal memuat data (search): "+(err?.message||err), true); }
+        await remove(ref(db, "users/" + aid));
+        toast("Dihapus.");
+        const row = document.querySelector(`tr[data-id="${aid}"]`);
+        if(row) row.remove();
+        checkEmpty();
+      }catch(e){ alert("Gagal hapus: " + e.message); }
     });
 
-    $("#btnListBanned").addEventListener("click", async ()=>{
-      STATE.pageMode = "banned";
+    // ===== Search behaviour =====
+    btnRunSearch.addEventListener("click", async ()=>{
+      await runSearch();
+    });
+    q_exact.addEventListener("keydown", (e)=>{ if(e.key === "Enter") runSearch(); });
+    q_prefix.addEventListener("keydown", (e)=>{ if(e.key === "Enter") runSearch(); });
+
+    async function runSearch(){
+      const exact = q_exact.value.trim();
+      const prefix = q_prefix.value.trim();
+
+      clearTable();
+      state.lastKey = null;
+
       try{
-        const arr = await fetchBanned();
-        renderTable(arr.slice(0, STATE.pageSize));
-        toast(`Banned: ${arr.length}`);
-      }catch(err){ console.error(err); toast("Gagal memuat data (banned): "+(err?.message||err), true); }
+        if(exact){
+          const snap = await get(ref(db, "users/"+exact));
+          if(snap.exists()){
+            const u = normalizeUser(exact, snap.val());
+            renderRows([u]);
+          }else{
+            renderRows([]);
+          }
+          return;
+        }
+        // prefix mode
+        if(prefix){
+          const qy = query(ref(db, "users"), orderByKey(), startAt(prefix), endAt(prefix+"\uf8ff"), limitToFirst(100));
+          const snap = await get(qy);
+          const arr = [];
+          snap.forEach(ch => arr.push(normalizeUser(ch.key, ch.val())));
+          renderRows(arr);
+          return;
+        }
+        // default: first page
+        await loadFirstPage();
+      }catch(e){
+        console.error(e); alert("Gagal memuat data: " + e.message);
+      }
+    }
+
+    // ===== List paging (default) =====
+    async function loadFirstPage(){
+      await loadMore(true);
+    }
+    btnMore.addEventListener("click", ()=> loadMore(false));
+
+    async function loadMore(reset){
+      if(state.busy) return;
+      state.busy = true;
+      try{
+        let qy;
+        if(!state.lastKey){
+          qy = query(ref(db,"users"), orderByKey(), limitToFirst(50));
+        }else{
+          qy = query(ref(db,"users"), orderByKey(), startAt(state.lastKey), limitToFirst(51)); // +1 untuk skip dupe
+        }
+        const snap = await get(qy);
+        const arr=[];
+        let first = true;
+        snap.forEach(ch => {
+          if(state.lastKey && first){ first=false; return; } // skip duplicate
+          arr.push(normalizeUser(ch.key, ch.val()));
+        });
+        if(arr.length){
+          state.lastKey = arr[arr.length-1].androidId;
+        }
+        if(reset) clearTable();
+        renderRows(arr, true);
+      }catch(e){
+        console.error(e); alert("Gagal memuat data: " + e.message);
+      }finally{
+        state.busy = false;
+      }
+    }
+
+    // ===== Table render =====
+    function clearTable(){
+      tbody.innerHTML = "";
+      rowEmpty && rowEmpty.remove();
+      checkEmpty();
+    }
+    function checkEmpty(){
+      if(!tbody.children.length){
+        const tr = document.createElement("tr");
+        const td = document.createElement("td");
+        td.colSpan = 5; td.className = "muted"; td.textContent = "Belum ada data user yang dimuat.";
+        tr.appendChild(td); tbody.appendChild(tr);
+      }
+    }
+    function renderRows(list, append=false){
+      if(!append) clearTable();
+      if(!list || !list.length){ checkEmpty(); return; }
+      for(const u of list){
+        if(!u) continue;
+        tbody.appendChild(buildRow(u));
+      }
+    }
+    function prependRow(aid, raw){
+      const u = normalizeUser(aid, raw);
+      const tr = buildRow(u);
+      tbody.prepend(tr);
+    }
+    function buildRow(u){
+      const tr = document.createElement("tr");
+      tr.dataset.id = u.androidId;
+      tr.innerHTML = `
+        <td class="nowrap"><strong>${u.androidId}</strong></td>
+        <td><input data-k="key" value="${escapeHtml(u.key)}" /></td>
+        <td>
+          <select data-k="banned">
+            <option value="false" ${!u.banned?"selected":""}>false</option>
+            <option value="true"  ${u.banned?"selected":""}>true</option>
+          </select>
+          <div class="row" style="gap:6px;margin-top:6px">
+            <input data-k="until" placeholder="dd-mm-yyyy / epoch" value="${escapeHtml(u.until||"")}" />
+            <input data-k="reason" placeholder="reason" value="${escapeHtml(u.reason||"")}" />
+          </div>
+        </td>
+        <td class="muted">${fmtTime(u.updatedAt)}</td>
+        <td class="t-actions">
+          <button data-act="save" class="btn-ok">Save</button>
+          <button data-act="del"  class="btn-err">Del</button>
+        </td>
+      `;
+      tr.querySelector('[data-act="save"]').addEventListener("click", async ()=>{
+        await saveRow(tr);
+      });
+      tr.querySelector('[data-act="del"]').addEventListener("click", async ()=>{
+        if(confirm("Hapus user ini?")){
+          await remove(ref(db, "users/"+u.androidId));
+          tr.remove(); checkEmpty();
+        }
+      });
+      return tr;
+    }
+
+    async function saveRow(tr){
+      const aid = tr.dataset.id;
+      const key = tr.querySelector('[data-k="key"]').value.trim();
+      const banned = tr.querySelector('[data-k="banned"]').value === "true";
+      const until = tr.querySelector('[data-k="until"]').value.trim();
+      const reason = tr.querySelector('[data-k="reason"]').value.trim();
+      const data = { key, banned, until, reason, updatedAt: Date.now() };
+      await update(ref(db, "users/"+aid), data);
+      await reloadRow(aid, tr);
+      toast("Tersimpan.");
+    }
+
+    async function reloadRow(aid, tr){
+      const snap = await get(ref(db, "users/"+aid));
+      if(!snap.exists()){ tr.remove(); checkEmpty(); return; }
+      const u = normalizeUser(aid, snap.val());
+      // patch
+      tr.querySelector('[data-k="key"]').value = u.key;
+      tr.querySelector('[data-k="banned"]').value = String(u.banned);
+      tr.querySelector('[data-k="until"]').value = u.until || "";
+      tr.querySelector('[data-k="reason"]').value = u.reason || "";
+      tr.children[3].textContent = fmtTime(u.updatedAt);
+    }
+
+    // ===== Admin management (Owner only) =====
+    btnGrant.addEventListener("click", async ()=>{
+      if(!state.isOwner){ alert("Hanya owner."); return; }
+      const id = adm_uid.value.trim();
+      if(!id){ alert("UID kosong"); return; }
+      await set(ref(db,"admins/"+id), true);
+      alert("Granted.");
+    });
+    btnRevoke.addEventListener("click", async ()=>{
+      if(!state.isOwner){ alert("Hanya owner."); return; }
+      const id = adm_uid.value.trim();
+      if(!id){ alert("UID kosong"); return; }
+      await remove(ref(db,"admins/"+id));
+      alert("Revoked.");
     });
 
-    $("#btnCreate").addEventListener("click", doCreate);
-    $("#btnReset").addEventListener("click", ()=>{
-      $("#f_id").value = ""; $("#f_key").value=""; $("#f_banned").value="false"; $("#f_until").value=""; $("#f_reason").value="";
-    });
-    $("#btnGenKey").addEventListener("click", ()=>{
-      const rand = Math.random().toString(36).slice(2,6).toUpperCase();
-      $("#f_key").value = `ZXCV-${rand}-PAID`;
-    });
-    $("#btnCopyId").addEventListener("click", ()=> navigator.clipboard.writeText($("#f_id").value||""));
-    $("#btnCopyKey").addEventListener("click", ()=> navigator.clipboard.writeText($("#f_key").value||""));
-
-    $("#btnBanSel").addEventListener("click", ()=> bulkUpdate({banned:true}));
-    $("#btnUnbanSel").addEventListener("click", ()=> bulkUpdate({banned:false, until:"", reason:""}));
-    $("#btnDeleteSel").addEventListener("click", bulkDelete);
-
-    $("#btnGrant").addEventListener("click", grantAdmin);
-    $("#btnRevoke").addEventListener("click", revokeAdmin);
-
-    // ====== First load ======
-    loadAll(true);
+    // ===== Utils =====
+    function escapeHtml(s){ return s.replace(/[&<>"']/g, m=>({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[m])); }
+    function toast(msg){
+      const el = document.createElement("div");
+      el.textContent = msg;
+      el.style.position="fixed"; el.style.left="50%"; el.style.bottom="16px"; el.style.transform="translateX(-50%)";
+      el.style.background="var(--pri)"; el.style.border="1px solid var(--pri-700)"; el.style.color="#fff";
+      el.style.padding="10px 14px"; el.style.borderRadius="10px"; el.style.zIndex="9999";
+      document.body.appendChild(el);
+      setTimeout(()=> el.remove(), 1400);
+    }
   </script>
 </body>
 </html>
