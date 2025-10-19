@@ -1,589 +1,530 @@
 <!doctype html>
-<html lang="id" translate="no">
+<html lang="id">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <title>AnimePlay Admin Panel</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>GxMods Admin Panel</title>
   <meta name="color-scheme" content="dark light">
   <style>
-    :root {
-      --bg: #0f1115;
-      --card: #171a21;
-      --muted: #212734;
-      --text: #e9eefc;
-      --text-dim: #9fb0d0;
-      --pri: #4f8cff;
-      --pri-700:#3a6fd6;
-      --ok: #2eb872;
-      --warn: #f8b84e;
-      --err: #ef5350;
-      --stroke: #2a3344;
-      --focus: #7fb0ff;
-    }
-    @media (prefers-color-scheme: light) {
-      :root {
-        --bg:#f6f8ff; --card:#ffffff; --muted:#eef2ff; --text:#0f172a;
-        --text-dim:#41506b; --pri:#1e88ff; --pri-700:#166ad9; --stroke:#d9e0ef;
-      }
+    :root{
+      --bg:#0f1115;
+      --panel:#151924;
+      --muted:#8b91a1;
+      --text:#e8ecf1;
+      --accent:#3b82f6;
+      --accent-2:#22c55e;
+      --danger:#ef4444;
+      --ring:rgba(59,130,246,.35);
+      --card:#111525;
+      --chip:#1c2235;
+      --chip-border:#2a3150;
+      --input:#0f1425;
+      --row:#0c101b;
     }
     *{box-sizing:border-box}
-    html,body{margin:0;height:100%;background:var(--bg);color:var(--text);font:14px/1.35 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu}
-    a{color:var(--pri);text-decoration:none}
-    .wrap{max-width:1100px;margin:auto;padding:16px}
-    .grid{display:grid;gap:12px}
-    .card{background:var(--card);border:1px solid var(--stroke);border-radius:14px;padding:14px}
-    .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-    .row > *{flex:1 1 auto}
-    .row.right{justify-content:flex-end}
-    .title{font-weight:700;font-size:16px}
-    .muted{color:var(--text-dim)}
-    .pill{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;background:var(--muted);border:1px solid var(--stroke);font-size:12px}
-    .ok{background:color-mix(in oklab, var(--ok) 18%, transparent);border-color:color-mix(in oklab, var(--ok) 55%, var(--stroke))}
-    .err{background:color-mix(in oklab, var(--err) 18%, transparent);border-color:color-mix(in oklab, var(--err) 55%, var(--stroke))}
-    label{font-size:12px;color:var(--text-dim)}
-    input,select,button,textarea{
-      font:inherit;color:inherit;background:var(--muted);border:1px solid var(--stroke);
-      border-radius:10px;padding:10px 12px;outline:none;min-height:42px
+    html,body{margin:0; padding:0; background:var(--bg); color:var(--text); font:500 15px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial}
+    a{color:var(--accent); text-decoration:none}
+    .wrap{max-width:1000px; margin:0 auto; padding:16px}
+    header{
+      position:sticky; top:0; z-index:30; backdrop-filter:saturate(1.2) blur(6px);
+      background:linear-gradient(180deg, rgba(15,17,21,.9), rgba(15,17,21,.75));
+      border-bottom:1px solid #1f2433;
     }
-    input:focus,select:focus,textarea:focus{border-color:var(--focus);box-shadow:0 0 0 3px color-mix(in oklab,var(--focus) 25%, transparent)}
-    button{background:var(--pri);border-color:var(--pri-700);cursor:pointer}
-    button:disabled{opacity:.6;cursor:not-allowed}
-    .btn-gray{background:var(--muted);border-color:var(--stroke)}
-    .btn-ok{background:var(--ok);border-color:color-mix(in oklab, var(--ok) 70%, #000)}
-    .btn-err{background:var(--err);border-color:color-mix(in oklab, var(--err) 70%, #000)}
-    .split{display:grid;gap:12px;grid-template-columns:1fr}
-    @media (min-width: 980px){ .split{grid-template-columns:320px 1fr} }
-    .section-head{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:8px}
-    .table{width:100%;border-collapse:collapse}
-    .table th,.table td{border-bottom:1px solid var(--stroke);padding:8px 6px;text-align:left;vertical-align:top}
-    .table th{position:sticky;top:0;background:var(--card);z-index:1}
-    .t-actions{display:flex;gap:6px;flex-wrap:wrap}
-    .badge{font-size:12px;padding:6px 8px;border-radius:8px;background:var(--muted);border:1px solid var(--stroke)}
-    .hidden{display:none !important}
-    .w-100{width:100%}
-    .w-50{width:50%}
-    .nowrap{white-space:nowrap}
-    .footer-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:flex-end}
-    /* Mobile-first comfortable hit targets */
-    @media (max-width: 640px){
-      .row > *{flex-basis:100%}
-      .footer-actions > *{flex:1 1 auto}
-      .table th:nth-child(4), .table td:nth-child(4){display:none} /* hide UpdatedAt on very small */
-      .t-actions button{flex:1 1 48%}
+    .h-inner{display:flex; gap:10px; align-items:center; justify-content:space-between; padding:10px 16px}
+    .brand{display:flex; gap:10px; align-items:center}
+    .logo{
+      width:28px; height:28px; border-radius:8px; background:linear-gradient(135deg,#2dd4bf,#3b82f6);
+      display:inline-grid; place-items:center; font-weight:800; color:#0b1020;
+      box-shadow:0 6px 20px rgba(59,130,246,.35), inset 0 0 8px rgba(255,255,255,.15);
+    }
+    .chips{display:flex; flex-wrap:wrap; gap:8px}
+    .chip{background:var(--chip); border:1px solid var(--chip-border); color:#cdd4e4; padding:6px 10px; border-radius:999px; font-size:12px}
+    .pill{padding:.55rem .9rem; border-radius:999px; border:1px solid #2a3150; background:var(--panel); color:#d6def7; min-width:76px; text-align:center}
+    .btn{appearance:none; user-select:none; border:1px solid #2a3150; background:#111525; color:#dbe7ff; border-radius:12px; padding:.7rem 1rem; font-weight:600; cursor:pointer}
+    .btn:hover{border-color:#3b466b}
+    .btn[disabled]{opacity:.55; cursor:not-allowed}
+    .btn-primary{background:linear-gradient(180deg,#3b82f6,#2563eb); border-color:#2563eb}
+    .btn-success{background:linear-gradient(180deg,#22c55e,#16a34a); border-color:#15803d}
+    .btn-danger{background:linear-gradient(180deg,#ef4444,#dc2626); border-color:#b91c1c}
+    .card{background:linear-gradient(180deg,#0f1425,#0e1220); border:1px solid #1f243a; border-radius:16px; padding:14px}
+    .grid{display:grid; gap:14px}
+    .grid-2{grid-template-columns:1fr}
+    .row{display:grid; gap:10px; grid-template-columns:130px 1fr}
+    label{color:#bfc6da; font-size:13px}
+    input,select,textarea{
+      width:100%; border:1px solid #1f2742; background:var(--input); color:#e5ecff;
+      border-radius:12px; padding:.85rem .9rem; outline:none; transition:box-shadow .15s, border-color .15s;
+    }
+    input::placeholder,textarea::placeholder{color:#97a0b8}
+    input:focus,select:focus,textarea:focus{border-color:#3554ff; box-shadow:0 0 0 3px var(--ring)}
+    .help{color:#9aa3bd; font-size:12px}
+    .toolbar{display:flex; gap:10px; flex-wrap:wrap; align-items:center}
+    .section-title{font-weight:800; letter-spacing:.2px; margin:4px 0 8px}
+    .divider{height:1px; background:#1f243a; margin:10px 0}
+    table{width:100%; border-collapse:separate; border-spacing:0 10px}
+    th{font-size:12px; color:#9fb0d9; text-align:left; padding:0 10px}
+    td{padding:10px; vertical-align:top}
+    .row-card{background:linear-gradient(180deg,#0f1425,#0d1220); border:1px solid #1e2542; border-radius:12px}
+    .td-actions{white-space:nowrap; display:flex; gap:10px}
+    .badge{font-size:11px; padding:.25rem .55rem; border-radius:999px}
+    .badge-ok{background:#16391f; color:#98f7b2; border:1px solid #1e6a36}
+    .badge-no{background:#3a1010; color:#ffb4b4; border:1px solid #7a2222}
+    .sticky-footer{position:sticky; bottom:0; background:linear-gradient(180deg, rgba(15,17,21,.85), rgba(15,17,21,.95)); padding:10px 0 0; margin-top:10px}
+    .toast{position:fixed; left:50%; transform:translateX(-50%); bottom:18px; background:#0b1328; border:1px solid #2a3150; padding:10px 14px; border-radius:12px; color:#d6def7; box-shadow:0 10px 30px rgba(0,0,0,.35); z-index:50; display:none}
+    .empty{padding:12px; border:1px dashed #2a3150; color:#aab2c7; border-radius:12px; text-align:center}
+    .hint{font-size:12px; color:#96a0bb}
+    .kbd{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; font-size:12px; background:#0d1530; border:1px solid #2a3150; padding:.25rem .45rem; border-radius:6px; color:#d9e2ff}
+    @media (min-width: 860px){
+      .grid-2{grid-template-columns: 1.1fr 1fr}
+    }
+    /* Mobile table → cards */
+    @media (max-width:700px){
+      table thead{display:none}
+      table, tbody, tr, td{display:block; width:100%}
+      tr{margin:0 0 10px 0}
+      .td-actions{justify-content:flex-end}
     }
   </style>
 </head>
 <body>
-  <div class="wrap grid">
-    <!-- AUTH CARD -->
-    <div id="authCard" class="card">
-      <div class="section-head">
-        <div class="title">Login Admin</div>
-        <div class="row right">
-          <span class="badge" id="badgeOwner" title="Owner">Owner</span>
-          <span class="badge" id="badgeAdmin" title="Admin">Admin</span>
-          <span class="badge" id="badgeUid">UID: -</span>
-        </div>
+<header>
+  <div class="h-inner wrap">
+    <div class="brand">
+      <div class="logo">GX</div>
+      <div>
+        <div style="font-weight:800">GxMods Admin Panel</div>
+        <div class="hint">Realtime Database • Aman di HP & Laptop</div>
       </div>
-      <div class="row">
-        <div class="w-100">
-          <label>Email</label>
-          <input id="email" type="email" autocomplete="username" placeholder="you@example.com">
-        </div>
-        <div class="w-100">
-          <label>Password</label>
-          <input id="password" type="password" autocomplete="current-password" placeholder="••••••••">
-        </div>
-      </div>
-      <div class="row right">
-        <button id="btnLogin">Login</button>
-      </div>
-      <p class="muted" style="margin:6px 0 0">Hanya akun yang ada di <code>/admins</code> yang diizinkan.</p>
     </div>
-
-    <!-- PANEL MAIN -->
-    <div id="panel" class="grid hidden">
-      <div class="split">
-        <!-- Create / Edit quick form -->
-        <div class="card">
-          <div class="section-head"><div class="title">Buat / Ubah User</div></div>
-          <div class="row">
-            <div class="w-100">
-              <label>Android ID</label>
-              <input id="f_androidId" placeholder="contoh: a1b2c3d4e5f6abcd">
-            </div>
-            <div class="w-100">
-              <label>Key</label>
-              <input id="f_key" placeholder="contoh: ZXCV-5R3K-PAID">
-            </div>
-            <div class="w-100">
-              <label>Alasan (opsional)</label>
-              <input id="f_reason" placeholder="Misal: Abuse">
-            </div>
-            <div class="w-100">
-              <label>Sampai (opsional, 25-12-2025 / 1735171200000)</label>
-              <input id="f_until" placeholder="dd-mm-yyyy ATAU epoch(ms)">
-            </div>
-            <div class="row">
-              <button id="btnSave" class="btn-ok">Simpan</button>
-              <button id="btnDelete" class="btn-err">Hapus</button>
-            </div>
-          </div>
-          <p class="muted" style="margin:6px 0 0">Kolom “Android ID” & “Key” wajib. Tanpa tombol copy & tanpa generate sesuai permintaan.</p>
-        </div>
-
-        <!-- Users List -->
-        <div class="card">
-          <div class="section-head">
-            <div class="title">Users List</div>
-            <div class="row right">
-              <button id="btnLogout" class="btn-gray">Logout</button>
-            </div>
-          </div>
-
-          <!-- Hanya dua kontrol: pencarian & prefix -->
-          <div class="row">
-            <div class="w-100">
-              <label>Pencarian (Android ID penuh)</label>
-              <input id="q_exact" placeholder="tempel Android ID untuk cari 1 user">
-            </div>
-            <div class="w-100">
-              <label>Search Prefix</label>
-              <input id="q_prefix" placeholder="misal: a1b2">
-            </div>
-          </div>
-          <div class="row right" style="margin-top:6px">
-            <button id="btnRunSearch" class="btn-gray">Search</button>
-          </div>
-
-          <div style="margin-top:10px;max-height:60vh;overflow:auto;border-radius:10px;border:1px solid var(--stroke)">
-            <table class="table" id="tbl">
-              <thead>
-                <tr>
-                  <th>Android ID</th>
-                  <th>Key</th>
-                  <th>Banned</th>
-                  <th class="nowrap">Updated</th>
-                  <th>Aksi</th>
-                </tr>
-              </thead>
-              <tbody id="tbody">
-                <tr id="rowEmpty"><td colspan="5" class="muted">Memuat…</td></tr>
-              </tbody>
-            </table>
-          </div>
-          <div class="footer-actions" style="margin-top:8px">
-            <button id="btnMore" class="btn-gray">Muat lebih</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Owner only: admins -->
-      <div class="card" id="ownerBox">
-        <div class="section-head"><div class="title">Kelola Admin (Owner saja)</div></div>
-        <div class="row">
-          <div class="w-100">
-            <label>UID</label>
-            <input id="adm_uid" placeholder="tempel UID untuk grant / revoke">
-          </div>
-        </div>
-        <div class="row">
-          <button id="btnGrant" class="btn-ok">Grant Admin</button>
-          <button id="btnRevoke" class="btn-err">Revoke Admin</button>
-        </div>
-        <p class="muted" style="margin:6px 0 0">Owner: <code>SjEQCMqzEMb2PQclx8Iidde3reA3</code></p>
-      </div>
+    <div class="toolbar" id="authBar">
+      <input id="email" type="email" placeholder="email admin" style="min-width:220px">
+      <input id="password" type="password" placeholder="password" style="min-width:180px">
+      <button class="btn btn-primary" id="btnLogin">Login</button>
+      <button class="btn" id="btnLogout" style="display:none">Logout</button>
     </div>
   </div>
+</header>
 
-  <script type="module">
-    // ===== Firebase SDK v10 (modules) =====
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
-    import {
-      getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut
-    } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
-    import {
-      getDatabase, ref, child, get, set, update, remove,
-      query, orderByKey, orderByChild, startAt, endAt, limitToFirst, equalTo
-    } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-database.js";
+<main class="wrap grid grid-2" id="app" style="opacity:0; pointer-events:none">
+  <!-- Left: Add/Edit -->
+  <section class="card">
+    <div class="section-title">Buat / Ubah User</div>
+    <div class="grid">
+      <div class="row">
+        <label>Android ID</label>
+        <input id="fAndroidId" placeholder="contoh: a1b2c3d4e5f6abcd" autocomplete="off">
+      </div>
+      <div class="row">
+        <label>Key</label>
+        <input id="fKey" placeholder="contoh: ZXCV-5R3K-PAID" autocomplete="off">
+      </div>
+      <div class="row">
+        <label>Alasan (opsional)</label>
+        <input id="fReason" placeholder="Misal: Abuse">
+      </div>
+      <div class="row">
+        <label>Sampai (opsional, 25-12-2025 / 1735171200000)</label>
+        <input id="fUntil" placeholder="dd-mm-yyyy ATAU epoch(ms)">
+      </div>
+      <div class="row">
+        <div></div>
+        <div class="toolbar">
+          <button class="btn btn-success" id="btnSave">Simpan</button>
+          <button class="btn btn-danger" id="btnDelete">Hapus</button>
+        </div>
+      </div>
+      <div class="hint">Kolom “Android ID” & “Key” wajib. Tanpa tombol copy & tanpa generate sesuai permintaan.</div>
+    </div>
+  </section>
 
-    // ===== Config kamu =====
-    const firebaseConfig = {
-      apiKey: "AIzaSyBpsA9-X9ckiyz2erxurJdLOzv-Deoi7R0",
-      authDomain: "animeplay-738a4.firebaseapp.com",
-      databaseURL: "https://animeplay-738a4-default-rtdb.firebaseio.com",
-      projectId: "animeplay-738a4",
-      storageBucket: "animeplay-738a4.firebasestorage.app",
-      messagingSenderId: "129738568083",
-      appId: "1:129738568083:web:d144ad8d1a66d893213866",
-      measurementId: "G-J6G96TPMHX"
-    };
-    const OWNER_UID = "SjEQCMqzEMb2PQclx8Iidde3reA3";
+  <!-- Right: List -->
+  <section class="card">
+    <div class="section-title">Users List</div>
+    <div class="chips" id="badges">
+      <span class="chip">UID: <span id="badgeUid">-</span></span>
+      <span class="chip">Admin: <span id="badgeAdmin">false</span></span>
+      <span class="chip">Owner: <span id="badgeOwner">false</span></span>
+    </div>
+    <div class="divider"></div>
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getDatabase(app);
+    <div class="grid">
+      <div class="row">
+        <label>Pencarian (Android ID penuh)</label>
+        <input id="searchExact" placeholder="tempel Android ID untuk cari 1 user">
+      </div>
+      <div class="row">
+        <label>Search Prefix</label>
+        <div class="toolbar" style="width:100%">
+          <input id="searchPrefix" placeholder="misal: a1b2" style="flex:1">
+          <button class="btn btn-primary" id="btnSearchPrefix">Search</button>
+          <button class="btn" id="btnClear">Clear</button>
+          <button class="btn" id="btnLoadMore">Muat lebih</button>
+          <button class="btn" id="btnLogoutInline" style="margin-left:auto">Logout</button>
+        </div>
+      </div>
+    </div>
 
-    // ===== DOM =====
-    const authCard = document.getElementById("authCard");
-    const panel = document.getElementById("panel");
-    const badgeUid = document.getElementById("badgeUid");
-    const badgeAdmin = document.getElementById("badgeAdmin");
-    const badgeOwner = document.getElementById("badgeOwner");
-    const ownerBox = document.getElementById("ownerBox");
+    <div class="divider"></div>
 
-    const emailEl = document.getElementById("email");
-    const passEl = document.getElementById("password");
-    const btnLogin = document.getElementById("btnLogin");
-    const btnLogout = document.getElementById("btnLogout");
+    <div id="tableWrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Android ID</th>
+            <th>Key</th>
+            <th>Banned</th>
+            <th>Until</th>
+            <th>Reason</th>
+            <th class="td-actions">Aksi</th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+      <div id="empty" class="empty" style="display:none">Belum ada data user yang dimuat.</div>
+    </div>
 
-    const f_androidId = document.getElementById("f_androidId");
-    const f_key = document.getElementById("f_key");
-    const f_reason = document.getElementById("f_reason");
-    const f_until = document.getElementById("f_until");
-    const btnSave = document.getElementById("btnSave");
-    const btnDelete = document.getElementById("btnDelete");
+    <div class="sticky-footer">
+      <div class="hint">Kompatibilitas <span class="kbd">GxMods.java</span>: panel menulis <span class="kbd">/users/{androidId}</span> sebagai <span class="kbd">{ key, banned, until, reason, updatedAt }</span>. Dialog aplikasi mendukung juga node string (hanya key) – panel akan tampilkan keduanya.</div>
+    </div>
+  </section>
 
-    const q_exact = document.getElementById("q_exact");
-    const q_prefix = document.getElementById("q_prefix");
-    const btnRunSearch = document.getElementById("btnRunSearch");
-    const btnMore = document.getElementById("btnMore");
+  <!-- Owner only -->
+  <section class="card" style="grid-column:1/-1">
+    <div class="section-title">Kelola Admin (Owner saja)</div>
+    <div class="grid">
+      <div class="row">
+        <label>UID</label>
+        <input id="admUid" placeholder="tempel UID untuk grant / revoke">
+      </div>
+      <div class="row">
+        <div></div>
+        <div class="toolbar">
+          <button class="btn btn-success" id="btnGrant">Grant Admin</button>
+          <button class="btn btn-danger" id="btnRevoke">Revoke Admin</button>
+        </div>
+      </div>
+      <div class="hint">Owner: <span class="kbd" id="ownerUidTxt"></span></div>
+    </div>
+  </section>
+</main>
 
-    const tbody = document.getElementById("tbody");
-    const rowEmpty = document.getElementById("rowEmpty");
+<div class="toast" id="toast"></div>
 
-    const adm_uid = document.getElementById("adm_uid");
-    const btnGrant = document.getElementById("btnGrant");
-    const btnRevoke = document.getElementById("btnRevoke");
+<!-- Firebase SDK (ESM) -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
+  import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
+  import { getDatabase, ref, child, get, set, update, remove, query, orderByKey, startAt, endAt, limitToFirst } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-database.js";
 
-    // ===== State =====
-    let state = {
-      current: null,
-      isAdmin: false,
-      isOwner: false,
-      lastKey: null,
-      busy: false
-    };
+  // === CONFIG ===
+  const firebaseConfig = {
+    apiKey: "AIzaSyBpsA9-X9ckiyz2erxurJdLOzv-Deoi7R0",
+    authDomain: "animeplay-738a4.firebaseapp.com",
+    databaseURL: "https://animeplay-738a4-default-rtdb.firebaseio.com",
+    projectId: "animeplay-738a4",
+    storageBucket: "animeplay-738a4.firebasestorage.app",
+    messagingSenderId: "129738568083",
+    appId: "1:129738568083:web:d144ad8d1a66d893213866",
+    measurementId: "G-J6G96TPMHX"
+  };
+  const OWNER_UID = "SjEQCMqzEMb2PQclx8Iidde3reA3";
 
-    function show(el){ el.classList.remove("hidden"); }
-    function hide(el){ el.classList.add("hidden"); }
+  // === INIT ===
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getDatabase(app);
 
-    function fmtTime(ms){
-      if(!ms) return "-";
-      try{
-        const d = new Date(Number(ms));
-        return d.toLocaleString();
-      }catch{ return String(ms); }
+  // === UI Helpers ===
+  const $ = (q) => document.querySelector(q);
+  const tbody = $("#tbody");
+  const empty = $("#empty");
+  const toast = $("#toast");
+  const appRoot = $("#app");
+  const authBar = $("#authBar");
+
+  function showToast(msg, ms=1800){
+    toast.textContent = msg;
+    toast.style.display = "block";
+    clearTimeout(showToast._t);
+    showToast._t = setTimeout(()=> toast.style.display="none", ms);
+  }
+
+  function str(v){ return (v ?? "").toString(); }
+
+  // === Auth UI ===
+  $("#btnLogin").addEventListener("click", async ()=>{
+    const em = $("#email").value.trim();
+    const pw = $("#password").value.trim();
+    if(!em || !pw) return showToast("Email & password wajib.");
+    try{
+      await signInWithEmailAndPassword(auth, em, pw);
+    }catch(e){
+      console.error(e); showToast("Login gagal: " + (e.code||e.message));
     }
-    function isValidKeyPath(k){
-      return !!k && !(/[.#$[\]/]/.test(k));
-    }
-    function normalizeUser(aid, val){
-      if(val == null) return null;
-      if(typeof val === "string"){
-        return { androidId: aid, key: val, banned: false, reason: "", until: "", updatedAt: 0 };
-      }
-      return {
-        androidId: aid,
-        key: String(val.key ?? ""),
-        banned: Boolean(val.banned ?? false),
-        reason: String(val.reason ?? ""),
-        until: String(val.until ?? ""),
-        updatedAt: Number(val.updatedAt ?? 0)
-      };
-    }
+  });
+  $("#btnLogout").addEventListener("click", ()=> signOut(auth));
+  $("#btnLogoutInline").addEventListener("click", ()=> signOut(auth));
 
-    // ===== Auth flow =====
-    onAuthStateChanged(auth, async (user) => {
-      state.current = user;
-      const uid = user?.uid ?? "-";
-      badgeUid.textContent = "UID: " + uid;
+  onAuthStateChanged(auth, async (u)=>{
+    const logged = !!u;
+    $("#btnLogout").style.display = logged ? "" : "none";
+    $("#btnLogin").style.display = logged ? "none" : "";
+    $("#password").style.display = logged ? "none" : "";
+    $("#email").style.display = logged ? "none" : "";
+    appRoot.style.opacity = "1";
+    appRoot.style.pointerEvents = "auto";
 
-      if(!user){
-        hide(panel);
-        show(authCard);
-        badgeAdmin.textContent = "Admin: -";
-        badgeOwner.textContent = "Owner";
-        ownerBox.classList.add("hidden");
-        return;
-      }
-
-      // Check admin flag
-      const snap = await get(ref(db, "admins/" + uid));
-      const isAdmin = snap.exists() && snap.val() === true;
-      const isOwner = uid === OWNER_UID;
-      state.isAdmin = isAdmin || isOwner;
-      state.isOwner = isOwner;
-
-      badgeAdmin.textContent = "Admin: " + (state.isAdmin ? "true" : "false");
-      badgeOwner.classList.toggle("ok", isOwner);
-      ownerBox.classList.toggle("hidden", !isOwner);
-
-      if(!state.isAdmin){
-        alert("Akun ini bukan admin. Minta owner untuk grant di /admins.");
-        await signOut(auth);
-        return;
-      }
-
-      // Success → tampilkan panel, sembunyikan login
-      hide(authCard);
-      show(panel);
-
-      // Muat awal (tanpa tombol List)
-      clearTable();
-      state.lastKey = null;
-      await loadFirstPage();
-    });
-
-    // Login / Logout
-    btnLogin.addEventListener("click", async ()=>{
-      try{
-        btnLogin.disabled = true;
-        await signInWithEmailAndPassword(auth, emailEl.value.trim(), passEl.value.trim());
-      }catch(e){
-        console.error(e); alert("Login gagal: " + e.message);
-      }finally{ btnLogin.disabled = false; }
-    });
-    btnLogout.addEventListener("click", async ()=>{
-      await signOut(auth);
-    });
-
-    // ===== CRUD quick form =====
-    btnSave.addEventListener("click", async ()=>{
-      const aid = f_androidId.value.trim();
-      const key = f_key.value.trim();
-      const reason = f_reason.value.trim();
-      const until = f_until.value.trim();
-
-      if(!isValidKeyPath(aid)){
-        alert("Android ID tidak valid. Tidak boleh mengandung . $ # [ ] /");
-        return;
-      }
-      if(!key){
-        alert("Key wajib diisi."); return;
-      }
-      const data = {
-        key, banned: false,
-        reason: reason || "",
-        until: until || "",
-        updatedAt: Date.now()
-      };
-      try{
-        await update(ref(db, "users/" + aid), data);
-        toast("Tersimpan.");
-        // refresh row spesifik kalau ada di table
-        const row = document.querySelector(`tr[data-id="${aid}"]`);
-        if(row){ await reloadRow(aid, row); }
-        else {
-          // push ke atas
-          prependRow(aid, data);
-        }
-      }catch(e){
-        console.error(e); alert("Gagal simpan: " + e.message);
-      }
-    });
-
-    btnDelete.addEventListener("click", async ()=>{
-      const aid = f_androidId.value.trim();
-      if(!isValidKeyPath(aid)){ alert("Android ID tidak valid."); return; }
-      if(!confirm("Hapus user ini?")) return;
-      try{
-        await remove(ref(db, "users/" + aid));
-        toast("Dihapus.");
-        const row = document.querySelector(`tr[data-id="${aid}"]`);
-        if(row) row.remove();
-        checkEmpty();
-      }catch(e){ alert("Gagal hapus: " + e.message); }
-    });
-
-    // ===== Search behaviour =====
-    btnRunSearch.addEventListener("click", async ()=>{
-      await runSearch();
-    });
-    q_exact.addEventListener("keydown", (e)=>{ if(e.key === "Enter") runSearch(); });
-    q_prefix.addEventListener("keydown", (e)=>{ if(e.key === "Enter") runSearch(); });
-
-    async function runSearch(){
-      const exact = q_exact.value.trim();
-      const prefix = q_prefix.value.trim();
-
-      clearTable();
-      state.lastKey = null;
-
-      try{
-        if(exact){
-          const snap = await get(ref(db, "users/"+exact));
-          if(snap.exists()){
-            const u = normalizeUser(exact, snap.val());
-            renderRows([u]);
-          }else{
-            renderRows([]);
-          }
-          return;
-        }
-        // prefix mode
-        if(prefix){
-          const qy = query(ref(db, "users"), orderByKey(), startAt(prefix), endAt(prefix+"\uf8ff"), limitToFirst(100));
-          const snap = await get(qy);
-          const arr = [];
-          snap.forEach(ch => arr.push(normalizeUser(ch.key, ch.val())));
-          renderRows(arr);
-          return;
-        }
-        // default: first page
-        await loadFirstPage();
-      }catch(e){
-        console.error(e); alert("Gagal memuat data: " + e.message);
-      }
-    }
-
-    // ===== List paging (default) =====
-    async function loadFirstPage(){
-      await loadMore(true);
-    }
-    btnMore.addEventListener("click", ()=> loadMore(false));
-
-    async function loadMore(reset){
-      if(state.busy) return;
-      state.busy = true;
-      try{
-        let qy;
-        if(!state.lastKey){
-          qy = query(ref(db,"users"), orderByKey(), limitToFirst(50));
+    if(!u){
+      $("#badgeUid").textContent = "-";
+      $("#badgeAdmin").textContent = "false";
+      $("#badgeOwner").textContent = "false";
+      appRoot.querySelectorAll("input,button,select,textarea").forEach(el=>{
+        if(el.closest("#authBar")) return;
+        if(el.id.startsWith("btnLoadMore") || el.id.startsWith("btnSearchPrefix") || el.id==="btnClear" || el.id==="searchPrefix" || el.id==="searchExact"){
+          el.disabled = false;
         }else{
-          qy = query(ref(db,"users"), orderByKey(), startAt(state.lastKey), limitToFirst(51)); // +1 untuk skip dupe
+          el.disabled = true;
         }
-        const snap = await get(qy);
-        const arr=[];
-        let first = true;
-        snap.forEach(ch => {
-          if(state.lastKey && first){ first=false; return; } // skip duplicate
-          arr.push(normalizeUser(ch.key, ch.val()));
-        });
-        if(arr.length){
-          state.lastKey = arr[arr.length-1].androidId;
-        }
-        if(reset) clearTable();
-        renderRows(arr, true);
-      }catch(e){
-        console.error(e); alert("Gagal memuat data: " + e.message);
-      }finally{
-        state.busy = false;
-      }
-    }
-
-    // ===== Table render =====
-    function clearTable(){
+      });
       tbody.innerHTML = "";
-      rowEmpty && rowEmpty.remove();
-      checkEmpty();
+      empty.style.display = "block";
+      return;
     }
-    function checkEmpty(){
-      if(!tbody.children.length){
-        const tr = document.createElement("tr");
-        const td = document.createElement("td");
-        td.colSpan = 5; td.className = "muted"; td.textContent = "Belum ada data user yang dimuat.";
-        tr.appendChild(td); tbody.appendChild(tr);
-      }
-    }
-    function renderRows(list, append=false){
-      if(!append) clearTable();
-      if(!list || !list.length){ checkEmpty(); return; }
-      for(const u of list){
-        if(!u) continue;
-        tbody.appendChild(buildRow(u));
-      }
-    }
-    function prependRow(aid, raw){
-      const u = normalizeUser(aid, raw);
-      const tr = buildRow(u);
-      tbody.prepend(tr);
-    }
-    function buildRow(u){
-      const tr = document.createElement("tr");
-      tr.dataset.id = u.androidId;
-      tr.innerHTML = `
-        <td class="nowrap"><strong>${u.androidId}</strong></td>
-        <td><input data-k="key" value="${escapeHtml(u.key)}" /></td>
-        <td>
-          <select data-k="banned">
-            <option value="false" ${!u.banned?"selected":""}>false</option>
-            <option value="true"  ${u.banned?"selected":""}>true</option>
-          </select>
-          <div class="row" style="gap:6px;margin-top:6px">
-            <input data-k="until" placeholder="dd-mm-yyyy / epoch" value="${escapeHtml(u.until||"")}" />
-            <input data-k="reason" placeholder="reason" value="${escapeHtml(u.reason||"")}" />
-          </div>
-        </td>
-        <td class="muted">${fmtTime(u.updatedAt)}</td>
-        <td class="t-actions">
-          <button data-act="save" class="btn-ok">Save</button>
-          <button data-act="del"  class="btn-err">Del</button>
-        </td>
-      `;
-      tr.querySelector('[data-act="save"]').addEventListener("click", async ()=>{
-        await saveRow(tr);
-      });
-      tr.querySelector('[data-act="del"]').addEventListener("click", async ()=>{
-        if(confirm("Hapus user ini?")){
-          await remove(ref(db, "users/"+u.androidId));
-          tr.remove(); checkEmpty();
-        }
-      });
-      return tr;
-    }
+    // Logged in
+    $("#badgeUid").textContent = u.uid;
+    $("#ownerUidTxt").textContent = OWNER_UID;
+    $("#btnLogoutInline").style.display = "";
+    const owner = u.uid === OWNER_UID;
+    $("#badgeOwner").textContent = owner ? "true":"false";
 
-    async function saveRow(tr){
-      const aid = tr.dataset.id;
-      const key = tr.querySelector('[data-k="key"]').value.trim();
-      const banned = tr.querySelector('[data-k="banned"]').value === "true";
-      const until = tr.querySelector('[data-k="until"]').value.trim();
-      const reason = tr.querySelector('[data-k="reason"]').value.trim();
-      const data = { key, banned, until, reason, updatedAt: Date.now() };
-      await update(ref(db, "users/"+aid), data);
-      await reloadRow(aid, tr);
-      toast("Tersimpan.");
+    // check admin flag
+    let isAdmin = false;
+    try{
+      const snap = await get(child(ref(db), "admins/" + u.uid));
+      isAdmin = (snap.exists() && snap.val() === true) || owner;
+    }catch(e){
+      console.warn(e);
     }
+    $("#badgeAdmin").textContent = isAdmin ? "true":"false";
 
-    async function reloadRow(aid, tr){
-      const snap = await get(ref(db, "users/"+aid));
-      if(!snap.exists()){ tr.remove(); checkEmpty(); return; }
-      const u = normalizeUser(aid, snap.val());
-      // patch
-      tr.querySelector('[data-k="key"]').value = u.key;
-      tr.querySelector('[data-k="banned"]').value = String(u.banned);
-      tr.querySelector('[data-k="until"]').value = u.until || "";
-      tr.querySelector('[data-k="reason"]').value = u.reason || "";
-      tr.children[3].textContent = fmtTime(u.updatedAt);
-    }
-
-    // ===== Admin management (Owner only) =====
-    btnGrant.addEventListener("click", async ()=>{
-      if(!state.isOwner){ alert("Hanya owner."); return; }
-      const id = adm_uid.value.trim();
-      if(!id){ alert("UID kosong"); return; }
-      await set(ref(db,"admins/"+id), true);
-      alert("Granted.");
+    // Enable/disable write controls
+    appRoot.querySelectorAll("input,button,select,textarea").forEach(el=>{
+      if(el.closest("#authBar")) return;
+      el.disabled = false;
     });
-    btnRevoke.addEventListener("click", async ()=>{
-      if(!state.isOwner){ alert("Hanya owner."); return; }
-      const id = adm_uid.value.trim();
-      if(!id){ alert("UID kosong"); return; }
-      await remove(ref(db,"admins/"+id));
-      alert("Revoked.");
-    });
-
-    // ===== Utils =====
-    function escapeHtml(s){ return s.replace(/[&<>"']/g, m=>({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[m])); }
-    function toast(msg){
-      const el = document.createElement("div");
-      el.textContent = msg;
-      el.style.position="fixed"; el.style.left="50%"; el.style.bottom="16px"; el.style.transform="translateX(-50%)";
-      el.style.background="var(--pri)"; el.style.border="1px solid var(--pri-700)"; el.style.color="#fff";
-      el.style.padding="10px 14px"; el.style.borderRadius="10px"; el.style.zIndex="9999";
-      document.body.appendChild(el);
-      setTimeout(()=> el.remove(), 1400);
+    if(!isAdmin){
+      document.querySelectorAll(".btn-danger,.btn-success").forEach(b=> b.disabled=true);
+      showToast("Kamu belum admin. Minta owner untuk grant.");
     }
-  </script>
+    // Load first page
+    state.prefix = "";
+    state.lastKey = null;
+    tbody.innerHTML = "";
+    await loadPage();
+  });
+
+  // === Data ops ===
+  const state = { prefix:"", lastKey:null, pageSize: 20 };
+
+  async function loadPage(reset=false){
+    $("#btnLoadMore").disabled = true;
+    try{
+      let q;
+      if(state.prefix){
+        const startAtKey = state.lastKey ? state.lastKey : state.prefix;
+        q = query(ref(db, "users"), orderByKey(), startAt(startAtKey), endAt(state.prefix + "\uf8ff"), limitToFirst(state.pageSize + 1));
+      }else{
+        const startAtKey = state.lastKey || "";
+        q = query(ref(db, "users"), orderByKey(), startAt(startAtKey), limitToFirst(state.pageSize + 1));
+      }
+      const snap = await get(q);
+      const obj = snap.val() || {};
+      const keys = Object.keys(obj);
+      if(state.lastKey && keys.length>0 && keys[0]===state.lastKey){
+        keys.shift();
+      }
+      keys.forEach(k=> renderRow(k, obj[k]));
+      state.lastKey = keys.length ? keys[keys.length-1] : state.lastKey;
+      empty.style.display = tbody.children.length ? "none":"block";
+      $("#btnLoadMore").disabled = keys.length < state.pageSize;
+    }catch(e){
+      console.error(e); showToast("Gagal memuat data.");
+      $("#btnLoadMore").disabled = false;
+    }
+  }
+
+  function renderRow(aid, data){
+    const tr = document.createElement("tr");
+    tr.className = "row-card";
+    const d = normalizeData(data);
+    tr.innerHTML = `
+      <td><div class="kbd" style="display:inline-block">${escapeHtml(aid)}</div></td>
+      <td><input data-k="key" value="${escapeHtml(str(d.key))}" /></td>
+      <td>
+        <select data-k="banned">
+          <option value="false" ${d.banned? "":"selected"}>false</option>
+          <option value="true"  ${d.banned? "selected":""}>true</option>
+        </select>
+      </td>
+      <td><input data-k="until" value="${escapeHtml(str(d.until))}" placeholder="dd-mm-yyyy / epoch"></td>
+      <td><input data-k="reason" value="${escapeHtml(str(d.reason))}" placeholder="reason"></td>
+      <td class="td-actions">
+        <button class="btn btn-success">Save</button>
+        <button class="btn btn-danger">Del</button>
+      </td>
+    `;
+    const [saveBtn, delBtn] = tr.querySelectorAll(".td-actions .btn");
+    saveBtn.addEventListener("click", ()=> saveRow(aid, tr));
+    delBtn.addEventListener("click", ()=> deleteRow(aid, tr));
+    tbody.appendChild(tr);
+  }
+
+  function normalizeData(v){
+    if(typeof v === "string"){ return { key:v, banned:false, until:"", reason:"", updatedAt: Date.now() }; }
+    if(!v || typeof v !== "object"){ return { key:"", banned:false, until:"", reason:"", updatedAt: Date.now() }; }
+    return { key: v.key ?? "", banned: !!v.banned, until: v.until ?? "", reason: v.reason ?? "", updatedAt: v.updatedAt ?? Date.now() };
+  }
+
+  function readRowInputs(tr){
+    const obj = {};
+    tr.querySelectorAll("input,select").forEach(el=>{
+      const k = el.getAttribute("data-k");
+      if(!k) return;
+      let val = el.value;
+      if(k==="banned") val = (val === "true");
+      obj[k] = val;
+    });
+    obj.updatedAt = Date.now();
+    return obj;
+  }
+
+  async function saveRow(aid, tr){
+    const data = readRowInputs(tr);
+    if(!data.key){ return showToast("Key wajib."); }
+    try{
+      await set(ref(db, "users/"+aid), data);
+      showToast("Tersimpan.");
+    }catch(e){
+      console.error(e); showToast("Gagal menyimpan: " + (e.code||e.message));
+    }
+  }
+  async function deleteRow(aid, tr){
+    if(!confirm("Hapus user "+aid+" ?")) return;
+    try{
+      await remove(ref(db, "users/"+aid));
+      tr.remove();
+      empty.style.display = tbody.children.length ? "none":"block";
+      showToast("Dihapus.");
+    }catch(e){
+      console.error(e); showToast("Gagal hapus: " + (e.code||e.message));
+    }
+  }
+
+  // Add/Edit form handlers
+  $("#btnSave").addEventListener("click", async ()=>{
+    const aid = $("#fAndroidId").value.trim();
+    const key = $("#fKey").value.trim();
+    const until = $("#fUntil").value.trim();
+    const reason = $("#fReason").value.trim();
+    if(!aid || !key) return showToast("Android ID & Key wajib.");
+    try{
+      await set(ref(db, "users/"+aid), { key, banned:false, until, reason, updatedAt:Date.now() });
+      showToast("Tersimpan.");
+      prependOrRefresh(aid, { key, banned:false, until, reason, updatedAt:Date.now() });
+    }catch(e){
+      console.error(e); showToast("Gagal menyimpan: " + (e.code||e.message));
+    }
+  });
+  $("#btnDelete").addEventListener("click", async ()=>{
+    const aid = $("#fAndroidId").value.trim();
+    if(!aid) return showToast("Isi Android ID dulu.");
+    if(!confirm("Hapus user "+aid+" ?")) return;
+    try{
+      await remove(ref(db, "users/"+aid));
+      showToast("Dihapus.");
+      [...tbody.children].forEach(tr=>{
+        const id = tr.querySelector(".kbd")?.textContent.trim();
+        if(id===aid) tr.remove();
+      });
+      empty.style.display = tbody.children.length ? "none":"block";
+    }catch(e){
+      console.error(e); showToast("Gagal hapus: " + (e.code||e.message));
+    }
+  });
+
+  function prependOrRefresh(aid, data){
+    let found = null;
+    [...tbody.children].forEach(tr=>{
+      const id = tr.querySelector(".kbd")?.textContent.trim();
+      if(id===aid) found = tr;
+    });
+    if(found){
+      found.querySelector('input[data-k="key"]').value = data.key;
+      found.querySelector('select[data-k="banned"]').value = data.banned ? "true":"false";
+      found.querySelector('input[data-k="until"]').value = str(data.until);
+      found.querySelector('input[data-k="reason"]').value = str(data.reason);
+    }else{
+      renderRow(aid, data);
+    }
+    empty.style.display = tbody.children.length ? "none":"block";
+  }
+
+  // Search exact
+  $("#searchExact").addEventListener("keydown", async (e)=>{
+    if(e.key !== "Enter") return;
+    const aid = $("#searchExact").value.trim();
+    if(!aid) return;
+    try{
+      const snap = await get(child(ref(db), "users/"+aid));
+      const val = snap.val();
+      tbody.innerHTML = "";
+      state.lastKey = null;
+      if(val === null){
+        empty.style.display = "block";
+      }else{
+        renderRow(aid, val);
+        empty.style.display = "none";
+      }
+    }catch(e){
+      console.error(e); showToast("Gagal cari.");
+    }
+  });
+
+  // Search prefix
+  $("#btnSearchPrefix").addEventListener("click", ()=>{
+    state.prefix = $("#searchPrefix").value.trim();
+    state.lastKey = null;
+    tbody.innerHTML = "";
+    loadPage(true);
+  });
+  $("#btnClear").addEventListener("click", ()=>{
+    $("#searchPrefix").value = "";
+    $("#searchExact").value = "";
+    state.prefix = "";
+    state.lastKey = null;
+    tbody.innerHTML = "";
+    loadPage(true);
+  });
+  $("#btnLoadMore").addEventListener("click", ()=> loadPage());
+
+  // Admin management (owner only)
+  $("#btnGrant").addEventListener("click", async ()=>{
+    if(!auth.currentUser || auth.currentUser.uid !== OWNER_UID) return showToast("Hanya owner.");
+    const id = $("#admUid").value.trim(); if(!id) return;
+    await set(ref(db, "admins/"+id), true);
+    showToast("Granted.");
+  });
+  $("#btnRevoke").addEventListener("click", async ()=>{
+    if(!auth.currentUser || auth.currentUser.uid !== OWNER_UID) return showToast("Hanya owner.");
+    const id = $("#admUid").value.trim(); if(!id) return;
+    await remove(ref(db, "admins/"+id));
+    showToast("Revoked.");
+  });
+
+  // Utils
+  function escapeHtml(s){
+    return String(s).replace(/[&<>"']/g, m=> ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+  }
+</script>
 </body>
 </html>
