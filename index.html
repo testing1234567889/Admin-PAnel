@@ -2,213 +2,224 @@
 <html lang="id">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>GxMods Admin Panel</title>
   <style>
-    :root {
-      --bg: #0e1116;
-      --card: #111722;
-      --muted: #1a2230;
-      --muted-2: #0f1a28;
-      --stroke: #243248;
-      --text: #e6eefc;
-      --sub: #9fb3d1;
-      --accent: #4da3ff;
-      --accent-2: #2f7fde;
-      --danger: #ff5f66;
-      --ok: #2ec27e;
-      --warn: #ffb020;
-      --chip: rgba(77,163,255,.14);
-      --shadow: 0 8px 24px rgba(0,0,0,.35);
-      --radius: 14px;
-      --radius-sm: 10px;
+    :root{
+      --bg:#0f141a;
+      --card:#161b22;
+      --muted:#a3b1c6;
+      --text:#e6edf3;
+      --primary:#1f6feb;
+      --primary-2:#1a5ccc;
+      --danger:#ef5350;
+      --success:#2eb872;
+      --chip:#0b1620;
+      --stroke:#263041;
     }
-    * { box-sizing: border-box; }
-    html,body { margin:0; height:100%; background:var(--bg); color:var(--text); font: 14px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Inter, Ubuntu, Cantarell, 'Noto Sans', sans-serif;}
-    a { color: var(--accent); text-decoration: none;}
-    .wrap { max-width: 1180px; margin: 28px auto; padding: 0 16px; }
-    header.card { display:flex; gap:10px; align-items:center; justify-content:space-between; padding:16px; }
-    .card {
-      background: linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.0)) , var(--card);
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      background:var(--bg);
+      color:var(--text);
+    }
+    .wrap{max-width:1220px; margin:28px auto; padding:0 16px;}
+    .row{display:grid; grid-template-columns: 1fr; gap:16px;}
+    @media (min-width: 980px){
+      .row{grid-template-columns: 1fr 1fr;}
+    }
+    .card{
+      background:linear-gradient(180deg, rgba(45,62,80,.35), rgba(22,27,34,.75));
       border:1px solid var(--stroke);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
+      border-radius:14px;
+      padding:18px;
+      box-shadow: 0 6px 22px rgba(0,0,0,.35);
     }
-    .pill { display:inline-flex; align-items:center; gap:8px; background: var(--chip); padding:8px 12px; border-radius: 999px; color: var(--text); border:1px solid var(--stroke); }
-    .row { display:flex; gap:12px; align-items:center; }
-    .grow { flex:1; }
-    .muted { color: var(--sub); }
-    .bad { background: rgba(255,95,102,.15); border-color: #70333a; }
-    .good { background: rgba(46,194,126,.16); border-color: #2c6a53; }
-    .btn {
-      background: var(--accent);
-      color: white;
-      border: 1px solid var(--accent-2);
-      border-radius: 11px; padding: 10px 16px; cursor:pointer;
-      transition: transform .06s ease, box-shadow .06s ease, background .2s ease;
-      box-shadow: 0 4px 14px rgba(77,163,255,.25);
-      user-select:none;
+    h1{font-size:18px; margin:0 0 10px 0}
+    .toolbar{
+      display:flex; gap:10px; align-items:center; flex-wrap:wrap;
+      background:var(--card); border:1px solid var(--stroke);
+      border-radius:16px; padding:12px 14px; margin-bottom:16px;
     }
-    .btn:hover { transform: translateY(-1px); }
-    .btn:disabled { opacity:.55; cursor:not-allowed; transform:none; }
-    .btn.alt { background: transparent; color: var(--text); border-color: var(--stroke); }
-    .btn.bad { background: var(--danger); border-color: #b33a41; box-shadow: 0 6px 16px rgba(255,95,102,.25); }
-    .btn.good { background: var(--ok); border-color: #1b8a5e; box-shadow: 0 6px 16px rgba(46,194,126,.25); color:#0a1610;}
-    .btn.small { padding:8px 12px; border-radius:10px; }
-    .btn.ghost { background: transparent; color: var(--text); border: 1px dashed var(--stroke); }
-    input, select, textarea {
-      width:100%; background: var(--muted); border:1px solid var(--stroke); color: var(--text);
-      padding: 12px 14px; border-radius: 12px; outline:none;
+    .chip{
+      background:var(--chip);
+      border:1px solid var(--stroke);
+      color:var(--text);
+      border-radius:999px; padding:8px 12px; font-size:13px;
     }
-    textarea { min-height: 86px; resize: vertical; }
-    label { display:block; margin: 10px 0 6px; color: var(--sub); }
-    .grid { display:grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-    .grid > .card { padding:18px; }
-    .hidden { display:none !important; }
-    .table {
-      width:100%; border-collapse: collapse; font-size: 13px;
+    .chip.k{background:#10233a}
+    .muted{color:var(--muted)}
+    .row2{display:grid; grid-template-columns:1fr 1fr; gap:8px}
+    .field{display:flex; gap:8px; align-items:center}
+    .field input, .field select, .field textarea{
+      width:100%;
+      background:#0b1620;
+      border:1px solid var(--stroke);
+      color:var(--text);
+      border-radius:12px;
+      padding:12px 12px;
+      font-size:14px;
+      outline:none;
     }
-    .table thead th { text-align:left; color: var(--sub); border-bottom:1px solid var(--stroke); padding: 10px 8px; position: sticky; top:0; background: var(--card); }
-    .table tbody td { border-bottom:1px solid var(--muted-2); padding:10px 8px; color: var(--text); }
-    .table tr:hover td { background: #0f1a23; }
-    .table input[type=checkbox] { width:18px; height:18px; }
-    .toolbar { padding:12px; border-top:1px solid var(--stroke); display:flex; gap:10px; justify-content:flex-end; background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,0)); border-radius: 0 0 var(--radius) var(--radius);}
-    .stack { display:flex; gap:10px; flex-wrap: wrap; align-items:center; }
-    .chip { font-size:12px; padding:6px 10px; border-radius:999px; border:1px solid var(--stroke); background: var(--chip); color: var(--text); }
-    .note { background: #0f1623; border:1px dashed var(--stroke); padding:12px; border-radius: 10px; color: var(--sub); }
-    .kbar { display:flex; gap:8px; align-items:center; padding:12px; border-radius: var(--radius); background: var(--muted-2); border:1px solid var(--stroke); }
-    .kbar input { background: transparent; border: none; flex:1; padding: 10px 12px; }
-    .right { text-align:right; }
-    .footer { margin-top: 18px; text-align:center; color: var(--sub); }
-    @media (max-width: 980px){
-      .grid { grid-template-columns: 1fr; }
-      header.card { flex-direction: column; align-items: stretch; gap: 12px; }
-      .toolbar { position: sticky; bottom: 0; z-index: 3; }
+    textarea{min-height:96px; resize:vertical}
+    .btn{
+      border-radius:12px;
+      border:1px solid var(--stroke);
+      padding:10px 14px;
+      font-size:14px; color:var(--text); background:#0b1620;
+      cursor:pointer; transition:.15s;
     }
+    .btn:hover{transform:translateY(-1px);}
+    .btn.primary{background:var(--primary); border-color:var(--primary-2)}
+    .btn.success{background:var(--success); border-color:#1a7a54}
+    .btn.danger{background:var(--danger); border-color:#c62828}
+    .btn.ghost{background:transparent}
+    .btn.small{padding:8px 10px; font-size:13px; border-radius:10px}
+    .grid-2{display:grid; grid-template-columns: 1fr auto; gap:8px; align-items:center}
+    .right{margin-left:auto}
+    .table-wrap{border:1px solid var(--stroke); border-radius:12px; overflow:auto; background:#0b1620}
+    table{width:100%; border-collapse:collapse; min-width:760px}
+    thead th{
+      position:sticky; top:0; z-index:2;
+      background:#0f2238; color:#bcd2f7; text-align:left; font-weight:600; font-size:13px;
+      border-bottom:1px solid var(--stroke);
+      padding:12px 10px;
+    }
+    tbody td{
+      border-bottom:1px solid #182334;
+      padding:10px; font-size:14px; color:#dbe7ff;
+    }
+    tbody tr:hover{background:#112030}
+    .row-actions{display:flex; gap:10px; flex-wrap:wrap; padding:10px 0}
+    .help{font-size:12.5px; color:#9fb0c7}
+    .hidden{display:none !important}
+    .pill{border-radius:999px; padding:6px 10px; font-size:12px; border:1px solid var(--stroke);}
+    .pill.true{background:#103b22; color:#b1ffd3; border-color:#1e7247}
+    .pill.false{background:#3b1010; color:#ffd1d1; border-color:#7a2424}
+    .flex{display:flex; gap:8px; align-items:center; flex-wrap:wrap}
+    .grow{flex:1}
   </style>
 </head>
 <body>
   <div class="wrap">
-    <header class="card" id="topBar">
-      <div class="stack">
-        <span class="pill" id="uidChip">UID: <b class="muted">-</b></span>
-        <span class="pill good" id="adminChip" title="Memiliki akses tulis">Admin: <b id="adminState">false</b></span>
-        <span class="pill" id="ownerChip">Owner: <b id="ownerState">false</b></span>
+    <div class="toolbar" id="topbar">
+      <span class="chip">UID: <b id="uidChip" class="muted">-</b></span>
+      <span class="chip">Admin: <b id="adminChip" class="muted">false</b></span>
+      <span class="chip">Owner: <b id="ownerChip" class="muted">false</b></span>
+
+      <div class="flex right" id="loginPanel">
+        <input id="emailInput" placeholder="email admin" class="chip k" />
+        <input id="passInput" placeholder="password" type="password" class="chip k" />
+        <button class="btn primary" id="loginBtn">Login</button>
       </div>
-      <div class="row grow" id="authBar">
-        <input id="authEmail" placeholder="email admin" autocomplete="username" />
-        <input id="authPass" placeholder="password" type="password" autocomplete="current-password" />
-        <button class="btn" id="loginBtn">Login</button>
-        <button class="btn alt" id="logoutBtn">Logout</button>
+      <div class="flex right hidden" id="logoutPanel">
+        <button class="btn ghost" id="logoutBtn">Logout</button>
       </div>
-    </header>
-
-    <div class="grid">
-      <!-- LEFT: editor -->
-      <section class="card">
-        <h3 style="margin:0 0 10px">Add / Edit User</h3>
-        <div>
-          <label>Android ID</label>
-          <div class="row">
-            <input id="f_id" placeholder="contoh: a1b2c3d4e5f6abcd" />
-            <button class="btn small alt" id="copyIdBtn" title="Salin ID yang sedang diisi">Copy</button>
-          </div>
-
-          <label>Key</label>
-          <div class="row">
-            <input id="f_key" placeholder="ZXCV-9999-PAID" />
-            <button class="btn small alt" id="genKeyBtn">Generate</button>
-            <button class="btn small alt" id="copyKeyBtn">Copy</button>
-          </div>
-
-          <div class="row">
-            <div class="grow">
-              <label>Banned</label>
-              <select id="f_banned">
-                <option value="false">false</option>
-                <option value="true">true</option>
-              </select>
-            </div>
-            <div class="grow">
-              <label>Until (dd-MM-yyyy atau epoch/ms, kosongkan jika tidak)</label>
-              <input id="f_until" placeholder="25-12-2025 atau 1738510000000" />
-            </div>
-          </div>
-
-          <label>Reason (opsional)</label>
-          <textarea id="f_reason" placeholder="opsional"></textarea>
-
-          <div class="row" style="margin-top:12px">
-            <button class="btn" id="saveBtn">Create / Overwrite</button>
-            <button class="btn alt" id="resetBtn">Reset</button>
-          </div>
-
-          <div class="note" style="margin-top:14px">
-            <b>Kompatibilitas GxMods:</b> Panel menulis ke <code>/users/{androidId}</code> dalam <i>format objek</i>.
-            Dialog Android-mu tetap bisa membaca jika suatu node tersimpan sebagai <i>string</i> (nilai = key).
-            Panel ini otomatis menampilkan keduanya.
-          </div>
-        </div>
-      </section>
-
-      <!-- RIGHT: list -->
-      <section class="card">
-        <div class="row" style="justify-content:space-between">
-          <h3 style="margin:0">Users List</h3>
-          <div class="row">
-            <button class="btn small alt" id="btnAll">List (100)</button>
-            <button class="btn small alt" id="btnBanned">List Banned</button>
-          </div>
-        </div>
-
-        <div class="kbar" style="margin-top:10px">
-          <span class="muted">Cari prefix Android</span>
-          <input id="searchPrefix" placeholder="mis. a1b2" />
-          <button class="btn small alt" id="btnSearchPrefix">Search Prefix</button>
-          <button class="btn small alt" id="btnClearPrefix">Clear</button>
-        </div>
-
-        <div style="overflow:auto; max-height: 52vh; margin-top: 10px;" id="tableWrap">
-          <table class="table" id="usersTable">
-            <thead>
-              <tr>
-                <th style="width:40px">Sel</th>
-                <th>Android ID</th>
-                <th>Key</th>
-                <th class="right">Banned</th>
-                <th>Until</th>
-                <th>Updated</th>
-              </tr>
-            </thead>
-            <tbody id="tbody">
-              <tr><td colspan="6" class="muted">Belum ada data user yang dimuat.</td></tr>
-            </tbody>
-          </table>
-        </div>
-        <div class="row" style="margin-top:10px; justify-content:flex-start">
-          <button class="btn small alt" id="prevBtn">Prev</button>
-          <button class="btn small alt" id="nextBtn">Next</button>
-        </div>
-
-        <div class="toolbar">
-          <button class="btn bad" id="banSelBtn">Ban Selected</button>
-          <button class="btn good" id="unbanSelBtn">Unban Selected</button>
-          <button class="btn bad alt" id="delSelBtn">Delete Selected</button>
-        </div>
-      </section>
     </div>
 
-    <p class="footer">© GxMods Admin Panel — Firebase Realtime Database</p>
+    <div class="row">
+      <!-- Add / Edit -->
+      <div class="card">
+        <h1>Add / Edit User</h1>
+        <div class="field">
+          <label style="width:120px">Android ID</label>
+          <input id="f_id" placeholder="contoh: a1b2c3d4e5f6abcd" />
+          <button class="btn small" id="btnCopyId">Copy</button>
+        </div>
+        <div class="field" style="margin-top:8px">
+          <label style="width:120px">Key</label>
+          <input id="f_key" placeholder="ZXCV-9999-PAID" />
+          <div class="flex">
+            <button class="btn small" id="btnGenKey">Generate</button>
+            <button class="btn small" id="btnCopyKey">Copy</button>
+          </div>
+        </div>
+        <div class="field" style="margin-top:8px">
+          <label style="width:120px">Banned</label>
+          <select id="f_banned">
+            <option value="false">false</option>
+            <option value="true">true</option>
+          </select>
+        </div>
+        <div class="field" style="margin-top:8px">
+          <label style="width:120px">Until</label>
+          <input id="f_until" placeholder="dd-MM-yyyy atau epoch/ms, kosongkan jika tidak" />
+        </div>
+        <div class="field" style="margin-top:8px">
+          <label style="width:120px">Reason</label>
+          <textarea id="f_reason" placeholder="opsional"></textarea>
+        </div>
+        <div class="row-actions">
+          <button class="btn primary" id="btnCreate">Create / Overwrite</button>
+          <button class="btn" id="btnReset">Reset</button>
+        </div>
+        <div class="help">Kompat: bila node <code>/users/{androidId}</code> berupa <b>string</b>, panel tetap menampilkan (sebagai <i>key</i>). Saat menyimpan, panel menulis <b>object</b> lengkap.</div>
+      </div>
+
+      <!-- Users List -->
+      <div class="card">
+        <h1>Users List</h1>
+        <div class="flex" style="margin-bottom:10px">
+          <button class="btn small" id="btnList">List (100)</button>
+          <button class="btn small" id="btnListBanned">List Banned</button>
+          <span class="grow"></span>
+          <input id="searchPrefix" placeholder="Cari prefix Android (mis. a1b2)" class="chip k grow" />
+          <button class="btn small" id="btnSearchPrefix">Search Prefix</button>
+          <button class="btn small" id="btnClear">Clear</button>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th style="width:48px">Sel</th>
+                <th>Android ID</th>
+                <th>Key</th>
+                <th style="width:100px">Banned</th>
+                <th>Until</th>
+                <th style="width:160px">Updated</th>
+              </tr>
+            </thead>
+            <tbody id="tbody"></tbody>
+          </table>
+        </div>
+
+        <div class="row-actions">
+          <button class="btn small" id="btnPrev">Prev</button>
+          <button class="btn small" id="btnNext">Next</button>
+          <span class="grow"></span>
+          <button class="btn danger" id="btnBanSel">Ban Selected</button>
+          <button class="btn success" id="btnUnbanSel">Unban Selected</button>
+          <button class="btn danger" id="btnDeleteSel">Delete Selected</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:16px">
+      <h1>Kelola Admin (Owner only)</h1>
+      <div class="flex">
+        <input id="adm_uid" placeholder="UID Firebase" class="chip k grow" />
+        <button class="btn small" id="btnGrant">Grant Admin</button>
+        <button class="btn small danger" id="btnRevoke">Revoke Admin</button>
+      </div>
+      <div class="help" style="margin-top:8px">Owner: <code>SjEQCMqzEMb2PQclx8Iidde3reA3</code>. Hanya owner yang bisa ubah daftar admin.</div>
+    </div>
+
+    <div class="help" id="toast" style="margin-top:12px"></div>
   </div>
 
   <script type="module">
-    // ===== Firebase CDN (v10) =====
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
-    import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-analytics.js";
-    import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
-    import { getDatabase, ref, get, child, set, update, remove, query, orderByKey, orderByChild, equalTo, startAt, endAt, limitToFirst } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-database.js";
+    // ===== Firebase SDK (v10) via CDN =====
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import {
+      getDatabase, ref, child, get, set, update, remove, query,
+      orderByKey, startAt, endAt, limitToFirst, orderByChild, equalTo
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
-    // ===== Config (punyamu) =====
+    // ====== CONFIG: sesuaikan punyamu di sini ======
     const firebaseConfig = {
       apiKey: "AIzaSyBpsA9-X9ckiyz2erxurJdLOzv-Deoi7R0",
       authDomain: "animeplay-738a4.firebaseapp.com",
@@ -222,275 +233,350 @@
     const OWNER_UID = "SjEQCMqzEMb2PQclx8Iidde3reA3";
 
     const app = initializeApp(firebaseConfig);
-    try { getAnalytics(app); } catch (e) { /* ignore if blocked */ }
     const auth = getAuth(app);
     const db = getDatabase(app);
 
-    // ===== el helper =====
-    const $ = (q) => document.querySelector(q);
-    const uidChip = $("#uidChip b");
-    const adminChip = $("#adminChip"); const adminState = $("#adminState");
-    const ownerChip = $("#ownerChip"); const ownerState = $("#ownerState");
-    const authBar = $("#authBar");
-    const loginBtn = $("#loginBtn");
-    const logoutBtn = $("#logoutBtn");
-
-    function toast(msg){
-      console.log(msg);
-      try { alert(msg); } catch (e){}
-    }
-    function fmtDate(ms){
-      if (!ms) return "";
-      if (typeof ms === "string" && ms.includes("-")) return ms; // already dd-MM-yyyy
-      const d = new Date(+ms);
-      const two = (n)=> (n<10?"0":"")+n;
-      return two(d.getDate())+"-"+two(d.getMonth()+1)+"-"+d.getFullYear()+" "+two(d.getHours())+":"+two(d.getMinutes());
-    }
-    function keyFromString(){
-      const a = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-      const part = (n)=> Array.from({length:n},()=>a[Math.floor(Math.random()*a.length)]).join("");
-      return "ZXCV-"+part(4)+"-"+part(4);
-    }
-    function setHidden(el, hide){ el.classList.toggle("hidden", !!hide); }
-    function clearTable(msg="Belum ada data user yang dimuat."){
-      $("#tbody").innerHTML = '<tr><td colspan="6" class="muted">'+msg+'</td></tr>';
-    }
-
-    // ===== auth wiring =====
-    loginBtn.onclick = async () => {
-      const email = $("#authEmail").value.trim();
-      const pass = $("#authPass").value;
-      if(!email || !pass) return toast("Isi email & password.");
-      try {
-        await signInWithEmailAndPassword(auth, email, pass);
-      } catch (e){
-        toast("Login gagal: "+e.code);
-      }
-    };
-    logoutBtn.onclick = ()=> signOut(auth);
-
-    // state & admin check
-    let state = {
-      uid: null,
+    // ====== STATE ======
+    const STATE = {
+      authUser: null,
       isAdmin: false,
       isOwner: false,
+      pageMode: "all",   // all | search | banned
+      prefix: "",
+      pageSize: 100,
+      cursor: null,
+      prevStack: [],
+      selection: new Set(),
+      cachedBanned: null,
     };
 
-    async function refreshBadges(){
-      uidChip.textContent = state.uid || "-";
-      adminState.textContent = state.isAdmin ? "true" : "false";
-      ownerState.textContent = state.isOwner ? "true" : "false";
-      adminChip.classList.toggle("good", state.isAdmin);
-      ownerChip.classList.toggle("good", state.isOwner);
+    // ====== UI helpers ======
+    const $ = (sel)=>document.querySelector(sel);
+    const $$ = (sel)=>document.querySelectorAll(sel);
+    function toast(msg, isErr=false){
+      const el = $("#toast");
+      el.textContent = msg || "";
+      el.style.color = isErr ? "#ff9b9b" : "#9fb0c7";
     }
-
-    async function readAdmin(uid){
-      try {
-        const snap = await get(ref(db, "admins/"+uid));
-        return snap.exists() && snap.val() === true;
-      }catch(e){ return false; }
+    function setChips(){
+      $("#uidChip").textContent  = STATE.authUser ? STATE.authUser.uid : "-";
+      $("#adminChip").textContent = String(STATE.isAdmin);
+      $("#ownerChip").textContent = String(STATE.isOwner);
     }
-
-    onAuthStateChanged(auth, async (user) => {
-      state.uid = user?.uid || null;
-      state.isOwner = (state.uid === OWNER_UID);
-      state.isAdmin = state.uid ? await readAdmin(state.uid) : false;
-
-      // UI: hide auth when logged-in; show otherwise
-      setHidden(authBar, !!user);
-
-      await refreshBadges();
-
-      // after login, load first page (even jika bukan admin: read tetap boleh)
-      loadMode = "all";
-      prefixFilter = "";
-      pagination.reset();
-      await loadTable();
-    });
-
-    // ===== editor wiring =====
-    $("#genKeyBtn").onclick = ()=> $("#f_key").value = keyFromString();
-    $("#copyIdBtn").onclick = ()=> navigator.clipboard.writeText($("#f_id").value||"");
-    $("#copyKeyBtn").onclick = ()=> navigator.clipboard.writeText($("#f_key").value||"");
-    $("#resetBtn").onclick = ()=>{ $("#f_id").value=""; $("#f_key").value=""; $("#f_banned").value="false"; $("#f_until").value=""; $("#f_reason").value=""; };
-
-    $("#saveBtn").onclick = async ()=>{
-      if(!state.isAdmin){ return toast("Akses ditolak. Akun ini bukan admin."); }
-      const id = $("#f_id").value.trim();
-      const key = $("#f_key").value.trim();
-      if(!id || !key) return toast("Android ID & Key wajib diisi.");
-      const banned = $("#f_banned").value === "true";
-      const until = $("#f_until").value.trim();
-      const reason = $("#f_reason").value.trim();
-
-      const payload = { key, banned };
-      if (until) payload.until = /^\d+$/.test(until) ? Number(until) : until;
-      if (reason) payload.reason = reason;
-      payload.updatedAt = Date.now();
-
+    function toggleAuthUI(){
+      const logged = !!STATE.authUser;
+      $("#loginPanel").classList.toggle("hidden", logged);
+      $("#logoutPanel").classList.toggle("hidden", !logged);
+    }
+    function fmtTime(ms){
+      if(!ms) return "";
       try{
-        await set(ref(db, "users/"+id), payload);
-        toast("Tersimpan.");
-        pagination.reset(); // kembali ke page awal
-        await loadTable();
-      }catch(e){
-        toast("Gagal simpan: "+e.code);
-      }
-    };
-
-    // ===== list & actions =====
-    const tbody = $("#tbody");
-    let loadMode = "all"; // 'all' | 'banned' | 'prefix'
-    let prefixFilter = "";
-    const PAGE = 100;
-    const pagination = {
-      lastKey: null,
-      firstKey: null,
-      dir: "fwd",
-      reset(){ this.lastKey = null; this.firstKey = null; this.dir="fwd"; }
-    };
-
-    $("#btnAll").onclick = async ()=>{ loadMode="all"; prefixFilter=""; pagination.reset(); await loadTable(); };
-    $("#btnBanned").onclick = async ()=>{ loadMode="banned"; prefixFilter=""; pagination.reset(); await loadTable(); };
-    $("#btnSearchPrefix").onclick = async ()=>{
-      const p = $("#searchPrefix").value.trim();
-      if(!p) return toast("Isi prefix Android ID."); 
-      loadMode="prefix"; prefixFilter=p; pagination.reset(); await loadTable();
-    };
-    $("#btnClearPrefix").onclick = async ()=>{ $("#searchPrefix").value=""; loadMode="all"; prefixFilter=""; pagination.reset(); await loadTable(); };
-    $("#prevBtn").onclick = async ()=>{ pagination.dir="back"; await loadTable(true); };
-    $("#nextBtn").onclick = async ()=>{ pagination.dir="fwd"; await loadTable(true); };
-
-    function rowHtml(id, obj){
-      let key = "", banned = false, until="", updated="";
-      if (typeof obj === "string"){ key = obj; }
-      else if (obj && typeof obj === "object"){
-        key = obj.key ?? "";
-        banned = !!obj.banned;
-        until = obj.until ?? "";
-        updated = obj.updatedAt ? fmtDate(obj.updatedAt) : "";
-      }
-      const banStr = banned ? "<span class='chip bad'>true</span>" : "<span class='chip good'>false</span>";
-      return `<tr data-id="${id}">
-        <td><input type="checkbox" class="sel"></td>
-        <td><a href="#" class="link-id">${id}</a></td>
-        <td>${key || "<span class='muted'>-</span>"}</td>
-        <td class="right">${banStr}</td>
-        <td>${until || "<span class='muted'>-</span>"}</td>
-        <td>${updated || "<span class='muted'>-</span>"}</td>
-      </tr>`;
+        const d = new Date(ms);
+        const z = (n)=> String(n).padStart(2,"0");
+        return `${z(d.getDate())}/${z(d.getMonth()+1)}/${d.getFullYear()}, ${z(d.getHours())}.${z(d.getMinutes())}.${z(d.getSeconds())}`;
+      }catch(_){return ""}
     }
 
-    async function loadTable(isPageNav=false){
-      clearTable("Memuat…");
-      try {
-        let q;
-        if (loadMode === "banned"){
-          // baca semua lalu filter (agar menangkap node bertipe string juga)
-          const snap = await get(ref(db, "users"));
-          if (!snap.exists()){ clearTable(); return; }
-          const all = snap.val();
-          const ids = Object.keys(all);
-          ids.sort();
-          const items = ids
-            .map(k=>({ id:k, v: all[k] }))
-            .filter(it => typeof it.v === "object" && it.v && (it.v.banned===true || it.v.banned==="true"));
-          const page = items.slice(0, PAGE);
-          renderRows(page);
-          return;
-        }
-        if (loadMode === "prefix" && prefixFilter){
-          const start = prefixFilter;
-          const end = prefixFilter + "\uf8ff";
-          q = query(ref(db, "users"), orderByKey(), startAt(start), endAt(end), limitToFirst(PAGE));
-        } else {
-          if (!pagination.lastKey || pagination.dir==="fwd"){
-            q = query(ref(db, "users"), orderByKey(), limitToFirst(PAGE+1), startAt(pagination.lastKey || ""));
-          } else {
-            // fallback simple: always from beginning (Realtime DB tidak punya startAfter yang rapi)
-            q = query(ref(db, "users"), orderByKey(), limitToFirst(PAGE));
-          }
-        }
-        const snap = await get(q);
-        if (!snap.exists()){ clearTable(); return; }
-        const obj = snap.val();
-        const ids = Object.keys(obj);
-        if (pagination.lastKey && loadMode==="all"){
-          // drop dupe pertama jika menggunakan startAt(lastKey)
-          if (ids[0] === pagination.lastKey) ids.shift();
-        }
-        const sliceIds = ids.slice(0, PAGE);
-        pagination.firstKey = sliceIds[0] || null;
-        pagination.lastKey  = sliceIds[sliceIds.length-1] || null;
-
-        const items = sliceIds.map(k => ({ id:k, v: obj[k] }));
-        renderRows(items);
-      } catch (e){
-        clearTable("Gagal memuat data.");
-        console.error(e);
+    // ====== Data mapping (string node compatible) ======
+    function normalizeUser(androidId, val){
+      if (typeof val === "string"){
+        return { id: androidId, key: val, banned: false, until: "", reason: "", updatedAt: null };
       }
+      val = val || {};
+      return {
+        id: androidId,
+        key: String(val.key || ""),
+        banned: Boolean(val.banned || false),
+        until: (val.until ?? ""),
+        reason: String(val.reason || ""),
+        updatedAt: Number(val.updatedAt || 0)
+      };
     }
 
-    function renderRows(items){
-      if (!items || items.length===0){ clearTable(); return; }
-      tbody.innerHTML = items.map(it => rowHtml(it.id, it.v)).join("");
-      // klik untuk load ke editor
-      tbody.querySelectorAll(".link-id").forEach(a => {
-        a.addEventListener("click", async (ev)=>{
-          ev.preventDefault();
-          const id = ev.target.closest("tr").dataset.id;
-          const snap = await get(ref(db, "users/"+id));
-          if (snap.exists()){
-            const v = snap.val();
-            $("#f_id").value = id;
-            if (typeof v === "string"){ $("#f_key").value = v; $("#f_banned").value="false"; $("#f_until").value=""; $("#f_reason").value=""; }
-            else {
-              $("#f_key").value = v.key ?? "";
-              $("#f_banned").value = (v.banned===true) ? "true" : "false";
-              $("#f_until").value = (v.until ?? "");
-              $("#f_reason").value = (v.reason ?? "");
-            }
-          }
+    // ====== Queries ======
+    async function fetchPageAll(startKey){
+      // orderByKey + limitToFirst; untuk pagination pakai startAt + skip duplikat pertama
+      let q = query(ref(db, "users"), orderByKey(), limitToFirst(STATE.pageSize + (startKey ? 1 : 0)));
+      if(startKey) q = query(ref(db, "users"), orderByKey(), startAt(startKey), limitToFirst(STATE.pageSize + 1));
+      const snap = await get(q);
+      if (!snap.exists()) return {items:[], nextCursor:null};
+      const items = [];
+      let firstKey = null, count=0;
+      snap.forEach(childSnap => {
+        const k = childSnap.key;
+        if(count===0) firstKey = k;
+        items.push(normalizeUser(k, childSnap.val()));
+        count++;
+      });
+      if(startKey && items.length>0 && items[0].id===startKey){
+        items.shift(); // buang duplikat
+      }
+      let nextCursor = null;
+      if(items.length === STATE.pageSize){
+        nextCursor = items[items.length-1].id;
+      }
+      return {items, nextCursor, firstKey};
+    }
+
+    async function fetchPrefix(prefix){
+      const q = query(ref(db,"users"), orderByKey(), startAt(prefix), endAt(prefix+"\\uf8ff"), limitToFirst(STATE.pageSize));
+      const snap = await get(q);
+      if(!snap.exists()) return [];
+      const arr = [];
+      snap.forEach(s=>arr.push(normalizeUser(s.key, s.val())));
+      return arr;
+    }
+
+    async function fetchBanned(){
+      if (STATE.cachedBanned){ return STATE.cachedBanned; }
+      // NOTE: RTDB query equalTo(true) tidak bisa dipaginasi enak; ambil semua lalu client-side slice
+      const q = query(ref(db,"users"), orderByChild("banned"), equalTo(true));
+      const snap = await get(q);
+      if(!snap.exists()) return [];
+      const arr = [];
+      snap.forEach(s=>arr.push(normalizeUser(s.key, s.val())));
+      // sort by updatedAt desc then by id
+      arr.sort((a,b)=> (b.updatedAt||0)-(a.updatedAt||0) || a.id.localeCompare(b.id));
+      STATE.cachedBanned = arr;
+      return arr;
+    }
+
+    // ====== Render ======
+    function renderTable(items){
+      const tb = $("#tbody");
+      tb.innerHTML = "";
+      STATE.selection.clear();
+      for(const it of items){
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td><input type="checkbox" data-id="${it.id}"></td>
+          <td>${it.id}</td>
+          <td>${it.key || "<span class='muted'>-</span>"}</td>
+          <td><span class="pill ${it.banned}">${it.banned}</span></td>
+          <td>${it.until ? it.until : "<span class='muted'>-</span>"}</td>
+          <td>${fmtTime(it.updatedAt)}</td>
+        `;
+        tb.appendChild(tr);
+      }
+      tb.querySelectorAll("input[type=checkbox]").forEach(ch=>{
+        ch.addEventListener("change", e=>{
+          const id = e.target.getAttribute("data-id");
+          if(e.target.checked) STATE.selection.add(id); else STATE.selection.delete(id);
         });
       });
     }
 
-    // bulk actions
-    function selectedIds(){
-      return Array.from(tbody.querySelectorAll("input.sel:checked")).map(el => el.closest("tr").dataset.id);
+    // ====== Paging helpers ======
+    async function loadAll(first=false){
+      try{
+        STATE.pageMode = "all";
+        if(first){ STATE.prevStack = []; STATE.cursor = null; }
+        const {items, nextCursor, firstKey} = await fetchPageAll(STATE.cursor);
+        if(firstKey && STATE.cursor && firstKey !== STATE.prevStack[STATE.prevStack.length-1]){
+          STATE.prevStack.push(firstKey);
+        } else if(first && firstKey){
+          STATE.prevStack = [firstKey];
+        }
+        STATE.cursor = nextCursor;
+        renderTable(items);
+        toast(`Memuat ${items.length} user`);
+      }catch(err){
+        console.error(err);
+        toast("Gagal memuat data (all): "+(err?.message||err), true);
+      }
     }
-    $("#banSelBtn").onclick = async ()=>{
-      if(!state.isAdmin) return toast("Akses ditolak (bukan admin).");
-      const ids = selectedIds(); if(ids.length===0) return toast("Pilih data.");
-      const payload = {};
-      ids.forEach(id => payload["users/"+id+"/banned"] = true);
-      payload["users/"+ids[0]+"/updatedAt"] = Date.now(); // minimal sentuh salah satu; RTDB tidak support multi-serverTimestamp
-      await update(ref(db), payload);
-      toast("Dibanned.");
-      await loadTable();
-    };
-    $("#unbanSelBtn").onclick = async ()=>{
-      if(!state.isAdmin) return toast("Akses ditolak (bukan admin).");
-      const ids = selectedIds(); if(ids.length===0) return toast("Pilih data.");
-      const payload = {};
-      ids.forEach(id => payload["users/"+id+"/banned"] = false);
-      payload["users/"+ids[0]+"/updatedAt"] = Date.now();
-      await update(ref(db), payload);
-      toast("Di-unban.");
-      await loadTable();
-    };
-    $("#delSelBtn").onclick = async ()=>{
-      if(!state.isAdmin) return toast("Akses ditolak (bukan admin).");
-      const ids = selectedIds(); if(ids.length===0) return toast("Pilih data.");
-      if(!confirm("Hapus "+ids.length+" data?")) return;
-      const ops = ids.map(id => remove(ref(db, "users/"+id)));
-      await Promise.all(ops);
-      toast("Dihapus.");
-      await loadTable();
-    };
+    async function nextPage(){
+      if(STATE.pageMode!=="all") return;
+      if(!STATE.cursor){ toast("Sudah di halaman terakhir"); return; }
+      const {items, nextCursor, firstKey} = await fetchPageAll(STATE.cursor);
+      if(firstKey) STATE.prevStack.push(firstKey);
+      STATE.cursor = nextCursor;
+      renderTable(items);
+    }
+    async function prevPage(){
+      if(STATE.pageMode!=="all") return;
+      if(STATE.prevStack.length < 2){ toast("Sudah di halaman pertama"); return; }
+      // Ambil cursor sebelum yang sekarang
+      STATE.prevStack.pop(); // buang current
+      const prevKey = STATE.prevStack.pop(); // ambil prev prev, nanti fetchPageAll akan push lagi
+      STATE.cursor = prevKey;
+      await loadAll(false);
+    }
 
-    // Initial list (tanpa login pun bisa baca)
-    loadTable();
+    // ====== Actions ======
+    async function doCreate(){
+      if(!STATE.isAdmin){ toast("Butuh admin untuk menulis.", true); return; }
+      const id = $("#f_id").value.trim();
+      if(!id){ toast("Android ID kosong.", true); return; }
+      if(/[.$#[\\]\\]/.test(id)){ toast("Android ID tidak boleh mengandung .$#[]/", true); return; }
+      const data = {
+        key: ($("#f_key").value||"").trim(),
+        banned: $("#f_banned").value === "true",
+        until: ($("#f_until").value||"").trim(),
+        reason: ($("#f_reason").value||"").trim(),
+        updatedAt: Date.now()
+      };
+      try{
+        await set(ref(db, "users/"+id), data);
+        toast("Tersimpan.");
+        await reloadAfterWrite(id);
+      }catch(err){
+        console.error(err); toast("Gagal menyimpan: "+(err?.message||err), true);
+      }
+    }
+    async function reloadAfterWrite(idFocus){
+      STATE.cachedBanned = null; // reset cache
+      if(STATE.pageMode==="search"){
+        const prefix = STATE.prefix;
+        if(prefix){ renderTable(await fetchPrefix(prefix)); }
+      }else if(STATE.pageMode==="banned"){
+        const bans = await fetchBanned();
+        renderTable(bans.slice(0, STATE.pageSize));
+      }else{
+        await loadAll(true);
+      }
+      // auto isi form untuk idFocus
+      try{
+        const s = await get(ref(db,"users/"+idFocus));
+        if(s.exists()){
+          const u = normalizeUser(idFocus, s.val());
+          $("#f_id").value = u.id;
+          $("#f_key").value = u.key;
+          $("#f_banned").value = String(u.banned);
+          $("#f_until").value = u.until || "";
+          $("#f_reason").value = u.reason || "";
+        }
+      }catch{}
+    }
+
+    async function bulkUpdate(newVals){
+      if(!STATE.isAdmin){ toast("Butuh admin untuk aksi ini.", true); return; }
+      const ids = Array.from(STATE.selection);
+      if(ids.length===0){ toast("Tidak ada yang dipilih."); return; }
+      const updates = {};
+      const now = Date.now();
+      ids.forEach(id=>{
+        Object.keys(newVals).forEach(k=>{
+          updates["users/"+id+"/"+k] = newVals[k];
+        });
+        updates["users/"+id+"/updatedAt"] = now;
+      });
+      try{
+        await update(ref(db), updates);
+        toast("Berhasil update "+ids.length+" user.");
+        await reloadAfterWrite(ids[0]);
+      }catch(err){ console.error(err); toast("Gagal update: "+(err?.message||err), true); }
+    }
+    async function bulkDelete(){
+      if(!STATE.isAdmin){ toast("Butuh admin untuk aksi ini.", true); return; }
+      const ids = Array.from(STATE.selection);
+      if(ids.length===0){ toast("Tidak ada yang dipilih."); return; }
+      try{
+        const obj = {};
+        ids.forEach(id=> obj["users/"+id] = null);
+        await update(ref(db), obj);
+        toast("Hapus "+ids.length+" user.");
+        await reloadAfterWrite("");
+      }catch(err){ console.error(err); toast("Gagal hapus: "+(err?.message||err), true); }
+    }
+
+    // ====== Admin mgmt ======
+    async function grantAdmin(){
+      if(!STATE.isOwner){ toast("Hanya owner yang boleh Grant.", true); return; }
+      const uid = $("#adm_uid").value.trim();
+      if(!uid) return toast("UID kosong.", true);
+      try{
+        await set(ref(db, "admins/"+uid), true);
+        toast("Grant admin OK.");
+      }catch(err){ console.error(err); toast("Gagal grant: "+(err?.message||err), true); }
+    }
+    async function revokeAdmin(){
+      if(!STATE.isOwner){ toast("Hanya owner yang boleh Revoke.", true); return; }
+      const uid = $("#adm_uid").value.trim();
+      if(!uid) return toast("UID kosong.", true);
+      try{
+        await remove(ref(db, "admins/"+uid));
+        toast("Revoke admin OK.");
+      }catch(err){ console.error(err); toast("Gagal revoke: "+(err?.message||err), true); }
+    }
+
+    // ====== Auth ======
+    $("#loginBtn").addEventListener("click", async ()=>{
+      const email = $("#emailInput").value.trim();
+      const pass = $("#passInput").value.trim();
+      if(!email || !pass){ return toast("Email/password kosong.", true); }
+      try{
+        await signInWithEmailAndPassword(auth, email, pass);
+      }catch(err){ console.error(err); toast("Login gagal: "+(err?.message||err), true); }
+    });
+    $("#logoutBtn").addEventListener("click", ()=> signOut(auth));
+
+    async function checkAdmin(uid){
+      try{
+        const s = await get(ref(db, "admins/"+uid));
+        return s.exists() && s.val()===true;
+      }catch(_){ return false }
+    }
+
+    onAuthStateChanged(auth, async (user)=>{
+      STATE.authUser = user || null;
+      STATE.isOwner = Boolean(user && user.uid === OWNER_UID);
+      STATE.isAdmin = false;
+      if(user){
+        STATE.isAdmin = await checkAdmin(user.uid);
+      }
+      setChips();
+      toggleAuthUI();
+      // refresh list state (supaya tombol enable/disable sesuai hak)
+      toast(user? "Login sebagai "+user.email : "Tidak login");
+    });
+
+    // ====== Wire UI ======
+    $("#btnList").addEventListener("click", ()=>{ STATE.cursor=null; STATE.prefix=""; $("#searchPrefix").value=""; STATE.cachedBanned=null; loadAll(true); });
+    $("#btnNext").addEventListener("click", nextPage);
+    $("#btnPrev").addEventListener("click", prevPage);
+    $("#btnClear").addEventListener("click", ()=>{ $("#searchPrefix").value=""; STATE.prefix=""; loadAll(true); });
+
+    $("#btnSearchPrefix").addEventListener("click", async ()=>{
+      const prefix = $("#searchPrefix").value.trim();
+      STATE.pageMode = "search";
+      STATE.prefix = prefix;
+      try{
+        const arr = await fetchPrefix(prefix);
+        renderTable(arr);
+        toast(`Hasil pencarian: ${arr.length}`);
+      }catch(err){ console.error(err); toast("Gagal memuat data (search): "+(err?.message||err), true); }
+    });
+
+    $("#btnListBanned").addEventListener("click", async ()=>{
+      STATE.pageMode = "banned";
+      try{
+        const arr = await fetchBanned();
+        renderTable(arr.slice(0, STATE.pageSize));
+        toast(`Banned: ${arr.length}`);
+      }catch(err){ console.error(err); toast("Gagal memuat data (banned): "+(err?.message||err), true); }
+    });
+
+    $("#btnCreate").addEventListener("click", doCreate);
+    $("#btnReset").addEventListener("click", ()=>{
+      $("#f_id").value = ""; $("#f_key").value=""; $("#f_banned").value="false"; $("#f_until").value=""; $("#f_reason").value="";
+    });
+    $("#btnGenKey").addEventListener("click", ()=>{
+      const rand = Math.random().toString(36).slice(2,6).toUpperCase();
+      $("#f_key").value = `ZXCV-${rand}-PAID`;
+    });
+    $("#btnCopyId").addEventListener("click", ()=> navigator.clipboard.writeText($("#f_id").value||""));
+    $("#btnCopyKey").addEventListener("click", ()=> navigator.clipboard.writeText($("#f_key").value||""));
+
+    $("#btnBanSel").addEventListener("click", ()=> bulkUpdate({banned:true}));
+    $("#btnUnbanSel").addEventListener("click", ()=> bulkUpdate({banned:false, until:"", reason:""}));
+    $("#btnDeleteSel").addEventListener("click", bulkDelete);
+
+    $("#btnGrant").addEventListener("click", grantAdmin);
+    $("#btnRevoke").addEventListener("click", revokeAdmin);
+
+    // ====== First load ======
+    loadAll(true);
   </script>
 </body>
 </html>
