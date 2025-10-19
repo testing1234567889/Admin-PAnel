@@ -16,33 +16,47 @@
     --danger:#ff6b6b;
     --stroke:#243140;
     --chip:#1d2631;
-    --input:#10171f;
+    --input:#0c1218;
+    --shadow:0 0 0 1px rgba(0,0,0,.05),0 10px 24px rgba(0,0,0,.25);
   }
   *{box-sizing:border-box}
+  html,body{height:100%}
   body{
-    margin:0;background:var(--bg);color:var(--text);font:16px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Inter,Helvetica,Arial;
+    margin:0;background:var(--bg);color:var(--text);
+    font:16px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Inter,Helvetica,Arial;
+    -webkit-text-size-adjust:100%;
+    text-size-adjust:100%;
+    touch-action:manipulation;
   }
   .wrap{max-width:1100px;margin:24px auto;padding:0 14px;}
   .row{display:grid;gap:18px;}
   @media (min-width: 980px){ .row{ grid-template-columns: 1fr 1fr; } }
-  .card{background:var(--card);border:1px solid var(--stroke);border-radius:16px;padding:16px;box-shadow:0 0 0 1px rgba(0,0,0,.05),0 10px 24px rgba(0,0,0,.25);}
-  .card h2{margin:0 0 12px;font-size:20px;letter-spacing:.2px}
-  .topbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:14px}
-  .chip{background:var(--chip);border:1px solid var(--stroke);padding:10px 14px;border-radius:999px;color:var(--text);font-size:14px}
+  .card{background:var(--card);border:1px solid var(--stroke);border-radius:16px;padding:16px;box-shadow:var(--shadow)}
+  .card h2{margin:0 0 12px;font-size:clamp(16px,2.5vw,20px);letter-spacing:.2px}
+  .topbar{
+    position:sticky;top:0;z-index:10;
+    display:flex;gap:10px;align-items:center;flex-wrap:wrap;
+    margin-bottom:14px;
+    padding:10px 0 6px;background:linear-gradient(180deg,var(--bg) 70%,transparent);
+    backdrop-filter:saturate(1.2);
+  }
+  .chip{background:var(--chip);border:1px solid var(--stroke);padding:10px 14px;border-radius:999px;color:var(--text);font-size:14px;white-space:nowrap}
   .chip.bad{background:#25181a;border-color:#3a2023;color:#ffb3b3}
   input,select,textarea{
     width:100%;border-radius:12px;border:1px solid var(--stroke);
-    padding:13px 12px;background:#0c1218;color:#var(--text);outline:none;
+    padding:13px 12px;background:var(--input);color:var(--text);outline:none;
+    min-height:44px;
   }
   input::placeholder,textarea::placeholder{color:#7089a3}
-  label{display:block;font-size:13px;color:#var(--sub);margin:8px 0 6px}
+  label{display:block;font-size:13px;color:var(--sub);margin:8px 0 6px}
   .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-  .btn{border:none;border-radius:14px;padding:12px 18px;font-weight:600;color:#0b1117;background:var(--brand);cursor:pointer}
+  .btn{border:none;border-radius:14px;padding:12px 18px;font-weight:600;color:#0b1117;background:var(--brand);cursor:pointer;min-height:44px}
   .btn.gray{background:#34485f;color:#d2e3f5}
   .btn.ok{background:var(--ok);color:#07140a}
   .btn.danger{background:var(--danger);color:#220a0a}
   .btn.block{width:100%}
-  .btn.small{padding:10px 14px;border-radius:12px}
+  .btn.small{padding:10px 14px;border-radius:12px;min-height:40px}
+  .btn:disabled{opacity:.55;cursor:not-allowed}
   .actions{display:flex;gap:10px;flex-wrap:wrap}
   .table{width:100%;border-collapse:separate;border-spacing:0 10px;margin-top:8px}
   .th,.td{padding:12px 10px;text-align:left;font-size:14px}
@@ -50,26 +64,35 @@
   .th{color:#9fb3c8}
   .empty{padding:12px;color:#9fb3c8}
   .footer-actions{display:flex;justify-content:center;margin-top:10px}
-  .pill{border-radius:999px;padding:10px 14px;border:1px solid var(--stroke);background:#0c1218;color:#var(--text);}
+  .pill{border-radius:999px;padding:10px 14px;border:1px solid var(--stroke);background:#0c1218;color:var(--text);}
   .hidden{display:none !important}
   .sep{height:10px}
   .logout-spot{display:flex;justify-content:flex-end;margin-bottom:12px}
   .kiri .card{height:100%}
-
-  /* === Users List: horizontal scroll ONLY inside list === */
-  .xscroll{
-    overflow-x:auto;
-    -webkit-overflow-scrolling:touch;
-    border:1px solid var(--stroke);
-    border-radius:12px;
-    padding:6px;
-    background:transparent;
+  /* ===== Mobile-first tweaks for small DPI / narrow screens ===== */
+  @media (max-width: 560px){
+    body{font-size:15px}
+    .wrap{padding:0 10px;margin:18px auto}
+    .card{border-radius:12px;padding:12px;box-shadow:0 0 0 1px rgba(0,0,0,.05),0 6px 16px rgba(0,0,0,.22)}
+    .chip{padding:8px 10px;font-size:12px}
+    .row2{grid-template-columns:1fr;gap:10px}
+    .topbar .actions{width:100%}
+    .topbar .actions input{min-width:0;flex:1 1 120px}
+    .topbar .actions #btnLogin{flex:0 0 120px}
+    .th{display:none} /* hide header row */
+    .tr{grid-template-columns:1fr;border-radius:10px}
+    .td{display:flex;gap:10px;align-items:center;justify-content:space-between;padding:10px 12px;border-top:1px solid rgba(255,255,255,.03)}
+    .td:first-child{border-top:none}
+    .td::before{content:attr(data-label);color:var(--sub);font-size:12px;margin-right:8px;flex:0 0 44%}
+    .td input,.td select{flex:1 1 auto;min-width:0}
+    .actions{gap:8px}
+    .btn.small{padding:9px 12px}
+    .pill{width:100%;text-align:center}
   }
-  .xscroll::-webkit-scrollbar{height:10px}
-  .xscroll::-webkit-scrollbar-thumb{background:#2a3a4e;border-radius:999px}
-  .xhint{font-size:12px;color:#8aa3bd;margin:6px 2px 0}
-  /* force width of row so mobile can swipe; page itself stays mobile */
-  .xscroll .tr{ min-width: 940px; }
+  /* Respect reduced motion */
+  @media (prefers-reduced-motion: reduce){
+    *{scroll-behavior:auto;transition:none !important;animation:none !important}
+  }
 </style>
 </head>
 <body>
@@ -81,8 +104,8 @@
       <span class="chip bad hidden" id="warnDomain">Tambahkan domain Pages ke Auth → Authorized domains.</span>
       <div style="flex:1"></div>
       <div class="actions" id="loginRow">
-        <input id="email" placeholder="email admin" style="min-width:240px">
-        <input id="password" type="password" placeholder="password" style="min-width:180px">
+        <input id="email" type="email" placeholder="email admin" autocomplete="username" autocapitalize="none" spellcheck="false" style="min-width:240px">
+        <input id="password" type="password" placeholder="password" autocomplete="current-password" style="min-width:180px">
         <button class="btn small" id="btnLogin">Login</button>
       </div>
       <button class="btn gray small hidden" id="btnLogout">Logout</button>
@@ -93,15 +116,15 @@
         <div class="card">
           <h2>Buat / Ubah User</h2>
           <label>Android ID</label>
-          <input id="formId" placeholder="contoh: a1b2c3d4e5f6abcd" />
+          <input id="formId" placeholder="contoh: a1b2c3d4e5f6abcd" autocapitalize="none" autocorrect="off" spellcheck="false" />
           <label>Key</label>
-          <input id="formKey" placeholder="contoh: ZXCV-5R3K-PAID" />
+          <input id="formKey" placeholder="contoh: ZXCV-5R3K-PAID" autocapitalize="characters" />
           <label>Alasan (opsional)</label>
           <input id="formReason" placeholder="Misal: Abuse" />
           <div class="row2">
             <div>
               <label>Sampai (opsional, 25-12-2025 / 1735171200000)</label>
-              <input id="formUntil" placeholder="dd-mm-yyyy ATAU epoch(ms)" />
+              <input id="formUntil" inputmode="numeric" placeholder="dd-mm-yyyy ATAU epoch(ms)" />
             </div>
             <div>
               <label>Banned</label>
@@ -125,29 +148,27 @@
           <div class="logout-spot"><button class="btn gray small hidden" id="btnLogout2">Logout</button></div>
           <h2>Users List</h2>
           <label>Pencarian (Android ID penuh)</label>
-          <input id="searchExact" placeholder="tempel Android ID untuk cari 1 user" />
+          <input id="searchExact" placeholder="tempel Android ID untuk cari 1 user" autocapitalize="none" autocorrect="off" spellcheck="false" />
           <div class="row2" style="margin-top:10px">
             <div>
               <label>Search Prefix</label>
-              <input id="searchPrefix" placeholder="misal: a1b2">
+              <input id="searchPrefix" placeholder="misal: a1b2" autocapitalize="none" autocorrect="off" spellcheck="false">
             </div>
             <div style="align-self:end">
               <button class="btn block" id="btnSearch">Search</button>
             </div>
           </div>
 
-          <p class="xhint">Geser ke samping (↔) jika kolom tidak muat di layar.</p>
-          <div class="xscroll">
-            <div class="tr th" style="grid-template-columns:1.4fr 1.3fr .9fr 1.2fr .8fr">
-              <div class="th">Android ID</div>
-              <div class="th">Key</div>
-              <div class="th">Banned</div>
-              <div class="th">Until</div>
-              <div class="th">Aksi</div>
-            </div>
-            <div id="listArea"></div>
+          <div class="sep"></div>
+          <!-- Header row hidden on mobile via CSS -->
+          <div class="tr th" style="grid-template-columns:1.4fr 1.3fr .9fr 1.2fr .8fr">
+            <div class="th">Android ID</div>
+            <div class="th">Key</div>
+            <div class="th">Banned</div>
+            <div class="th">Until</div>
+            <div class="th">Aksi</div>
           </div>
-
+          <div id="listArea"></div>
           <div class="footer-actions">
             <button id="btnMore" class="pill hidden">Muat lebih</button>
           </div>
@@ -158,7 +179,7 @@
         <div class="card">
           <h2>Kelola Admin (Owner saja)</h2>
           <label>UID</label>
-          <input id="adminUid" placeholder="tempel UID untuk grant / revoke">
+          <input id="adminUid" placeholder="tempel UID untuk grant / revoke" autocapitalize="none" autocorrect="off" spellcheck="false">
           <div class="actions" style="margin-top:10px">
             <button class="btn ok" id="btnGrant">Grant Admin</button>
             <button class="btn danger" id="btnRevoke">Revoke Admin</button>
@@ -206,7 +227,7 @@
   let isAdmin = false;
   let isOwner = false;
   let cursor = null;
-  let PAGE = 25;
+  let PAGE = window.matchMedia("(max-width: 560px)").matches ? 12 : 25; // lebih ringan di HP kecil
   let lastPrefix = "";
   let exactMode = null; // if set, we show single user result
 
@@ -249,16 +270,16 @@
     const tr = document.createElement("div");
     tr.className = "tr";
     tr.innerHTML = `
-      <div class="td" style="padding-left:14px;font-weight:600">${aid}</div>
-      <div class="td"><input class="inpKey needAdmin" value="${key||""}" placeholder="key" /></div>
-      <div class="td">
+      <div class="td" data-label="Android ID" style="padding-left:14px;font-weight:600;word-break:break-all">${aid}</div>
+      <div class="td" data-label="Key"><input class="inpKey needAdmin" value="${key||""}" placeholder="key" /></div>
+      <div class="td" data-label="Banned">
         <select class="inpBan needAdmin">
           <option ${banned==="false"?"selected":""}>false</option>
           <option ${banned==="true"?"selected":""}>true</option>
         </select>
       </div>
-      <div class="td"><input class="inpUntil needAdmin" value="${until||""}" placeholder="dd-mm-yyyy / epoch" /></div>
-      <div class="td">
+      <div class="td" data-label="Until"><input class="inpUntil needAdmin" value="${until||""}" placeholder="dd-mm-yyyy / epoch" inputmode="numeric"/></div>
+      <div class="td" data-label="Aksi">
         <div class="actions">
           <button class="btn ok small needAdmin">Save</button>
           <button class="btn danger small needAdmin">Del</button>
@@ -309,9 +330,9 @@
       }
       if(lastPrefix){ // prefix mode
         if(cursor){
-          q = query(base, orderByKey(), startAt(cursor), endAt(lastPrefix + "\uf8ff"), limitToFirst(PAGE+1));
+          q = query(base, orderByKey(), startAt(cursor), endAt(lastPrefix + "\\uf8ff"), limitToFirst(PAGE+1));
         } else {
-          q = query(base, orderByKey(), startAt(lastPrefix), endAt(lastPrefix + "\uf8ff"), limitToFirst(PAGE+1));
+          q = query(base, orderByKey(), startAt(lastPrefix), endAt(lastPrefix + "\\uf8ff"), limitToFirst(PAGE+1));
         }
       } else { // default listing
         if(cursor){
@@ -429,7 +450,7 @@
 
   onAuthStateChanged(auth, async (user) => {
     await refreshAdmin(user?.uid || null);
-    // otomatis load list ketika sudah ada auth
+    // otomatis load list ketika sudah ada auth (agar read true pun tetap konsisten alur)
     await loadFirst();
   });
 
