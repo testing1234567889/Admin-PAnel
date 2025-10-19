@@ -30,7 +30,7 @@
 
   <!-- LOGIN -->
   <div id="loginCard" class="card">
-    <h2>Login Admin</h2>
+    <h2>Login Admin (Email & Password)</h2>
     <div class="row"><label>Email</label><input id="email" type="text" placeholder="admin@example.com"/></div>
     <div class="row"><label>Password</label><input id="pass" type="password" placeholder="••••••••"/></div>
     <div class="row"><button id="btnLogin">Login</button><span id="loginMsg" class="muted"></span></div>
@@ -55,15 +55,9 @@
         <h3>Add User</h3>
         <div class="row"><label>Android ID</label><input id="n_id" type="text" placeholder="a1b2c3d4e5f6abcd"/></div>
         <div class="row"><label>Key</label><input id="n_key" type="text" placeholder="ZXCV-9999-PAID"/></div>
-        <div class="row">
-          <label>Premium</label><select id="n_premium"><option>false</option><option>true</option></select>
-        </div>
-        <div class="row">
-          <label>Role</label><select id="n_role"><option>user</option><option>admin</option></select>
-        </div>
-        <div class="row">
-          <label>Banned</label><select id="n_banned"><option>false</option><option>true</option></select>
-        </div>
+        <div class="row"><label>Premium</label><select id="n_premium"><option>false</option><option>true</option></select></div>
+        <div class="row"><label>Role</label><select id="n_role"><option>user</option><option>admin</option></select></div>
+        <div class="row"><label>Banned</label><select id="n_banned"><option>false</option><option>true</option></select></div>
         <div class="row"><label>Until</label><input id="n_until" type="text" placeholder="dd-MM-yyyy atau epoch/ms"/></div>
         <div class="row"><label>Reason</label><textarea id="n_reason" placeholder="opsional"></textarea></div>
         <div class="toolbar">
@@ -121,6 +115,13 @@
           <span id="listInfo" class="muted right"></span>
         </div>
 
+        <!-- Search prefix Android ID -->
+        <div class="toolbar">
+          <input id="prefixInput" type="text" placeholder="Cari prefix Android ID (mis. a1b2)"/>
+          <button id="btnSearchPrefix" class="alt">Search Prefix</button>
+          <button id="btnClearPrefix" class="alt">Clear</button>
+        </div>
+
         <div class="toolbar">
           <button id="batchBan" class="warn">Ban Selected</button>
           <button id="batchUnban" class="alt">Unban Selected</button>
@@ -168,10 +169,10 @@
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
   import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-  import { getDatabase, ref, get, set, update, remove, query, orderByKey, orderByChild, equalTo, startAt, limitToFirst } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+  import { getDatabase, ref, get, set, update, remove, query, orderByKey, orderByChild, equalTo, startAt, endAt, limitToFirst } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
   import { getAnalytics, isSupported } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics.js";
 
-  // === CONFIG PROYEKMU ===
+  // === CONFIG ===
   const firebaseConfig = {
     apiKey: "AIzaSyBpsA9-X9ckiyz2erxurJdLOzv-Deoi7R0",
     authDomain: "animeplay-738a4.firebaseapp.com",
@@ -212,11 +213,14 @@
         roleFilter=$("roleFilter"), listInfo=$("listInfo"), tbody=$("tbody"), chkAll=$("chkAll"),
         prevPage=$("prevPage"), nextPage=$("nextPage");
 
-  // Admin mgmt
+  // Prefix search
+  const prefixInput=$("prefixInput"), btnSearchPrefix=$("btnSearchPrefix"), btnClearPrefix=$("btnClearPrefix");
+
+  // Admin mgmt (DECLARE SEKALI — biar gak "already declared")
   const adm_uid=$("adm_uid"), adm_add=$("adm_add"), adm_del=$("adm_del"), admMsg=$("admMsg");
 
   // State
-  let ADMIN_OK=false, OWNER_OK=false, CURSOR=null, HISTORY=[]; const PAGE_SIZE=100; let LAST_PAGE_COUNT=0;
+  let ADMIN_OK=false, OWNER_OK=false, CURSOR=null, HISTORY=[]; const PAGE_SIZE=100;
 
   // Helpers
   const setBusy=(el,on)=>{ if(el) el.disabled=!!on; };
@@ -224,7 +228,6 @@
   const asBool=v=> (typeof v==="boolean")?v:["1","true","yes","y"].includes(String(v||"").trim().toLowerCase());
   const randKey=()=>{ const abc="ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; let s=""; for(let i=0;i<4;i++) s+=abc[Math.floor(Math.random()*abc.length)]; return s+"-"+Date.now().toString(36).toUpperCase(); };
   const fmtTime=ms=> ms? new Date(ms).toLocaleString(): "";
-
   async function getAdminFlag(uid){ try{ const snap=await get(ref(db,"admins/"+uid)); return !!snap.val(); }catch{ return false; } }
 
   // Auth
@@ -237,7 +240,6 @@
     isAdmin.textContent = "Admin: " + (ADMIN_OK?"true":"false");
     loginCard.classList.add("hide"); panelCard.classList.remove("hide");
     if(!ADMIN_OK) alert("Akun ini belum terdaftar sebagai admin.\nSet /admins/"+u.uid+" = true di Realtime Database.");
-    // Load awal
     btnListAll.click();
   });
 
@@ -267,7 +269,6 @@
     try{
       await set(ref(db,"users/"+id), payload);
       toast(addMsg,"User created.");
-      // tampilkan di detail + refresh list
       await loadById(id);
       await refreshPage();
     }catch(e){ toast(addMsg,"Gagal create: "+(e.message||e)); }
@@ -297,9 +298,9 @@
       showDetail(id,v);
     }catch(e){ toast(detailMsg,"Gagal search key: "+(e.message||e)); }
   }
-  $("btnFindId").onclick = ()=> loadById($("searchId").value.trim());
-  $("btnFindKey").onclick = ()=> loadByKey($("searchKey").value.trim());
-  $("btnClear").onclick = ()=>{ $("searchId").value=""; $("searchKey").value=""; dBox.classList.add("hide"); };
+  btnFindId.onclick = ()=> loadById(searchId.value.trim());
+  btnFindKey.onclick = ()=> loadByKey(searchKey.value.trim());
+  btnClear.onclick = ()=>{ searchId.value=""; searchKey.value=""; dBox.classList.add("hide"); };
 
   d_rotate.onclick=()=>{ d_key.value=randKey(); toast(detailMsg,"Key di-rotate (belum disave)."); };
   d_ban.onclick=()=>{ d_banned.value="true"; if(!d_reason.value) d_reason.value="Violation"; toast(detailMsg,"Set banned=true (belum disave)."); };
@@ -348,36 +349,42 @@
     const q=query(ref(db,"users"), orderByChild(field), equalTo(true), limitToFirst(PAGE_SIZE));
     const snap=await get(q); const rows=[]; snap.forEach(ch=> rows.push([ch.key,ch.val()])); return rows;
   }
+  async function listByIdPrefix(prefix){
+    const q = query(ref(db,"users"), orderByKey(), startAt(prefix), endAt(prefix + "\uf8ff"), limitToFirst(PAGE_SIZE));
+    const snap=await get(q); const rows=[]; snap.forEach(ch=> rows.push([ch.key,ch.val()])); return rows;
+  }
   async function applyRoleFilter(rows){
     const r=roleFilter.value; if(!r) return rows; return rows.filter(([_,v])=> (v.role||"user")===r);
   }
   async function renderRows(rows){
-    LAST_PAGE_COUNT=rows.length; listInfo.textContent=`${rows.length} items`;
+    $("listInfo").textContent=`${rows.length} items`;
     const html = rows.length? rows.map(([id,v])=>rowHtml(id,v)).join("") : `<tr><td colspan="8" class="muted">Belum ada data user yang dimuat.</td></tr>`;
-    tbody.innerHTML=html; bindRowClicks();
+    $("tbody").innerHTML=html; bindRowClicks();
   }
-  async function refreshPage(){ if(CURSOR===null){ await actionListAll(); return; } const rows=await listByKey(CURSOR); const filtered=await applyRoleFilter(rows); await renderRows(filtered); }
+  async function refreshPage(){ await actionListAll(); }
   async function reloadRow(id){
-    const tr=tbody.querySelector(`tr[data-id="${id}"]`); if(!tr) return;
+    const tr=$("tbody").querySelector(`tr[data-id="${id}"]`); if(!tr) return;
     const snap=await get(ref(db,"users/"+id)); if(!snap.exists()){ tr.remove(); return; }
     tr.outerHTML=rowHtml(id,snap.val()); bindRowClicks();
   }
-  async function actionListAll(){ const rows=await listByKey(CURSOR); const filtered=await applyRoleFilter(rows); await renderRows(filtered); }
-  async function actionListBanned(){ const rows=await listByChildBool("banned"); const filtered=await applyRoleFilter(rows); CURSOR=null; HISTORY=[]; await renderRows(filtered); }
-  async function actionListPremium(){ const rows=await listByChildBool("premium"); const filtered=await applyRoleFilter(rows); CURSOR=null; HISTORY=[]; await renderRows(filtered); }
+  async function actionListAll(){ const rows=await listByKey(null); const filtered=await applyRoleFilter(rows); await renderRows(filtered); }
+  async function actionListBanned(){ const rows=await listByChildBool("banned"); const filtered=await applyRoleFilter(rows); await renderRows(filtered); }
+  async function actionListPremium(){ const rows=await listByChildBool("premium"); const filtered=await applyRoleFilter(rows); await renderRows(filtered); }
 
   btnListAll.onclick=actionListAll; btnListBanned.onclick=actionListBanned; btnListPremium.onclick=actionListPremium; roleFilter.onchange=refreshPage;
 
-  let lastFirstKey=null;
-  nextPage.onclick=async ()=>{
-    const last=tbody.querySelector("tr:last-child"); if(!last) return;
-    const first=tbody.querySelector("tr:first-child"); lastFirstKey = first? first.dataset.id : null;
-    CURSOR = last.dataset.id; HISTORY.push(CURSOR); await refreshPage();
+  // Paging tombol prev/next disimplify (ambil ulang 100 teratas)
+  $("nextPage").onclick=actionListAll;
+  $("prevPage").onclick=actionListAll;
+
+  // Prefix search
+  btnSearchPrefix.onclick = async ()=>{
+    const p = prefixInput.value.trim(); if(!p){ await actionListAll(); return; }
+    const rows = await listByIdPrefix(p);
+    const filtered = await applyRoleFilter(rows);
+    await renderRows(filtered);
   };
-  prevPage.onclick=async ()=>{
-    if(HISTORY.length<=1){ HISTORY=[]; CURSOR=null; await refreshPage(); return; }
-    HISTORY.pop(); CURSOR=HISTORY[HISTORY.length-1]; await refreshPage();
-  };
+  btnClearPrefix.onclick = async ()=>{ prefixInput.value=""; await actionListAll(); };
 
   // Select all & batch ops
   $("chkAll").onchange=()=>{ document.querySelectorAll(".chkRow").forEach(c=> c.checked=$("chkAll").checked); };
@@ -402,13 +409,12 @@
   $("batchPremiumOff").onclick=()=>batchUpdate("premium",false);
   $("batchDelete").onclick=batchDeleteFn;
 
-  // Admin management
-  const adm_uid=$("adm_uid"), adm_add=$("adm_add"), adm_del=$("adm_del"), admMsg=$("admMsg");
+  // Admin management (OWNER only)
   async function setAdmin(uid,val){
-    if(!OWNER_OK){ admMsg.textContent="Hanya OWNER."; return; }
-    if(!uid){ admMsg.textContent="Isi UID."; return; }
-    try{ await set(ref(db,"admins/"+uid), !!val); admMsg.textContent=(val?"Granted":"Revoked")+" for "+uid; setTimeout(()=>admMsg.textContent="",2000); }
-    catch(e){ admMsg.textContent="Gagal: "+(e.message||e); }
+    if(!OWNER_OK){ $("admMsg").textContent="Hanya OWNER."; return; }
+    if(!uid){ $("admMsg").textContent="Isi UID."; return; }
+    try{ await set(ref(db,"admins/"+uid), !!val); $("admMsg").textContent=(val?"Granted":"Revoked")+" for "+uid; setTimeout(()=>$("admMsg").textContent="",2000); }
+    catch(e){ $("admMsg").textContent="Gagal: "+(e.message||e); }
   }
   adm_add.onclick=()=>setAdmin(adm_uid.value.trim(),true);
   adm_del.onclick=()=>setAdmin(adm_uid.value.trim(),false);
