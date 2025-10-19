@@ -1,29 +1,40 @@
 <!doctype html>
 <html>
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>GxMods Admin Panel</title>
   <style>
-    body{font-family:system-ui,Segoe UI,Roboto,Arial,sans-serif;background:#0f1115;color:#e8e8e8;margin:0}
-    .wrap{max-width:980px;margin:32px auto;padding:0 16px}
-    .card{background:#161a22;border:1px solid #222633;border-radius:14px;padding:18px;box-shadow:0 6px 24px rgba(0,0,0,.25)}
+    :root{
+      --bg:#0f1115; --card:#161a22; --stroke:#222633; --muted:#9aa4b2; --pri:#1e88ff; --pri2:#166ad9;
+      --warn:#ef5350; --warn2:#e53935; --ok:#2eb872; --chip:#233049; --chipb:#2f3e5a;
+    }
+    body{font-family:system-ui,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:#e8e8e8;margin:0}
+    .wrap{max-width:1100px;margin:32px auto;padding:0 16px}
+    .card{background:var(--card);border:1px solid var(--stroke);border-radius:16px;padding:18px;box-shadow:0 6px 24px rgba(0,0,0,.25)}
     .row{display:flex;gap:12px;align-items:center;margin:8px 0}
-    .row > label{min-width:120px;color:#9aa4b2}
-    input[type=text],input[type=password],textarea{
+    .row>label{min-width:120px;color:var(--muted)}
+    input[type=text],input[type=password],textarea,select{
       flex:1;background:#0f1320;border:1px solid #232a3a;border-radius:10px;color:#e8e8e8;padding:10px 12px;outline:none
     }
     textarea{min-height:64px}
-    button{background:#1e88ff;border:1px solid #166ad9;border-radius:28px;color:#fff;padding:10px 16px;cursor:pointer}
+    button{background:var(--pri);border:1px solid var(--pri2);border-radius:28px;color:#fff;padding:9px 14px;cursor:pointer}
     button.alt{background:transparent;border-color:#395074;color:#a9c7ff}
-    button.warn{background:#ef5350;border-color:#e53935}
-    .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-    .muted{color:#9aa4b2}
+    button.warn{background:var(--warn);border-color:var(--warn2)}
+    .muted{color:var(--muted)}
+    .pill{display:inline-block;padding:4px 10px;border-radius:999px;background:var(--chip);border:1px solid var(--chipb);font-size:12px}
     .hide{display:none}
-    .pill{display:inline-block;padding:4px 10px;border-radius:999px;background:#233049;border:1px solid #2f3e5a;font-size:12px}
-    .sp{height:10px}
     .hr{height:1px;background:#283246;margin:12px 0}
+    .grid2{display:grid;grid-template-columns:340px 1fr;gap:16px}
+    table{width:100%;border-collapse:separate;border-spacing:0}
+    th,td{padding:10px;border-bottom:1px solid #283246;font-size:14px}
+    th{text-align:left;color:#cbd5e1}
+    tr:hover{background:#121827}
     .right{margin-left:auto}
+    .nowrap{white-space:nowrap}
+    .toolbar{display:flex;gap:8px;flex-wrap:wrap}
+    .tag-ok{color:var(--ok)}
+    .tag-warn{color:var(--warn)}
   </style>
 </head>
 <body>
@@ -32,63 +43,137 @@
   <!-- LOGIN -->
   <div id="loginCard" class="card">
     <h2>Login Admin</h2>
-    <div class="row"><label>Email</label>   <input id="email" type="text" placeholder="admin@example.com"/></div>
-    <div class="row"><label>Password</label><input id="pass"  type="password" placeholder="••••••••"/></div>
+    <div class="row"><label>Email</label><input id="email" type="text" placeholder="admin@example.com"/></div>
+    <div class="row"><label>Password</label><input id="pass" type="password" placeholder="••••••••"/></div>
     <div class="row">
       <button id="btnLogin">Login</button>
       <span id="loginMsg" class="muted"></span>
     </div>
   </div>
 
-  <div class="sp"></div>
+  <div class="hr"></div>
 
   <!-- PANEL -->
   <div id="panelCard" class="card hide">
     <div class="row">
       <div class="pill" id="meUid">UID: -</div>
       <div class="pill" id="isAdmin">Admin: -</div>
+      <div class="pill" id="isOwner">Owner: -</div>
       <button id="btnLogout" class="alt right">Logout</button>
     </div>
 
     <div class="hr"></div>
 
-    <h3>Cari User (Android ID)</h3>
-    <div class="row">
-      <input id="androidId" type="text" placeholder="mis. a1b2c3d4e5f6abcd" />
-      <button id="btnLoad" class="alt">Load</button>
-    </div>
+    <div class="grid2">
+      <!-- LEFT: Search & Detail -->
+      <div>
+        <h3>Search / Detail</h3>
+        <div class="row">
+          <input id="searchId" type="text" placeholder="Android ID (exact)"/>
+        </div>
+        <div class="row">
+          <input id="searchKey" type="text" placeholder="Key (exact)"/>
+        </div>
+        <div class="toolbar">
+          <button id="btnFindId" class="alt">Find by ID</button>
+          <button id="btnFindKey" class="alt">Find by Key</button>
+          <button id="btnClear" class="alt">Clear</button>
+        </div>
 
-    <div id="userCard" class="hide">
-      <div class="grid">
-        <div class="row"><label>Android ID</label> <input id="f_id" type="text" disabled /></div>
-        <div class="row"><label>Key</label>        <input id="f_key" type="text" placeholder="ZXCV-9999-PAID" /></div>
-        <div class="row"><label>Premium</label>    <input id="f_premium" type="text" placeholder="true/false" /></div>
-        <div class="row"><label>Role</label>       <input id="f_role" type="text" placeholder="user/admin" /></div>
-        <div class="row"><label>Banned</label>     <input id="f_banned" type="text" placeholder="true/false" /></div>
-        <div class="row"><label>Until</label>      <input id="f_until" type="text" placeholder="dd-MM-yyyy atau epoch/ms" /></div>
+        <div id="detailBox" class="hide">
+          <div class="hr"></div>
+          <h4>Detail User</h4>
+          <div class="row"><label>Android ID</label><input id="d_id" type="text" disabled/></div>
+          <div class="row"><label>Key</label><input id="d_key" type="text" placeholder="ZXCV-9999-PAID"/></div>
+          <div class="row"><label>Premium</label>
+            <select id="d_premium"><option>false</option><option>true</option></select>
+          </div>
+          <div class="row"><label>Role</label>
+            <select id="d_role"><option>user</option><option>admin</option></select>
+          </div>
+          <div class="row"><label>Banned</label>
+            <select id="d_banned"><option>false</option><option>true</option></select>
+          </div>
+          <div class="row"><label>Until</label><input id="d_until" type="text" placeholder="dd-MM-yyyy atau epoch/ms"/></div>
+          <div class="row"><label>Reason</label><textarea id="d_reason" placeholder="alasan ban (opsional)"></textarea></div>
+          <div class="toolbar">
+            <button id="d_rotate" class="alt">Rotate Key</button>
+            <button id="d_ban" class="warn">Ban</button>
+            <button id="d_unban" class="alt">Unban</button>
+            <button id="d_save">Save</button>
+            <button id="d_delete" class="warn right">Delete User</button>
+          </div>
+          <div class="row"><span id="detailMsg" class="muted"></span></div>
+        </div>
+
+        <div class="hr"></div>
+
+        <h3>Kelola Admin (Owner only)</h3>
+        <div class="row"><label>UID</label><input id="adm_uid" type="text" placeholder="UID Firebase"/></div>
+        <div class="toolbar">
+          <button id="adm_add" class="alt">Grant Admin</button>
+          <button id="adm_del" class="warn">Revoke Admin</button>
+          <span id="admMsg" class="muted"></span>
+        </div>
       </div>
-      <div class="row"><label>Reason</label><textarea id="f_reason" placeholder="alasan ban (opsional)"></textarea></div>
-      <div class="row">
-        <button id="btnRotate" class="alt">Rotate Key</button>
-        <button id="btnBan" class="warn">Ban</button>
-        <button id="btnUnban" class="alt">Unban</button>
-        <button id="btnSave">Save</button>
-        <span id="saveMsg" class="muted right"></span>
+
+      <!-- RIGHT: List & Batch -->
+      <div>
+        <h3>Users List</h3>
+        <div class="toolbar">
+          <button id="btnListAll" class="alt">List (by key, 100)</button>
+          <button id="btnListBanned" class="alt">List Banned</button>
+          <button id="btnListPremium" class="alt">List Premium</button>
+          <span class="muted">Filter:</span>
+          <select id="roleFilter">
+            <option value="">role:any</option>
+            <option value="user">user</option>
+            <option value="admin">admin</option>
+          </select>
+          <span id="listInfo" class="muted right"></span>
+        </div>
+
+        <div class="toolbar">
+          <button id="batchBan" class="warn">Ban Selected</button>
+          <button id="batchUnban" class="alt">Unban Selected</button>
+          <button id="batchPremiumOn" class="alt">Set Premium</button>
+          <button id="batchPremiumOff" class="alt">Unset Premium</button>
+          <button id="batchDelete" class="warn right">Delete Selected</button>
+        </div>
+
+        <table>
+          <thead>
+            <tr>
+              <th><input type="checkbox" id="chkAll"/></th>
+              <th>Android ID</th>
+              <th>Key</th>
+              <th class="nowrap">Premium</th>
+              <th>Role</th>
+              <th class="nowrap">Banned</th>
+              <th>Until</th>
+              <th>Updated</th>
+            </tr>
+          </thead>
+          <tbody id="tbody"></tbody>
+        </table>
+
+        <div class="toolbar">
+          <button id="prevPage" class="alt">Prev</button>
+          <button id="nextPage" class="alt">Next</button>
+        </div>
       </div>
     </div>
-
-    <div id="emptyMsg" class="muted">Belum ada data user yang dimuat.</div>
   </div>
 </div>
 
-<!-- Firebase v9+ ES Modules (CDN) -->
+<!-- Firebase v10 ES Modules (CDN) -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
   import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-  import { getDatabase, ref, get, update } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+  import { getDatabase, ref, get, set, update, remove, query, orderByKey, orderByChild, equalTo, startAt, limitToFirst } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
   import { getAnalytics, isSupported } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics.js";
 
-  // === Config kamu ===
+  // === CONFIG PROYEKMU ===
   const firebaseConfig = {
     apiKey: "AIzaSyBpsA9-X9ckiyz2erxurJdLOzv-Deoi7R0",
     authDomain: "animeplay-738a4.firebaseapp.com",
@@ -99,118 +184,300 @@
     appId: "1:129738568083:web:d144ad8d1a66d893213866",
     measurementId: "G-J6G96TPMHX"
   };
+  const OWNER_UID = "SjEQCMqzEMb2PQclx8Iidde3reA3";
 
   // Init
   const app = initializeApp(firebaseConfig);
   try { isSupported().then(ok => { if (ok) getAnalytics(app); }); } catch(_) {}
-
   const auth = getAuth(app);
   const db   = getDatabase(app);
 
-  // DOM helpers
-  const $ = (id)=>document.getElementById(id);
+  // DOM refs
+  const $ = id => document.getElementById(id);
   const loginCard=$("loginCard"), panelCard=$("panelCard");
-  const meUid=$("meUid"), isAdmin=$("isAdmin");
+  const meUid=$("meUid"), isAdmin=$("isAdmin"), isOwner=$("isOwner");
   const btnLogin=$("btnLogin"), loginMsg=$("loginMsg"), btnLogout=$("btnLogout");
-  const btnLoad=$("btnLoad"), androidId=$("androidId");
-  const userCard=$("userCard"), emptyMsg=$("emptyMsg"), saveMsg=$("saveMsg");
-  const f = {
-    id:$("f_id"), key:$("f_key"), premium:$("f_premium"), role:$("f_role"),
-    banned:$("f_banned"), until:$("f_until"), reason:$("f_reason")
-  };
-  const btnRotate=$("btnRotate"), btnBan=$("btnBan"), btnUnban=$("btnUnban"), btnSave=$("btnSave");
 
-  let ADMIN_OK = false;
+  const searchId=$("searchId"), searchKey=$("searchKey");
+  const btnFindId=$("btnFindId"), btnFindKey=$("btnFindKey"), btnClear=$("btnClear");
+  const dBox=$("detailBox"), d_id=$("d_id"), d_key=$("d_key"), d_premium=$("d_premium"),
+        d_role=$("d_role"), d_banned=$("d_banned"), d_until=$("d_until"), d_reason=$("d_reason"),
+        d_rotate=$("d_rotate"), d_ban=$("d_ban"), d_unban=$("d_unban"), d_save=$("d_save"), d_delete=$("d_delete"), detailMsg=$("detailMsg");
 
-  const setBusy = (el,on)=>{ el.disabled=!!on; };
-  const toast = (msg)=>{ saveMsg.textContent=msg; setTimeout(()=>saveMsg.textContent="", 2500); };
-  const asBool = (v)=> typeof v==="boolean" ? v : ["1","true","yes","y"].includes(String(v||"").trim().toLowerCase());
-  const randKey = ()=> {
-    const alphabet="ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-    let s=""; for(let i=0;i<4;i++){ s+=alphabet[Math.floor(Math.random()*alphabet.length)]; }
-    return s+"-"+Date.now().toString(36).toUpperCase();
-  };
+  const btnListAll=$("btnListAll"), btnListBanned=$("btnListBanned"), btnListPremium=$("btnListPremium"),
+        roleFilter=$("roleFilter"), listInfo=$("listInfo"),
+        tbody=$("tbody"), chkAll=$("chkAll"), prevPage=$("prevPage"), nextPage=$("nextPage");
 
-  async function checkIsAdmin(uid){
-    try{
-      const snap = await get(ref(db, "admins/"+uid));
-      return !!snap.val();
-    }catch(e){
-      // Kalau rules blokir read, anggap bukan admin
-      return false;
-    }
+  const adm_uid=$("adm_uid"), adm_add=$("adm_add"), adm_del=$("adm_del"), admMsg=$("admMsg");
+
+  const batchBan=$("batchBan"), batchUnban=$("batchUnban"), batchPremiumOn=$("batchPremiumOn"),
+        batchPremiumOff=$("batchPremiumOff"), batchDelete=$("batchDelete");
+
+  // State
+  let ADMIN_OK=false, OWNER_OK=false, CURSOR=null, HISTORY=[];
+  const PAGE_SIZE=100;
+  let LAST_PAGE_COUNT=0;
+
+  // Helpers
+  const setBusy=(el,on)=>{ if(el) el.disabled=!!on; };
+  const toast=(el,msg)=>{ if(!el) return; el.textContent=msg; setTimeout(()=>el.textContent="",2500); };
+  const asBool=v=> (typeof v==="boolean")?v:["1","true","yes","y"].includes(String(v||"").trim().toLowerCase());
+  const randKey=()=>{ const abc="ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; let s=""; for(let i=0;i<4;i++) s+=abc[Math.floor(Math.random()*abc.length)]; return s+"-"+Date.now().toString(36).toUpperCase(); };
+  const fmtTime=ms=> ms? new Date(ms).toLocaleString(): "";
+
+  async function getAdminFlag(uid){
+    try{ const snap = await get(ref(db,"admins/"+uid)); return !!snap.val(); }
+    catch{ return false; }
   }
 
+  // Auth flow
   onAuthStateChanged(auth, async (u)=>{
-    if(!u){
-      loginCard.classList.remove("hide");
-      panelCard.classList.add("hide");
-      return;
-    }
-    meUid.textContent = "UID: " + u.uid;
-    ADMIN_OK = await checkIsAdmin(u.uid);
-    isAdmin.textContent = "Admin: " + (ADMIN_OK ? "true" : "false");
-    loginCard.classList.add("hide");
-    panelCard.classList.remove("hide");
-    if(!ADMIN_OK){ alert("Akun ini belum terdaftar sebagai admin.\nSet /admins/"+u.uid+" = true di Realtime Database."); }
+    if(!u){ loginCard.classList.remove("hide"); panelCard.classList.add("hide"); return; }
+    meUid.textContent="UID: "+u.uid;
+    OWNER_OK = (u.uid===OWNER_UID);
+    ADMIN_OK = OWNER_OK || await getAdminFlag(u.uid);
+    isOwner.textContent = "Owner: " + (OWNER_OK?"true":"false");
+    isAdmin.textContent = "Admin: " + (ADMIN_OK?"true":"false");
+    loginCard.classList.add("hide"); panelCard.classList.remove("hide");
+    if(!ADMIN_OK) alert("Akun ini belum terdaftar sebagai admin.\nSet /admins/"+u.uid+" = true di Realtime Database.");
   });
 
   btnLogin.onclick = async ()=>{
     setBusy(btnLogin,true); loginMsg.textContent="";
-    const email = $("email").value.trim(), pass = $("pass").value;
-    try{ await signInWithEmailAndPassword(auth, email, pass); }
+    try{ await signInWithEmailAndPassword(auth, $("email").value.trim(), $("pass").value); }
     catch(e){ loginMsg.textContent = e.message || "Login gagal"; }
     finally{ setBusy(btnLogin,false); }
   };
   btnLogout.onclick = ()=>signOut(auth);
 
-  // Load user by Android ID
-  btnLoad.onclick = async ()=>{
-    const id = androidId.value.trim();
-    if(!id){ toast("Isi Android ID dulu"); return; }
-    setBusy(btnLoad,true); emptyMsg.classList.add("hide"); userCard.classList.add("hide");
+  // Detail: load & render
+  function showDetail(id, v){
+    d_id.value=id||"";
+    d_key.value=(v&&v.key)||"";
+    d_premium.value=String(!!(v&&v.premium));
+    d_role.value=(v&&v.role)||"user";
+    d_banned.value=String(!!(v&&v.banned));
+    d_until.value=(v&&v.until)||"";
+    d_reason.value=(v&&v.reason)||"";
+    dBox.classList.remove("hide");
+  }
+
+  async function loadById(id){
+    if(!id){ toast(detailMsg,"Isi Android ID."); return; }
     try{
-      const snap = await get(ref(db, "users/"+id));
-      if(!snap.exists()){ emptyMsg.textContent="User tidak ditemukan."; emptyMsg.classList.remove("hide"); return; }
-      const v = snap.val();
-      f.id.value = id;
-      f.key.value = v.key || "";
-      f.premium.value = String(!!v.premium);
-      f.role.value = v.role || "user";
-      f.banned.value = String(!!v.banned);
-      f.until.value = v.until || "";
-      f.reason.value = v.reason || "";
-      userCard.classList.remove("hide");
-    }catch(e){
-      emptyMsg.textContent = "Gagal load: "+(e.message||e); emptyMsg.classList.remove("hide");
-    }finally{ setBusy(btnLoad,false); }
-  };
+      const snap = await get(ref(db,"users/"+id));
+      if(!snap.exists()){ toast(detailMsg,"User tidak ditemukan."); dBox.classList.add("hide"); return; }
+      showDetail(id, snap.val());
+    }catch(e){ toast(detailMsg,"Gagal load: "+(e.message||e)); }
+  }
 
-  // Actions
-  btnRotate.onclick = ()=>{ f.key.value = randKey(); toast("Key di-rotate (belum disave)."); };
-  btnBan.onclick    = ()=>{ f.banned.value = "true"; if(!f.reason.value) f.reason.value = "Violation"; toast("Set banned = true (belum disave)."); };
-  btnUnban.onclick  = ()=>{ f.banned.value = "false"; f.reason.value = ""; f.until.value = ""; toast("Set banned = false (belum disave)."); };
+  async function loadByKey(key){
+    if(!key){ toast(detailMsg,"Isi Key."); return; }
+    try{
+      const q = query(ref(db,"users"), orderByChild("key"), equalTo(key));
+      const snap = await get(q);
+      if(!snap.exists()){ toast(detailMsg,"Tidak ada user dengan key tsb."); dBox.classList.add("hide"); return; }
+      // Ambil user pertama
+      let id=null, v=null;
+      snap.forEach(ch=>{ if(!id){ id=ch.key; v=ch.val(); }});
+      showDetail(id, v);
+    }catch(e){ toast(detailMsg,"Gagal search key: "+(e.message||e)); }
+  }
 
-  btnSave.onclick = async ()=>{
+  btnFindId.onclick = ()=> loadById(searchId.value.trim());
+  btnFindKey.onclick = ()=> loadByKey(searchKey.value.trim());
+  btnClear.onclick = ()=>{ searchId.value=""; searchKey.value=""; dBox.classList.add("hide"); };
+
+  d_rotate.onclick = ()=>{ d_key.value = randKey(); toast(detailMsg,"Key di-rotate (belum disave)."); };
+  d_ban.onclick    = ()=>{ d_banned.value="true"; if(!d_reason.value) d_reason.value="Violation"; toast(detailMsg,"Set banned=true (belum disave)."); };
+  d_unban.onclick  = ()=>{ d_banned.value="false"; d_reason.value=""; d_until.value=""; toast(detailMsg,"Set banned=false (belum disave)."); };
+
+  d_save.onclick = async ()=>{
     if(!ADMIN_OK){ alert("Bukan admin."); return; }
-    const id = f.id.value.trim(); if(!id){ toast("Tidak ada ID."); return; }
-    const payload = {
-      key: f.key.value.trim(),
-      premium: asBool(f.premium.value),
-      role: (f.role.value.trim()||"user"),
-      banned: asBool(f.banned.value),
-      until: f.until.value.trim(),
-      reason: f.reason.value.trim(),
-      updatedAt: Date.now()
+    const id=d_id.value.trim(); if(!id){ toast(detailMsg,"Tidak ada ID."); return; }
+    const payload={
+      key:d_key.value.trim(),
+      premium:asBool(d_premium.value),
+      role:(d_role.value.trim()||"user"),
+      banned:asBool(d_banned.value),
+      until:d_until.value.trim(),
+      reason:d_reason.value.trim(),
+      updatedAt:Date.now()
     };
-    setBusy(btnSave,true);
-    try{
-      await update(ref(db, "users/"+id), payload);
-      toast("Saved.");
-    }catch(e){
-      toast("Gagal save: "+(e.message||e));
-    }finally{ setBusy(btnSave,false); }
+    try{ await update(ref(db,"users/"+id), payload); toast(detailMsg,"Saved."); await reloadRow(id); }
+    catch(e){ toast(detailMsg,"Gagal save: "+(e.message||e)); }
   };
+
+  d_delete.onclick = async ()=>{
+    if(!ADMIN_OK){ alert("Bukan admin."); return; }
+    const id=d_id.value.trim(); if(!id) return;
+    if(!confirm("Hapus user "+id+" ?")) return;
+    try{ await remove(ref(db,"users/"+id)); toast(detailMsg,"Deleted."); dBox.classList.add("hide"); await refreshPage(); }
+    catch(e){ toast(detailMsg,"Gagal delete: "+(e.message||e)); }
+  };
+
+  // List rendering
+  function rowHtml(id,v){
+    const ban = v.banned?'<span class="tag-warn">true</span>':'false';
+    const pre = v.premium?'<span class="tag-ok">true</span>':'false';
+    return `<tr data-id="${id}">
+      <td><input type="checkbox" class="chkRow" data-id="${id}"></td>
+      <td class="nowrap"><a href="#" class="lnkId" data-id="${id}">${id}</a></td>
+      <td>${(v.key||"")}</td>
+      <td>${pre}</td>
+      <td>${v.role||"user"}</td>
+      <td>${ban}</td>
+      <td>${v.until||""}</td>
+      <td>${fmtTime(v.updatedAt)||""}</td>
+    </tr>`;
+  }
+
+  function bindRowClicks(){
+    document.querySelectorAll(".lnkId").forEach(a=>{
+      a.onclick=(e)=>{ e.preventDefault(); loadById(a.dataset.id); };
+    });
+  }
+
+  async function listByKey(startKey=null){
+    const base = query(ref(db,"users"), orderByKey(), limitToFirst(PAGE_SIZE + (startKey?1:0)));
+    const q = startKey? query(ref(db,"users"), orderByKey(), startAt(startKey), limitToFirst(PAGE_SIZE+1)) : base;
+    const snap = await get(q);
+    const rows=[];
+    let first=true;
+    snap.forEach(ch=>{
+      if(startKey && first && ch.key===startKey){ first=false; return; } // skip duplicate on paged
+      rows.push([ch.key, ch.val()]);
+    });
+    return rows;
+  }
+
+  async function listByChildBool(field){
+    const q = query(ref(db,"users"), orderByChild(field), equalTo(true), limitToFirst(PAGE_SIZE));
+    const snap = await get(q);
+    const rows=[];
+    snap.forEach(ch=> rows.push([ch.key, ch.val()]));
+    return rows;
+  }
+
+  async function applyRoleFilter(rows){
+    const roleVal = roleFilter.value;
+    if(!roleVal) return rows;
+    return rows.filter(([_,v]) => (v.role||"user")===roleVal);
+  }
+
+  async function renderRows(rows){
+    LAST_PAGE_COUNT = rows.length;
+    listInfo.textContent = `${rows.length} items`;
+    tbody.innerHTML = rows.map(([id,v])=>rowHtml(id,v)).join("") || `<tr><td colspan="8" class="muted">No data</td></tr>`;
+    bindRowClicks();
+  }
+
+  async function refreshPage(){
+    if(CURSOR===null){ await actionListAll(); return; }
+    const rows = await listByKey(CURSOR);
+    const filtered = await applyRoleFilter(rows);
+    await renderRows(filtered);
+  }
+
+  async function reloadRow(id){
+    // Kalau row ada di tabel, update tampilannya
+    const tr = tbody.querySelector(`tr[data-id="${id}"]`);
+    if(!tr) return;
+    const snap = await get(ref(db,"users/"+id));
+    if(!snap.exists()) { tr.remove(); return; }
+    tr.outerHTML = rowHtml(id, snap.val());
+    bindRowClicks();
+  }
+
+  // Buttons list
+  async function actionListAll(){
+    CURSOR = HISTORY.length? HISTORY[HISTORY.length-1]: null;
+    const rows = await listByKey(CURSOR);
+    const filtered = await applyRoleFilter(rows);
+    await renderRows(filtered);
+  }
+  async function actionListBanned(){
+    const rows = await listByChildBool("banned");
+    const filtered = await applyRoleFilter(rows);
+    CURSOR=null; HISTORY=[]; await renderRows(filtered);
+  }
+  async function actionListPremium(){
+    const rows = await listByChildBool("premium");
+    const filtered = await applyRoleFilter(rows);
+    CURSOR=null; HISTORY=[]; await renderRows(filtered);
+  }
+
+  btnListAll.onclick = actionListAll;
+  btnListBanned.onclick = actionListBanned;
+  btnListPremium.onclick = actionListPremium;
+  roleFilter.onchange = refreshPage;
+
+  nextPage.onclick = async ()=>{
+    if(LAST_PAGE_COUNT===0){ return; }
+    // Simpan cursor & maju
+    if(tbody.firstElementChild){
+      const firstKey = tbody.querySelector("tr")?.dataset.id || null;
+      if(firstKey && (HISTORY.length===0 || HISTORY[HISTORY.length-1]!==firstKey)) HISTORY.push(firstKey);
+    }
+    const last = tbody.querySelector("tr:last-child");
+    CURSOR = last? last.dataset.id : null;
+    await refreshPage();
+  };
+  prevPage.onclick = async ()=>{
+    if(HISTORY.length===0){ CURSOR=null; await refreshPage(); return; }
+    HISTORY.pop();
+    CURSOR = HISTORY.length? HISTORY[HISTORY.length-1]: null;
+    await refreshPage();
+  };
+
+  // Select all
+  chkAll.onchange = ()=>{
+    document.querySelectorAll(".chkRow").forEach(c=> c.checked = chkAll.checked);
+  };
+
+  function selectedIds(){
+    const ids=[]; document.querySelectorAll(".chkRow:checked").forEach(c=> ids.push(c.dataset.id));
+    return ids;
+  }
+
+  async function batchUpdate(field, value){
+    if(!ADMIN_OK){ alert("Bukan admin."); return; }
+    const ids = selectedIds(); if(ids.length===0) return alert("Pilih dulu itemnya.");
+    if(!confirm(`Apply ${field}=${value} ke ${ids.length} user?`)) return;
+    const now = Date.now();
+    const tasks = ids.map(id=> update(ref(db,"users/"+id), { [field]: value, updatedAt: now }));
+    await Promise.allSettled(tasks);
+    await refreshPage();
+  }
+  async function batchDeleteFn(){
+    if(!ADMIN_OK){ alert("Bukan admin."); return; }
+    const ids = selectedIds(); if(ids.length===0) return alert("Pilih dulu itemnya.");
+    if(!confirm(`Hapus ${ids.length} user?`)) return;
+    await Promise.allSettled(ids.map(id=> remove(ref(db,"users/"+id))));
+    await refreshPage();
+  }
+
+  batchBan.onclick = ()=> batchUpdate("banned", true);
+  batchUnban.onclick = ()=> batchUpdate("banned", false);
+  batchPremiumOn.onclick  = ()=> batchUpdate("premium", true);
+  batchPremiumOff.onclick = ()=> batchUpdate("premium", false);
+  batchDelete.onclick = batchDeleteFn;
+
+  // Owner admin management
+  async function setAdmin(uid, val){
+    if(!OWNER_OK){ admMsg.textContent="Hanya OWNER."; return; }
+    if(!uid) { admMsg.textContent="Isi UID."; return; }
+    try{
+      await set(ref(db,"admins/"+uid), !!val);
+      admMsg.textContent = (val? "Granted":"Revoked")+" for "+uid;
+      setTimeout(()=>admMsg.textContent="", 2000);
+    }catch(e){ admMsg.textContent="Gagal: "+(e.message||e); }
+  }
+  adm_add.onclick = ()=> setAdmin(adm_uid.value.trim(), true);
+  adm_del.onclick = ()=> setAdmin(adm_uid.value.trim(), false);
+
+  // Init list on load
+  btnListAll.click();
 </script>
 </body>
 </html>
