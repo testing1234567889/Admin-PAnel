@@ -11,8 +11,9 @@
       --ok:#2eb872; --warn:#ef5350; --pill:#213042; --pillTxt:#cce7ff;
     }
     *{box-sizing:border-box}
-    html,body{height:100%;background:var(--bg);color:var(--txt);font:14px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, 'Helvetica Neue', Arial}
+    html,body{height:100%;background:var(--bg);color:var(--txt);font:14px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Arial}
     a{color:inherit;text-decoration:none}
+    .hidden{display:none !important}
     .wrap{max-width:1200px;margin:20px auto;padding:0 12px}
     .card{background:linear-gradient(180deg,rgba(33,136,255,.12),transparent),var(--card);border:1px solid var(--stroke);border-radius:16px;padding:16px;box-shadow:0 6px 20px rgba(0,0,0,.25)}
     .row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
@@ -20,11 +21,12 @@
     h2{margin:4px 0 14px 0;font-weight:700;font-size:18px}
     label{display:block;margin:10px 0 6px 2px;color:var(--hint);font-size:12px}
     input,select,textarea{width:100%;background:var(--muted);border:1px solid var(--stroke);color:var(--txt);border-radius:12px;padding:12px 12px;font-size:14px;outline:none}
+    input::placeholder,textarea::placeholder{color:var(--hint)}
     textarea{min-height:76px;resize:vertical}
     .btn{display:inline-flex;align-items:center;justify-content:center;border-radius:999px;border:1px solid var(--stroke);padding:10px 16px;min-height:42px;cursor:pointer;user-select:none;gap:8px}
     .btn:disabled{opacity:.55;cursor:not-allowed}
     .btn--pri{background:var(--pri);border-color:#1c7be8;color:#fff}
-    .btn--ghost{background:transparent}
+    .btn--ghost{background:transparent;color:#dfe8f6}
     .btn--warn{background:var(--warn);border-color:#b00020;color:#fff}
     .btn--ok{background:var(--ok);border-color:#1d8a55;color:#fff}
     .btn--muted{background:#222a3a;border-color:var(--stroke);color:#ccd6e0}
@@ -32,11 +34,11 @@
     .toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
     .tag{background:#1b2536;color:#c7d7ff;border:1px solid #2a3955;padding:6px 10px;border-radius:999px;font-size:12px}
     .right{margin-left:auto}
-    table{width:100%;border-collapse:separate;border-spacing:0 8px}
+    table{width:100%;border-collapse:separate;border-spacing:0 8px;color:var(--txt)}
     th,td{padding:12px}
-    thead th{font-size:12px;color:var(--hint);text-align:left}
-    tbody tr{background:var(--muted);border:1px solid var(--stroke)}
-    tbody tr td{border-top:1px solid var(--stroke);border-bottom:1px solid var(--stroke)}
+    thead th{font-size:12px;color:#c6d4e6;text-align:left;background:transparent}
+    tbody tr{background:var(--muted);border:1px solid var(--stroke);color:var(--txt)}
+    tbody tr td{border-top:1px solid var(--stroke);border-bottom:1px solid var(--stroke);color:var(--txt)}
     tbody tr td:first-child{border-left:1px solid var(--stroke);border-top-left-radius:12px;border-bottom-left-radius:12px}
     tbody tr td:last-child{border-right:1px solid var(--stroke);border-top-right-radius:12px;border-bottom-right-radius:12px}
     .table-wrap{overflow:auto;max-height:60vh;padding-bottom:6px}
@@ -47,14 +49,14 @@
     .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
     @media(max-width:560px){.grid2{grid-template-columns:1fr}}
     .hl{color:#bfe1ff}
-    .copy{font-size:12px}
+    .mono{font-family:ui-monospace,Menlo,Consolas,"Courier New",monospace}
     .danger{color:#ffb4ba}
     .ok{color:#b5ffd1}
     .hint{color:var(--hint)}
     .toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:#1b2536;color:#dfe8f6;border:1px solid #2a3955;border-radius:12px;padding:10px 14px;z-index:99;opacity:0;pointer-events:none;transition:.25s}
     .toast.show{opacity:1;pointer-events:auto}
-    /* buttons dock for mobile bulk actions */
-    .dock{position:sticky;bottom:0;display:flex;gap:10px;justify-content:center;padding:10px 0;background:linear-gradient(180deg, transparent, rgba(0,0,0,.35))}
+    .dock{position:sticky;bottom:0;display:flex;gap:10px;justify-content:center;padding:10px 0;background:linear-gradient(180deg,transparent,rgba(0,0,0,.35))}
+    .empty{padding:18px;color:#cbd6e4;text-align:center;border:1px dashed #345}
   </style>
 </head>
 <body>
@@ -64,11 +66,17 @@
         <div class="tag">UID: <span id="meUid">-</span></div>
         <div class="tag">Admin: <span id="meAdmin">false</span></div>
         <div class="tag">Owner: <span id="meOwner">false</span></div>
-        <div class="right flex">
+
+        <!-- LOGIN BOX (disembunyikan saat sudah login) -->
+        <div class="right flex" id="loginBox">
           <input id="email" placeholder="email admin" style="width:200px">
           <input id="pass" type="password" placeholder="password" style="width:160px">
           <button id="loginBtn" class="btn btn--pri">Login</button>
-          <button id="logoutBtn" class="btn btn--ghost">Logout</button>
+        </div>
+
+        <!-- LOGOUT BOX (disembunyikan saat belum login) -->
+        <div class="right" id="logoutBox" class="hidden">
+          <button id="logoutBtn" class="btn btn--ghost hidden">Logout</button>
         </div>
       </div>
     </div>
@@ -137,10 +145,13 @@
         <div class="toolbar">
           <button id="btnList" class="btn btn--muted">List (100)</button>
           <button id="btnListBanned" class="btn btn--muted">List Banned</button>
-          <input id="q_prefix" class="grow" placeholder="Cari prefix Android ID (mis. a1b2)">
+          <input id="q_prefix" class="grow" placeholder="Cari prefix Android (mis. a1b2)">
           <button id="btnSearchPrefix" class="btn btn--muted">Search Prefix</button>
           <button id="btnClrPrefix" class="btn btn--ghost">Clear</button>
+          <button id="btnRefresh" class="btn btn--ghost">Refresh</button>
         </div>
+
+        <div id="state" class="hint" style="padding:6px 2px;">Ready.</div>
 
         <div class="table-wrap">
           <table>
@@ -176,8 +187,8 @@
   <div id="toast" class="toast"></div>
 
   <script type="module">
-    // ====== CONFIG ======
-    const OWNER_UID = "SjEQCMqzEMb2PQclx8Iidde3reA3"; // punyamu
+    // ===== CONFIG =====
+    const OWNER_UID = "SjEQCMqzEMb2PQclx8Iidde3reA3";
     const FIREBASE_CONFIG = {
       apiKey: "AIzaSyBpsA9-X9ckiyz2erxurJdLOzv-Deoi7R0",
       authDomain: "animeplay-738a4.firebaseapp.com",
@@ -189,34 +200,34 @@
       measurementId: "G-J6G96TPMHX"
     };
 
-    // ====== SDK v9 (modular) via CDN ======
+    // ===== SDK v9 CDN =====
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-    import { getDatabase, ref, child, get, set, update, remove, query, orderByKey, startAt, endAt, limitToFirst } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
+    import { getDatabase, ref, get, set, update, query, orderByKey, startAt, endAt, limitToFirst } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
     import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
 
     const app = initializeApp(FIREBASE_CONFIG);
     const db = getDatabase(app);
     const auth = getAuth(app);
 
-    // ====== STATE ======
+    // ===== STATE =====
     const S = {
       me: { uid: null, isOwner: false, isAdmin: false },
-      list: [], sel: new Set(), cursorStart: null, lastKey: null, bannedOnly: false, prefix: null
+      list: [], sel: new Set(), cursorStart: null, bannedOnly: false, prefix: null
     };
 
-    // ====== HELPERS ======
-    const $ = sel => document.querySelector(sel);
+    // ===== $ helpers =====
+    const $ = s => document.querySelector(s);
     const toast = (msg, ms=1600)=>{ const t=$("#toast"); t.textContent=msg; t.classList.add("show"); setTimeout(()=>t.classList.remove("show"), ms); };
+    const setState = t => $("#state").textContent = t;
     const fmtTime = ms => { if(!ms) return ""; const d=new Date(ms); const dd=String(d.getDate()).padStart(2,"0"); const mm=String(d.getMonth()+1).padStart(2,"0"); const yy=d.getFullYear(); const hh=String(d.getHours()).padStart(2,"0"); const mi=String(d.getMinutes()).padStart(2,"0"); const ss=String(d.getSeconds()).padStart(2,"0"); return `${dd}/${mm}/${yy}, ${hh}.${mi}.${ss}` };
     const parseUntil = v => {
-      if(!v) return "";
+      if(!v && v!==0) return "";
       v = String(v).trim();
       if(/^\d{10}$/.test(v)) return Number(v)*1000;
       if(/^\d{13}$/.test(v)) return Number(v);
-      // dd-MM-yyyy
       const m = v.match(/^(\d{2})-(\d{2})-(\d{4})$/);
       if(m){ const [_,d,mo,y]=m; return new Date(`${y}-${mo}-${d}T00:00:00Z`).getTime(); }
-      return v; // simpan mentah kalau user pakai format lain
+      return v;
     };
     const isBannedNow = (banned, until)=>{
       if(!banned) return false;
@@ -228,12 +239,17 @@
       if(!S.me.uid){ toast("Login dulu."); throw 0; }
       if(!S.me.isAdmin){ toast("Akses tulis butuh admin."); throw 0; }
     };
+    const toggleLoginUI = authed=>{
+      $("#loginBox").classList.toggle("hidden", authed);
+      $("#logoutBtn").classList.toggle("hidden", !authed);
+    };
 
-    // ====== AUTH ======
+    // ===== AUTH =====
     const updateBadges = async ()=>{
       $("#meUid").textContent = S.me.uid ?? "-";
       $("#meOwner").textContent = S.me.isOwner;
-      // cek admin flag di /admins/{uid}
+
+      // cek /admins/{uid}
       let admin = false;
       if(S.me.uid){
         try{
@@ -243,12 +259,15 @@
       }
       S.me.isAdmin = S.me.isOwner || admin;
       $("#meAdmin").textContent = S.me.isAdmin;
+      toggleLoginUI(!!S.me.uid);
     };
 
     onAuthStateChanged(auth, async (u)=>{
       S.me.uid = u?.uid || null;
       S.me.isOwner = (u?.uid === OWNER_UID);
       await updateBadges();
+      // setiap perubahan auth → refresh list
+      doList(true).catch(()=>{});
     });
 
     $("#loginBtn").onclick = async ()=>{
@@ -262,14 +281,13 @@
         console.error(e); toast("Login gagal: "+(e.code||e.message));
       }
     };
-    $("#logoutBtn").onclick = async ()=>{ try{ await signOut(auth); toast("Logout."); }catch{} };
+    $("#logoutBtn").onclick = async ()=>{ try{ await signOut(auth); toast("Logout."); }catch(e){} };
 
-    // ====== CRUD ======
+    // ===== CRUD =====
     const readUser = async (aid)=>{
       const snap = await get(ref(db, `users/${aid}`));
       return snap.exists()? snap.val() : null;
     };
-
     const writeUser = async (aid, data)=>{
       ensureAdminWrite();
       const payload = {
@@ -282,7 +300,6 @@
       await set(ref(db, `users/${aid}`), payload);
       toast("Tersimpan.");
     };
-
     const deleteUsers = async (ids)=>{
       ensureAdminWrite();
       const multi = {};
@@ -290,7 +307,6 @@
       await update(ref(db), multi);
       toast(`Hapus ${ids.length} user.`);
     };
-
     const setBanBulk = async (ids, banned)=>{
       ensureAdminWrite();
       const multi = {};
@@ -302,7 +318,7 @@
       toast(`${banned? "Di-ban" : "Di-unban"} ${ids.length} user.`);
     };
 
-    // ====== LIST/PAGINATION ======
+    // ===== LIST & PAGING =====
     async function fetchList({prefix=null, bannedOnly=false, startKey=null, limit=100}={}){
       let q;
       if(prefix){
@@ -320,7 +336,6 @@
           all.push({ id, ...v });
         }
       });
-      // simple cursor
       let nextStart = null;
       if(all.length > limit){
         const last = all.pop();
@@ -332,10 +347,15 @@
     function renderRows(rows){
       const tb = $("#tbody");
       tb.innerHTML = "";
+      if(!rows || rows.length===0){
+        tb.innerHTML = `<tr><td colspan="6"><div class="empty">Belum ada data user yang dimuat.</div></td></tr>`;
+        $("#countInfo").textContent = "0 items";
+        return;
+      }
       rows.forEach(r=>{
         const tr = document.createElement("tr");
         tr.innerHTML = `
-          <td><input type="checkbox" data-id="${r.id}"></td>
+          <td><input type="checkbox" aria-label="select" data-id="${r.id}"></td>
           <td><a href="#" class="hl fill" data-id="${r.id}">${r.id}</a></td>
           <td class="mono">${(r.key||"")}</td>
           <td class="${r.banned? "danger":"ok"}">${r.banned}</td>
@@ -344,7 +364,6 @@
         `;
         tb.appendChild(tr);
       });
-      // bind checkbox
       S.sel.clear();
       tb.querySelectorAll('input[type="checkbox"]').forEach(cb=>{
         cb.onchange = (e)=>{
@@ -352,13 +371,13 @@
           if(e.target.checked) S.sel.add(id); else S.sel.delete(id);
         };
       });
-      // bind click fill to the form
       tb.querySelectorAll('a.fill').forEach(a=>{
         a.onclick = async (e)=>{
           e.preventDefault();
           const id = a.getAttribute("data-id");
           const v = await readUser(id);
           fillForm(id, v);
+          window.scrollTo({top:0,behavior:"smooth"});
         };
       });
       $("#countInfo").textContent = `${rows.length} items`;
@@ -373,14 +392,22 @@
     }
 
     async function doList(firstPage=true){
-      const {prefix, bannedOnly} = S;
-      const {rows, nextStart} = await fetchList({prefix, bannedOnly, startKey:firstPage? (prefix||"") : S.cursorStart});
-      S.list = rows;
-      S.cursorStart = nextStart;
-      renderRows(rows);
+      try{
+        setState("Loading list…");
+        const {prefix, bannedOnly} = S;
+        const {rows, nextStart} = await fetchList({prefix, bannedOnly, startKey:firstPage? (prefix||"") : S.cursorStart});
+        S.list = rows;
+        S.cursorStart = nextStart;
+        renderRows(rows);
+        setState(`Selesai. ${rows.length} baris.`);
+      }catch(e){
+        console.error(e);
+        setState("Gagal memuat list: " + (e.code||e.message||e));
+        renderRows([]);
+      }
     }
 
-    // ====== UI EVENTS ======
+    // ===== UI EVENTS =====
     $("#btnSave").onclick = async ()=>{
       try{
         const aid = $("#f_id").value.trim();
@@ -404,23 +431,21 @@
       if(!v){ toast("Tidak ditemukan."); return; }
       fillForm(id, v);
     };
-
     $("#btnFindKey").onclick = async ()=>{
       const target = $("#q_key").value.trim();
       if(!target){ toast("Isi key."); return; }
-      // scan cepat 1000 pertama (kalau user banyak, pakai paging manual)
       const {rows} = await fetchList({prefix:null, bannedOnly:false, startKey:"", limit:1000});
       const hit = rows.find(r => (r.key||"") === target);
       if(!hit){ toast("Key tidak ditemukan di batch ini."); return; }
       fillForm(hit.id, hit);
     };
-
     $("#btnClear").onclick = ()=>{ $("#q_id").value=""; $("#q_key").value=""; };
 
-    $("#btnList").onclick = async ()=>{ S.prefix=null; S.bannedOnly=false; S.cursorStart=null; await doList(true); };
-    $("#btnListBanned").onclick = async ()=>{ S.prefix=null; S.bannedOnly=true; S.cursorStart=null; await doList(true); };
-    $("#btnSearchPrefix").onclick = async ()=>{ S.prefix = ($("#q_prefix").value||"").trim(); S.bannedOnly=false; S.cursorStart=null; await doList(true); };
-    $("#btnClrPrefix").onclick = async ()=>{ $("#q_prefix").value=""; S.prefix=null; S.cursorStart=null; await doList(true); };
+    $("#btnList").onclick        = async ()=>{ S.prefix=null; S.bannedOnly=false; S.cursorStart=null; await doList(true); };
+    $("#btnListBanned").onclick  = async ()=>{ S.prefix=null; S.bannedOnly=true;  S.cursorStart=null; await doList(true); };
+    $("#btnSearchPrefix").onclick= async ()=>{ S.prefix = ($("#q_prefix").value||"").trim(); S.bannedOnly=false; S.cursorStart=null; await doList(true); };
+    $("#btnClrPrefix").onclick   = async ()=>{ $("#q_prefix").value=""; S.prefix=null; S.cursorStart=null; await doList(true); };
+    $("#btnRefresh").onclick     = async ()=>{ await doList(true); };
 
     $("#btnPrev").onclick = async ()=>{ toast("Pagination sederhana: hanya Next (cursor forward)."); };
     $("#btnNext").onclick = async ()=>{ if(!S.cursorStart){ toast("Sudah terakhir."); return; } await doList(false); };
@@ -429,17 +454,17 @@
     $("#btnUnbanSel").onclick = async ()=>{ if(S.sel.size===0){ toast("Pilih dulu."); return; } await setBanBulk(Array.from(S.sel), false); await doList(true); };
     $("#btnDelSel").onclick = async ()=>{ if(S.sel.size===0){ toast("Pilih dulu."); return; } if(!confirm("Hapus selected?")) return; await deleteUsers(Array.from(S.sel)); await doList(true); };
 
-    $("#copyId").onclick = ()=>{ navigator.clipboard.writeText($("#f_id").value||""); toast("Android ID disalin."); };
+    $("#copyId").onclick  = ()=>{ navigator.clipboard.writeText($("#f_id").value||""); toast("Android ID disalin."); };
     $("#copyKey").onclick = ()=>{ navigator.clipboard.writeText($("#f_key").value||""); toast("Key disalin."); };
-    $("#genKey").onclick = ()=>{
-      // Key simple: 4 alphanum - 4 digit - SUFFIX
+    $("#genKey").onclick  = ()=>{
       const part = (n,chars)=>Array.from(crypto.getRandomValues(new Uint8Array(n))).map(b=>chars[b%chars.length]).join('');
       const k = `${part(4,"ABCDEFGHJKLMNPQRSTUVWXYZ")}-${part(4,"0123456789")}-PAID`;
       $("#f_key").value = k;
     };
 
-    // auto-refresh list setelah login
-    setTimeout(()=>doList(true), 600);
+    // boot
+    setState("Menunggu data…");
+    doList(true).catch(()=>{});
   </script>
 </body>
 </html>
