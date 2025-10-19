@@ -1,566 +1,496 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>GxMods Admin Panel</title>
-<link rel="preconnect" href="https://www.gstatic.com" crossorigin>
-<style>
-  :root{
-    --bg:#0e1116; --panel:#141922; --muted:#1b2230; --soft:#1a2330;
-    --stroke:#263246; --text:#e6efff; --hint:#9bb1d1;
-    --accent:#3391ff; --accent-2:#2eb872; --danger:#ef5350; --danger-2:#e53935;
-    --pill:#1a2a3d; --chip:#172233; --shadow:rgba(0,0,0,.4);
-  }
-  *{box-sizing:border-box}
-  body{margin:0;background:var(--bg);color:var(--text);font:14px/1.45 system-ui,Segoe UI,Roboto,Helvetica,Arial}
-  .wrap{max-width:1200px;margin:22px auto;padding:0 14px}
-  .card{background:linear-gradient(180deg,#151b24, #121721);border:1px solid var(--stroke);border-radius:16px;box-shadow:0 8px 24px var(--shadow)}
-  .row{display:grid;grid-template-columns:1fr 1fr;gap:18px}
-  @media (max-width:980px){.row{grid-template-columns:1fr}}
-  .toolbar{display:flex;gap:10px;align-items:center;justify-content:space-between;padding:14px 16px}
-  .chips{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-  .chip{background:var(--chip);border:1px solid var(--stroke);color:var(--hint);padding:6px 10px;border-radius:20px;font-size:12px;white-space:nowrap}
-  .right{display:flex;gap:8px;align-items:center}
-  .hide{display:none}
-  .section{padding:16px}
-  h3{margin:0 0 10px 0;font-size:18px}
-  label{display:block;margin:12px 0 6px;color:var(--hint);font-size:12px}
-  input, select, textarea{
-    width:100%;background:var(--soft);border:1px solid var(--stroke);
-    color:var(--text);border-radius:12px;padding:12px 12px;outline:none
-  }
-  input::placeholder,textarea::placeholder{color:#6f8cb3}
-  textarea{min-height:80px;resize:vertical}
-  .fld-row{display:flex;gap:8px;align-items:center}
-  .btn{border:1px solid var(--stroke);background:var(--muted);color:var(--text);padding:10px 14px;border-radius:12px;cursor:pointer}
-  .btn:disabled{opacity:.55;cursor:not-allowed}
-  .btn.primary{background:var(--accent);border-color:#1c6fe0}
-  .btn.green{background:var(--accent-2);border-color:#1e9c60}
-  .btn.red{background:var(--danger);border-color:var(--danger-2)}
-  .btn.ghost{background:transparent;border-color:var(--stroke);color:var(--hint)}
-  .btn.small{padding:8px 10px;border-radius:10px;font-size:12px}
-  .btn.block{width:100%}
-  .table{width:100%;border-collapse:separate;border-spacing:0 8px}
-  .thead, .trow{
-    display:grid;grid-template-columns: 36px 1.2fr 1fr .7fr .9fr .9fr;gap:10px;align-items:center
-  }
-  @media (max-width:720px){
-    .thead,.trow{grid-template-columns:32px 1.3fr 1fr .6fr}
-    .col-hide-md{display:none}
-  }
-  .thead{padding:6px 10px;color:var(--hint);font-size:12px}
-  .trow{background:var(--panel);border:1px solid var(--stroke);border-radius:12px;padding:10px}
-  .trow input[type="checkbox"]{width:18px;height:18px}
-  .muted{color:var(--hint)}
-  .actions{display:flex;gap:10px;flex-wrap:wrap}
-  .stack{display:flex;flex-direction:column;gap:10px}
-  .bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-  .pill{background:var(--pill);border:1px solid var(--stroke);padding:8px 10px;border-radius:12px}
-  .notice{padding:12px;border:1px dashed var(--stroke);border-radius:12px;color:var(--hint)}
-  .center{display:flex;align-items:center;justify-content:center}
-  .loading{position:fixed;inset:0;background:rgba(0,0,0,.35);backdrop-filter:blur(1px);display:none}
-  .toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:#0f1520;color:#dff0ff;border:1px solid #2b3a52;padding:10px 14px;border-radius:10px;display:none}
-</style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1" />
+  <title>GxMods Admin Panel</title>
+  <style>
+    :root {
+      --bg: #0e1116;
+      --card: #111722;
+      --muted: #1a2230;
+      --muted-2: #0f1a28;
+      --stroke: #243248;
+      --text: #e6eefc;
+      --sub: #9fb3d1;
+      --accent: #4da3ff;
+      --accent-2: #2f7fde;
+      --danger: #ff5f66;
+      --ok: #2ec27e;
+      --warn: #ffb020;
+      --chip: rgba(77,163,255,.14);
+      --shadow: 0 8px 24px rgba(0,0,0,.35);
+      --radius: 14px;
+      --radius-sm: 10px;
+    }
+    * { box-sizing: border-box; }
+    html,body { margin:0; height:100%; background:var(--bg); color:var(--text); font: 14px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Inter, Ubuntu, Cantarell, 'Noto Sans', sans-serif;}
+    a { color: var(--accent); text-decoration: none;}
+    .wrap { max-width: 1180px; margin: 28px auto; padding: 0 16px; }
+    header.card { display:flex; gap:10px; align-items:center; justify-content:space-between; padding:16px; }
+    .card {
+      background: linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.0)) , var(--card);
+      border:1px solid var(--stroke);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+    .pill { display:inline-flex; align-items:center; gap:8px; background: var(--chip); padding:8px 12px; border-radius: 999px; color: var(--text); border:1px solid var(--stroke); }
+    .row { display:flex; gap:12px; align-items:center; }
+    .grow { flex:1; }
+    .muted { color: var(--sub); }
+    .bad { background: rgba(255,95,102,.15); border-color: #70333a; }
+    .good { background: rgba(46,194,126,.16); border-color: #2c6a53; }
+    .btn {
+      background: var(--accent);
+      color: white;
+      border: 1px solid var(--accent-2);
+      border-radius: 11px; padding: 10px 16px; cursor:pointer;
+      transition: transform .06s ease, box-shadow .06s ease, background .2s ease;
+      box-shadow: 0 4px 14px rgba(77,163,255,.25);
+      user-select:none;
+    }
+    .btn:hover { transform: translateY(-1px); }
+    .btn:disabled { opacity:.55; cursor:not-allowed; transform:none; }
+    .btn.alt { background: transparent; color: var(--text); border-color: var(--stroke); }
+    .btn.bad { background: var(--danger); border-color: #b33a41; box-shadow: 0 6px 16px rgba(255,95,102,.25); }
+    .btn.good { background: var(--ok); border-color: #1b8a5e; box-shadow: 0 6px 16px rgba(46,194,126,.25); color:#0a1610;}
+    .btn.small { padding:8px 12px; border-radius:10px; }
+    .btn.ghost { background: transparent; color: var(--text); border: 1px dashed var(--stroke); }
+    input, select, textarea {
+      width:100%; background: var(--muted); border:1px solid var(--stroke); color: var(--text);
+      padding: 12px 14px; border-radius: 12px; outline:none;
+    }
+    textarea { min-height: 86px; resize: vertical; }
+    label { display:block; margin: 10px 0 6px; color: var(--sub); }
+    .grid { display:grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .grid > .card { padding:18px; }
+    .hidden { display:none !important; }
+    .table {
+      width:100%; border-collapse: collapse; font-size: 13px;
+    }
+    .table thead th { text-align:left; color: var(--sub); border-bottom:1px solid var(--stroke); padding: 10px 8px; position: sticky; top:0; background: var(--card); }
+    .table tbody td { border-bottom:1px solid var(--muted-2); padding:10px 8px; color: var(--text); }
+    .table tr:hover td { background: #0f1a23; }
+    .table input[type=checkbox] { width:18px; height:18px; }
+    .toolbar { padding:12px; border-top:1px solid var(--stroke); display:flex; gap:10px; justify-content:flex-end; background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,0)); border-radius: 0 0 var(--radius) var(--radius);}
+    .stack { display:flex; gap:10px; flex-wrap: wrap; align-items:center; }
+    .chip { font-size:12px; padding:6px 10px; border-radius:999px; border:1px solid var(--stroke); background: var(--chip); color: var(--text); }
+    .note { background: #0f1623; border:1px dashed var(--stroke); padding:12px; border-radius: 10px; color: var(--sub); }
+    .kbar { display:flex; gap:8px; align-items:center; padding:12px; border-radius: var(--radius); background: var(--muted-2); border:1px solid var(--stroke); }
+    .kbar input { background: transparent; border: none; flex:1; padding: 10px 12px; }
+    .right { text-align:right; }
+    .footer { margin-top: 18px; text-align:center; color: var(--sub); }
+    @media (max-width: 980px){
+      .grid { grid-template-columns: 1fr; }
+      header.card { flex-direction: column; align-items: stretch; gap: 12px; }
+      .toolbar { position: sticky; bottom: 0; z-index: 3; }
+    }
+  </style>
 </head>
 <body>
-<div class="wrap">
-  <div class="card">
-    <div class="toolbar">
-      <div class="chips" id="topChips">
-        <span class="chip" id="chipUID">UID: -</span>
-        <span class="chip" id="chipAdmin">Admin: -</span>
-        <span class="chip" id="chipOwner">Owner: -</span>
+  <div class="wrap">
+    <header class="card" id="topBar">
+      <div class="stack">
+        <span class="pill" id="uidChip">UID: <b class="muted">-</b></span>
+        <span class="pill good" id="adminChip" title="Memiliki akses tulis">Admin: <b id="adminState">false</b></span>
+        <span class="pill" id="ownerChip">Owner: <b id="ownerState">false</b></span>
       </div>
-      <div class="right">
-        <div id="loginBox" class="bar">
-          <input id="email" type="email" placeholder="email admin" style="min-width:220px">
-          <input id="pass" type="password" placeholder="password" style="min-width:180px">
-          <button id="btnLogin" class="btn primary">Login</button>
-        </div>
-        <button id="btnLogout" class="btn ghost hide">Logout</button>
+      <div class="row grow" id="authBar">
+        <input id="authEmail" placeholder="email admin" autocomplete="username" />
+        <input id="authPass" placeholder="password" type="password" autocomplete="current-password" />
+        <button class="btn" id="loginBtn">Login</button>
+        <button class="btn alt" id="logoutBtn">Logout</button>
       </div>
-    </div>
-  </div>
+    </header>
 
-  <div class="row" style="margin-top:14px">
-    <!-- Form kiri -->
-    <div class="card">
-      <div class="section">
-        <h3>Add / Edit User</h3>
-        <div class="fld-row">
-          <div style="flex:1">
-            <label>Android ID</label>
-            <input id="fldAid" placeholder="contoh: a1b2c3d4e5f6abcd">
+    <div class="grid">
+      <!-- LEFT: editor -->
+      <section class="card">
+        <h3 style="margin:0 0 10px">Add / Edit User</h3>
+        <div>
+          <label>Android ID</label>
+          <div class="row">
+            <input id="f_id" placeholder="contoh: a1b2c3d4e5f6abcd" />
+            <button class="btn small alt" id="copyIdBtn" title="Salin ID yang sedang diisi">Copy</button>
           </div>
-          <button id="btnCopyAid" class="btn small">Copy</button>
-        </div>
 
-        <div class="fld-row" style="margin-top:8px">
-          <div style="flex:1">
-            <label>Key</label>
-            <input id="fldKey" placeholder="ZXCV-9999-PAID">
+          <label>Key</label>
+          <div class="row">
+            <input id="f_key" placeholder="ZXCV-9999-PAID" />
+            <button class="btn small alt" id="genKeyBtn">Generate</button>
+            <button class="btn small alt" id="copyKeyBtn">Copy</button>
           </div>
-          <button id="btnGenKey" class="btn small">Generate</button>
-          <button id="btnCopyKey" class="btn small">Copy</button>
-        </div>
 
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px">
-          <div>
-            <label>Banned</label>
-            <select id="fldBanned">
-              <option value="false">false</option>
-              <option value="true">true</option>
-            </select>
+          <div class="row">
+            <div class="grow">
+              <label>Banned</label>
+              <select id="f_banned">
+                <option value="false">false</option>
+                <option value="true">true</option>
+              </select>
+            </div>
+            <div class="grow">
+              <label>Until (dd-MM-yyyy atau epoch/ms, kosongkan jika tidak)</label>
+              <input id="f_until" placeholder="25-12-2025 atau 1738510000000" />
+            </div>
           </div>
-          <div>
-            <label>Until (dd-MM-yyyy atau epoch/ms, kosongkan jika tidak)</label>
-            <input id="fldUntil" placeholder="25-12-2025 atau 1738510000000">
-          </div>
-        </div>
 
-        <div style="margin-top:8px">
           <label>Reason (opsional)</label>
-          <textarea id="fldReason" placeholder="opsional"></textarea>
-        </div>
+          <textarea id="f_reason" placeholder="opsional"></textarea>
 
-        <div class="actions" style="margin-top:12px">
-          <button id="btnSave" class="btn primary">Create / Overwrite</button>
-          <button id="btnReset" class="btn">Reset</button>
-        </div>
-
-        <div style="margin-top:18px"><h3>Search / Detail</h3></div>
-        <div class="stack">
-          <div class="fld-row">
-            <input id="searchId" placeholder="Android ID (exact)">
-            <button id="btnFindId" class="btn small">Find by ID</button>
+          <div class="row" style="margin-top:12px">
+            <button class="btn" id="saveBtn">Create / Overwrite</button>
+            <button class="btn alt" id="resetBtn">Reset</button>
           </div>
-          <div class="fld-row">
-            <input id="searchKey" placeholder="Key (exact)">
-            <button id="btnFindKey" class="btn small">Find by Key</button>
-            <button id="btnClearFind" class="btn small">Clear</button>
+
+          <div class="note" style="margin-top:14px">
+            <b>Kompatibilitas GxMods:</b> Panel menulis ke <code>/users/{androidId}</code> dalam <i>format objek</i>.
+            Dialog Android-mu tetap bisa membaca jika suatu node tersimpan sebagai <i>string</i> (nilai = key).
+            Panel ini otomatis menampilkan keduanya.
           </div>
         </div>
-      </div>
+      </section>
+
+      <!-- RIGHT: list -->
+      <section class="card">
+        <div class="row" style="justify-content:space-between">
+          <h3 style="margin:0">Users List</h3>
+          <div class="row">
+            <button class="btn small alt" id="btnAll">List (100)</button>
+            <button class="btn small alt" id="btnBanned">List Banned</button>
+          </div>
+        </div>
+
+        <div class="kbar" style="margin-top:10px">
+          <span class="muted">Cari prefix Android</span>
+          <input id="searchPrefix" placeholder="mis. a1b2" />
+          <button class="btn small alt" id="btnSearchPrefix">Search Prefix</button>
+          <button class="btn small alt" id="btnClearPrefix">Clear</button>
+        </div>
+
+        <div style="overflow:auto; max-height: 52vh; margin-top: 10px;" id="tableWrap">
+          <table class="table" id="usersTable">
+            <thead>
+              <tr>
+                <th style="width:40px">Sel</th>
+                <th>Android ID</th>
+                <th>Key</th>
+                <th class="right">Banned</th>
+                <th>Until</th>
+                <th>Updated</th>
+              </tr>
+            </thead>
+            <tbody id="tbody">
+              <tr><td colspan="6" class="muted">Belum ada data user yang dimuat.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="row" style="margin-top:10px; justify-content:flex-start">
+          <button class="btn small alt" id="prevBtn">Prev</button>
+          <button class="btn small alt" id="nextBtn">Next</button>
+        </div>
+
+        <div class="toolbar">
+          <button class="btn bad" id="banSelBtn">Ban Selected</button>
+          <button class="btn good" id="unbanSelBtn">Unban Selected</button>
+          <button class="btn bad alt" id="delSelBtn">Delete Selected</button>
+        </div>
+      </section>
     </div>
 
-    <!-- List kanan -->
-    <div class="card">
-      <div class="section">
-        <h3>Users List</h3>
-        <div class="bar" style="margin-bottom:8px">
-          <button id="btnList" class="btn small">List (100)</button>
-          <button id="btnListBanned" class="btn small">List Banned</button>
-          <input id="searchPrefix" placeholder="Cari prefix Android (mis. a1b2)" style="min-width:200px">
-          <button id="btnSearchPrefix" class="btn small">Search Prefix</button>
-          <button id="btnClearPrefix" class="btn small">Clear</button>
-        </div>
-
-        <div class="thead">
-          <div class="muted">Sel</div>
-          <div class="muted">Android ID</div>
-          <div class="muted">Key</div>
-          <div class="muted">Banned</div>
-          <div class="muted col-hide-md">Until</div>
-          <div class="muted col-hide-md">Updated</div>
-        </div>
-        <div id="rows" class="stack"></div>
-
-        <div class="bar" style="margin-top:10px;justify-content:space-between">
-          <div class="bar">
-            <button id="btnPrev" class="btn small">Prev</button>
-            <button id="btnNext" class="btn small">Next</button>
-          </div>
-          <div class="bar">
-            <button id="btnBanSel" class="btn red">Ban Selected</button>
-            <button id="btnUnbanSel" class="btn green">Unban Selected</button>
-            <button id="btnDelSel" class="btn red">Delete Selected</button>
-          </div>
-        </div>
-
-        <div class="notice" style="margin-top:12px">
-          <b>Kompatibilitas GxMods:</b> Panel menulis ke <code>/users/{androidId}</code> dalam format objek.
-          Dialog Android-mu juga tetap bisa membaca jika suatu node tersimpan sebagai <i>string</i> (nilai = key).
-          Panel ini otomatis menampilkan keduanya.
-        </div>
-
-        <div class="section" style="padding:0;margin-top:14px">
-          <h3>Kelola Admin (Owner only)</h3>
-          <div class="fld-row">
-            <input id="fldAdminUid" placeholder="UID Firebase">
-            <button id="btnGrant" class="btn small">Grant Admin</button>
-            <button id="btnRevoke" class="btn small">Revoke Admin</button>
-          </div>
-          <div class="pill" style="margin-top:8px">Owner UID: <code id="ownerUidView"></code></div>
-        </div>
-      </div>
-    </div>
+    <p class="footer">© GxMods Admin Panel — Firebase Realtime Database</p>
   </div>
-</div>
 
-<div id="loading" class="loading center"><div class="pill">Loading...</div></div>
-<div id="toast" class="toast"></div>
+  <script type="module">
+    // ===== Firebase CDN (v10) =====
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-analytics.js";
+    import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
+    import { getDatabase, ref, get, child, set, update, remove, query, orderByKey, orderByChild, equalTo, startAt, endAt, limitToFirst } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-database.js";
 
-<script type="module">
-  // ===== Firebase SDK =====
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-  import {
-    getDatabase, ref, get, set, update, remove, child,
-    query, orderByKey, startAt, endAt, limitToFirst, orderByChild, equalTo
-  } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
-
-  // ===== Konfigurasi Firebase (punya kamu) =====
-  const firebaseConfig = {
-    apiKey: "AIzaSyBpsA9-X9ckiyz2erxurJdLOzv-Deoi7R0",
-    authDomain: "animeplay-738a4.firebaseapp.com",
-    databaseURL: "https://animeplay-738a4-default-rtdb.firebaseio.com",
-    projectId: "animeplay-738a4",
-    storageBucket: "animeplay-738a4.firebasestorage.app",
-    messagingSenderId: "129738568083",
-    appId: "1:129738568083:web:d144ad8d1a66d893213866",
-    measurementId: "G-J6G96TPMHX"
-  };
-  const OWNER_UID = "SjEQCMqzEMb2PQclx8Iidde3reA3";
-
-  const app  = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-  const db   = getDatabase(app);
-
-  // ====== Helpers UI ======
-  const $ = sel => document.querySelector(sel);
-  const $$ = sel => document.querySelectorAll(sel);
-  const toast = (t, ms=1600)=>{ const el=$("#toast"); el.textContent=t; el.style.display="block"; setTimeout(()=>el.style.display="none", ms); }
-  const loading = (v)=>{ $("#loading").style.display = v? "flex":"none"; }
-  const fmtDate = (ms)=>{ try{ const d = new Date(ms); return `${d.getDate().toString().padStart(2,"0")}/${(d.getMonth()+1).toString().padStart(2,"0")}/${d.getFullYear()} ${d.toTimeString().slice(0,5)}` }catch(e){return "-"}}
-  const byId = id => id?.trim();
-  const isOwner = (uid)=> uid===OWNER_UID;
-
-  // ====== State ======
-  let curUser = null;
-  let isAdmin = false;
-  let nextStartKey = null;
-  let lastStack = []; // buat Prev
-
-  // ====== DOM refs ======
-  const chipUID = $("#chipUID"), chipAdmin=$("#chipAdmin"), chipOwner=$("#chipOwner");
-  const loginBox=$("#loginBox"), btnLogout=$("#btnLogout"), btnLogin=$("#btnLogin");
-  $("#ownerUidView").textContent = OWNER_UID;
-
-  // ====== Auth listeners ======
-  onAuthStateChanged(auth, async (u)=>{
-    curUser = u || null;
-    chipUID.textContent = "UID: " + (u? u.uid : "-");
-    $("#btnLogout").classList.toggle("hide", !u);
-    loginBox.classList.toggle("hide", !!u);
-
-    if(!u){
-      isAdmin = false;
-      chipAdmin.textContent = "Admin: -";
-      chipOwner.textContent = "Owner: -";
-      // Tetap boleh lihat list (rules .read: true).
-      await doList();
-      return;
-    }
-    chipOwner.textContent = "Owner: " + (isOwner(u.uid) ? "true":"false");
-
-    // cek /admins/{uid}
-    try{
-      const a = await get(ref(db, "admins/"+u.uid));
-      isAdmin = a.exists() && a.val()===true;
-    }catch(e){ isAdmin=false; }
-    chipAdmin.textContent = "Admin: " + (isAdmin?"true":"false");
-
-    await doList();
-  });
-
-  // ====== Login / Logout ======
-  btnLogin.onclick = async ()=>{
-    const email = $("#email").value.trim();
-    const pass  = $("#pass").value.trim();
-    if(!email || !pass){ toast("Isi email dan password."); return; }
-    loading(true);
-    try{
-      await signInWithEmailAndPassword(auth, email, pass);
-      toast("Login sukses");
-    }catch(e){
-      console.error(e); toast("Login gagal: "+(e.code||e.message));
-    }finally{ loading(false); }
-  };
-  btnLogout.onclick = async ()=>{
-    await signOut(auth);
-    toast("Logged out");
-  };
-
-  // ====== Key generator ======
-  const rand4 = ()=> Math.floor(1000 + Math.random()*9000);
-  const rand4H = ()=> (Math.random().toString(36).slice(2,6)).toUpperCase();
-  const genKey = ()=> `${rand4H()}-${rand4()}-PAID`;
-  $("#btnGenKey").onclick = ()=> $("#fldKey").value = genKey();
-
-  $("#btnCopyAid").onclick = ()=>{ const v=$("#fldAid").value; navigator.clipboard.writeText(v||""); toast("Android ID disalin"); }
-  $("#btnCopyKey").onclick = ()=>{ const v=$("#fldKey").value; navigator.clipboard.writeText(v||""); toast("Key disalin"); }
-
-  // ====== Save / Overwrite ======
-  $("#btnSave").onclick = async ()=>{
-    if(!curUser){ toast("Login dulu."); return; }
-    if(!isAdmin){ toast("Akses ditolak (bukan admin)."); return; }
-
-    const id = byId($("#fldAid").value);
-    if(!id){ toast("Android ID kosong."); return; }
-
-    const obj = {
-      key: ($("#fldKey").value||"").trim(),
-      banned: $("#fldBanned").value==="true",
-      until: ($("#fldUntil").value||"").trim(),  // biarkan string/epoch; dialog bisa baca
-      reason: ($("#fldReason").value||"").trim(),
-      updatedAt: Date.now()
+    // ===== Config (punyamu) =====
+    const firebaseConfig = {
+      apiKey: "AIzaSyBpsA9-X9ckiyz2erxurJdLOzv-Deoi7R0",
+      authDomain: "animeplay-738a4.firebaseapp.com",
+      databaseURL: "https://animeplay-738a4-default-rtdb.firebaseio.com",
+      projectId: "animeplay-738a4",
+      storageBucket: "animeplay-738a4.firebasestorage.app",
+      messagingSenderId: "129738568083",
+      appId: "1:129738568083:web:d144ad8d1a66d893213866",
+      measurementId: "G-J6G96TPMHX"
     };
-    loading(true);
-    try{
-      await set(ref(db, "users/"+id), obj);
-      toast("Tersimpan.");
-      await doList({keepCursor:true}); // biar list update tanpa reset halaman
-    }catch(e){
-      console.error(e); toast("Gagal simpan: "+(e.code||e.message));
-    }finally{ loading(false); }
-  };
-  $("#btnReset").onclick = ()=>{
-    $("#fldAid").value = "";
-    $("#fldKey").value = "";
-    $("#fldBanned").value = "false";
-    $("#fldUntil").value = "";
-    $("#fldReason").value = "";
-  };
+    const OWNER_UID = "SjEQCMqzEMb2PQclx8Iidde3reA3";
 
-  // ====== List & rendering ======
-  const rowsEl = $("#rows");
-  function normalizeNode(id, v){
-    if(typeof v==="string" || typeof v==="number"){
-      return { id, key: String(v), banned:false, until:"", reason:"", updatedAt:0 };
+    const app = initializeApp(firebaseConfig);
+    try { getAnalytics(app); } catch (e) { /* ignore if blocked */ }
+    const auth = getAuth(app);
+    const db = getDatabase(app);
+
+    // ===== el helper =====
+    const $ = (q) => document.querySelector(q);
+    const uidChip = $("#uidChip b");
+    const adminChip = $("#adminChip"); const adminState = $("#adminState");
+    const ownerChip = $("#ownerChip"); const ownerState = $("#ownerState");
+    const authBar = $("#authBar");
+    const loginBtn = $("#loginBtn");
+    const logoutBtn = $("#logoutBtn");
+
+    function toast(msg){
+      console.log(msg);
+      try { alert(msg); } catch (e){}
     }
-    return {
-      id,
-      key: v?.key || "",
-      banned: !!v?.banned,
-      until: (v?.until ?? ""),
-      reason: v?.reason || "",
-      updatedAt: v?.updatedAt || 0
+    function fmtDate(ms){
+      if (!ms) return "";
+      if (typeof ms === "string" && ms.includes("-")) return ms; // already dd-MM-yyyy
+      const d = new Date(+ms);
+      const two = (n)=> (n<10?"0":"")+n;
+      return two(d.getDate())+"-"+two(d.getMonth()+1)+"-"+d.getFullYear()+" "+two(d.getHours())+":"+two(d.getMinutes());
+    }
+    function keyFromString(){
+      const a = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+      const part = (n)=> Array.from({length:n},()=>a[Math.floor(Math.random()*a.length)]).join("");
+      return "ZXCV-"+part(4)+"-"+part(4);
+    }
+    function setHidden(el, hide){ el.classList.toggle("hidden", !!hide); }
+    function clearTable(msg="Belum ada data user yang dimuat."){
+      $("#tbody").innerHTML = '<tr><td colspan="6" class="muted">'+msg+'</td></tr>';
+    }
+
+    // ===== auth wiring =====
+    loginBtn.onclick = async () => {
+      const email = $("#authEmail").value.trim();
+      const pass = $("#authPass").value;
+      if(!email || !pass) return toast("Isi email & password.");
+      try {
+        await signInWithEmailAndPassword(auth, email, pass);
+      } catch (e){
+        toast("Login gagal: "+e.code);
+      }
     };
-  }
-  function parseUntilToMs(until){
-    if(until==null || until==="") return null;
-    if(typeof until==="number") return (until>1e12? until : until*1000);
-    let s = String(until).trim().replace(/\//g,"-");
-    if(/^\d{13}$/.test(s)) return parseInt(s,10);
-    if(/^\d{10}$/.test(s)) return parseInt(s,10)*1000;
-    // dd-MM-yyyy
-    if(/^\d{2}-\d{2}-\d{4}$/.test(s)){
-      const [d,m,y] = s.split("-").map(n=>parseInt(n,10));
-      const dt = new Date(y,(m-1),d,23,59,59).getTime();
-      return dt;
-    }
-    // yyyy-MM-dd
-    if(/^\d{4}-\d{2}-\d{2}$/.test(s)){
-      const [y,m,d] = s.split("-").map(n=>parseInt(n,10));
-      return new Date(y,(m-1),d,23,59,59).getTime();
-    }
-    return null;
-  }
-  function isBannedNow(banned, until){
-    if(!banned) return false;
-    const t = parseUntilToMs(until);
-    if(t==null) return true; // ban tanpa batas waktu
-    return Date.now() <= t;
-  }
-  function renderRows(list){
-    rowsEl.innerHTML = "";
-    for(const r of list){
-      const row = document.createElement("div");
-      row.className = "trow";
-      row.innerHTML = `
-        <input type="checkbox" data-id="${r.id}">
-        <div style="overflow:auto"><div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${r.id}</div></div>
-        <div class="muted" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${r.key||""}</div>
-        <div class="${isBannedNow(r.banned,r.until)?'':'muted'}">${r.banned? 'true':'false'}</div>
-        <div class="muted col-hide-md">${r.until? r.until : '-'}</div>
-        <div class="muted col-hide-md">${r.updatedAt? fmtDate(r.updatedAt): '-'}</div>
-      `;
-      // klik baris => load ke form
-      row.addEventListener("click",(e)=>{
-        // kecuali klik checkbox
-        if(e.target && e.target.type==="checkbox") return;
-        $("#fldAid").value = r.id;
-        $("#fldKey").value = r.key || "";
-        $("#fldBanned").value = r.banned? "true":"false";
-        $("#fldUntil").value = r.until || "";
-        $("#fldReason").value = r.reason || "";
-        window.scrollTo({top:0,behavior:"smooth"});
-      });
-      rowsEl.appendChild(row);
-    }
-  }
+    logoutBtn.onclick = ()=> signOut(auth);
 
-  async function fetchList({prefix=null, bannedOnly=false, startKey=null, limit=100}={}){
-    let q;
-    if(prefix){
-      const end = prefix + "\uf8ff";
-      q = query(ref(db,"users"), orderByKey(), startAt(startKey || prefix), endAt(end), limitToFirst(limit+1));
-    }else{
-      q = query(ref(db,"users"), orderByKey(), startAt(startKey || ""), limitToFirst(limit+1));
+    // state & admin check
+    let state = {
+      uid: null,
+      isAdmin: false,
+      isOwner: false,
+    };
+
+    async function refreshBadges(){
+      uidChip.textContent = state.uid || "-";
+      adminState.textContent = state.isAdmin ? "true" : "false";
+      ownerState.textContent = state.isOwner ? "true" : "false";
+      adminChip.classList.toggle("good", state.isAdmin);
+      ownerChip.classList.toggle("good", state.isOwner);
     }
-    const snap = await get(q);
-    const arr = [];
-    snap.forEach(ch=>{
-      const id = ch.key;
-      const norm = normalizeNode(id, ch.val());
-      if(!bannedOnly || isBannedNow(norm.banned, norm.until)) arr.push(norm);
+
+    async function readAdmin(uid){
+      try {
+        const snap = await get(ref(db, "admins/"+uid));
+        return snap.exists() && snap.val() === true;
+      }catch(e){ return false; }
+    }
+
+    onAuthStateChanged(auth, async (user) => {
+      state.uid = user?.uid || null;
+      state.isOwner = (state.uid === OWNER_UID);
+      state.isAdmin = state.uid ? await readAdmin(state.uid) : false;
+
+      // UI: hide auth when logged-in; show otherwise
+      setHidden(authBar, !!user);
+
+      await refreshBadges();
+
+      // after login, load first page (even jika bukan admin: read tetap boleh)
+      loadMode = "all";
+      prefixFilter = "";
+      pagination.reset();
+      await loadTable();
     });
-    let next = null;
-    if(arr.length > limit){
-      const last = arr.pop();
-      next = last.id;
+
+    // ===== editor wiring =====
+    $("#genKeyBtn").onclick = ()=> $("#f_key").value = keyFromString();
+    $("#copyIdBtn").onclick = ()=> navigator.clipboard.writeText($("#f_id").value||"");
+    $("#copyKeyBtn").onclick = ()=> navigator.clipboard.writeText($("#f_key").value||"");
+    $("#resetBtn").onclick = ()=>{ $("#f_id").value=""; $("#f_key").value=""; $("#f_banned").value="false"; $("#f_until").value=""; $("#f_reason").value=""; };
+
+    $("#saveBtn").onclick = async ()=>{
+      if(!state.isAdmin){ return toast("Akses ditolak. Akun ini bukan admin."); }
+      const id = $("#f_id").value.trim();
+      const key = $("#f_key").value.trim();
+      if(!id || !key) return toast("Android ID & Key wajib diisi.");
+      const banned = $("#f_banned").value === "true";
+      const until = $("#f_until").value.trim();
+      const reason = $("#f_reason").value.trim();
+
+      const payload = { key, banned };
+      if (until) payload.until = /^\d+$/.test(until) ? Number(until) : until;
+      if (reason) payload.reason = reason;
+      payload.updatedAt = Date.now();
+
+      try{
+        await set(ref(db, "users/"+id), payload);
+        toast("Tersimpan.");
+        pagination.reset(); // kembali ke page awal
+        await loadTable();
+      }catch(e){
+        toast("Gagal simpan: "+e.code);
+      }
+    };
+
+    // ===== list & actions =====
+    const tbody = $("#tbody");
+    let loadMode = "all"; // 'all' | 'banned' | 'prefix'
+    let prefixFilter = "";
+    const PAGE = 100;
+    const pagination = {
+      lastKey: null,
+      firstKey: null,
+      dir: "fwd",
+      reset(){ this.lastKey = null; this.firstKey = null; this.dir="fwd"; }
+    };
+
+    $("#btnAll").onclick = async ()=>{ loadMode="all"; prefixFilter=""; pagination.reset(); await loadTable(); };
+    $("#btnBanned").onclick = async ()=>{ loadMode="banned"; prefixFilter=""; pagination.reset(); await loadTable(); };
+    $("#btnSearchPrefix").onclick = async ()=>{
+      const p = $("#searchPrefix").value.trim();
+      if(!p) return toast("Isi prefix Android ID."); 
+      loadMode="prefix"; prefixFilter=p; pagination.reset(); await loadTable();
+    };
+    $("#btnClearPrefix").onclick = async ()=>{ $("#searchPrefix").value=""; loadMode="all"; prefixFilter=""; pagination.reset(); await loadTable(); };
+    $("#prevBtn").onclick = async ()=>{ pagination.dir="back"; await loadTable(true); };
+    $("#nextBtn").onclick = async ()=>{ pagination.dir="fwd"; await loadTable(true); };
+
+    function rowHtml(id, obj){
+      let key = "", banned = false, until="", updated="";
+      if (typeof obj === "string"){ key = obj; }
+      else if (obj && typeof obj === "object"){
+        key = obj.key ?? "";
+        banned = !!obj.banned;
+        until = obj.until ?? "";
+        updated = obj.updatedAt ? fmtDate(obj.updatedAt) : "";
+      }
+      const banStr = banned ? "<span class='chip bad'>true</span>" : "<span class='chip good'>false</span>";
+      return `<tr data-id="${id}">
+        <td><input type="checkbox" class="sel"></td>
+        <td><a href="#" class="link-id">${id}</a></td>
+        <td>${key || "<span class='muted'>-</span>"}</td>
+        <td class="right">${banStr}</td>
+        <td>${until || "<span class='muted'>-</span>"}</td>
+        <td>${updated || "<span class='muted'>-</span>"}</td>
+      </tr>`;
     }
-    return {rows:arr, next};
-  }
 
-  async function doList(opts={}){
-    loading(true);
-    try{
-      const pref = (opts.prefix ?? $("#searchPrefix").value.trim()) || null;
-      const bannedOnly = !!opts.bannedOnly;
-      const start = opts.keepCursor ? nextStartKey : null;
-      const {rows,next} = await fetchList({prefix:pref, bannedOnly, startKey:start, limit:100});
-      renderRows(rows);
-      if(!opts.keepCursor){ lastStack = []; }
-      nextStartKey = next;
-    }catch(e){
-      console.error(e); toast("Gagal memuat list.");
-    }finally{ loading(false); }
-  }
-
-  // tombol list
-  $("#btnList").onclick = ()=> doList({prefix:null,bannedOnly:false,keepCursor:false});
-  $("#btnListBanned").onclick = ()=> doList({prefix:null,bannedOnly:true,keepCursor:false});
-  $("#btnSearchPrefix").onclick = ()=> doList({keepCursor:false});
-  $("#btnClearPrefix").onclick = ()=> { $("#searchPrefix").value=""; doList({keepCursor:false}); }
-
-  // pagination
-  $("#btnNext").onclick = async ()=>{
-    if(!nextStartKey){ toast("Sudah terakhir."); return; }
-    lastStack.push(nextStartKey);
-    await doList({keepCursor:true});
-  };
-  $("#btnPrev").onclick = async ()=>{
-    if(lastStack.length<2){ toast("Sudah awal."); return; }
-    // ambil kunci sebelum terakhir
-    lastStack.pop();
-    const prevStart = lastStack.pop();
-    nextStartKey = prevStart;
-    await doList({keepCursor:true});
-  };
-
-  // ====== Batch actions ======
-  function selectedIds(){
-    const ids=[];
-    $$("#rows input[type='checkbox']").forEach(x=>{ if(x.checked) ids.push(x.getAttribute("data-id")) });
-    return ids;
-  }
-  $("#btnBanSel").onclick = async ()=>{
-    const ids = selectedIds(); if(ids.length===0) return toast("Pilih dulu.");
-    if(!curUser || !isAdmin) return toast("Perlu admin.");
-    loading(true);
-    try{
-      const upd = {};
-      const now = Date.now();
-      ids.forEach(id=>{
-        upd[`users/${id}/banned`] = true;
-        upd[`users/${id}/updatedAt`] = now;
-      });
-      await update(ref(db), upd);
-      toast("Sudah dibanned.");
-      await doList({keepCursor:true});
-    }catch(e){ console.error(e); toast("Gagal ban."); }finally{ loading(false); }
-  };
-  $("#btnUnbanSel").onclick = async ()=>{
-    const ids = selectedIds(); if(ids.length===0) return toast("Pilih dulu.");
-    if(!curUser || !isAdmin) return toast("Perlu admin.");
-    loading(true);
-    try{
-      const upd = {};
-      const now = Date.now();
-      ids.forEach(id=>{
-        upd[`users/${id}/banned`] = false;
-        upd[`users/${id}/updatedAt`] = now;
-      });
-      await update(ref(db), upd);
-      toast("Unban OK.");
-      await doList({keepCursor:true});
-    }catch(e){ console.error(e); toast("Gagal unban."); }finally{ loading(false); }
-  };
-  $("#btnDelSel").onclick = async ()=>{
-    const ids = selectedIds(); if(ids.length===0) return toast("Pilih dulu.");
-    if(!curUser || !isAdmin) return toast("Perlu admin.");
-    if(!confirm(`Hapus ${ids.length} data?`)) return;
-    loading(true);
-    try{
-      const upd = {};
-      ids.forEach(id=>{ upd[`users/${id}`]=null; });
-      await update(ref(db), upd);
-      toast("Deleted.");
-      await doList({keepCursor:false});
-    }catch(e){ console.error(e); toast("Gagal delete."); }finally{ loading(false); }
-  };
-
-  // ====== Find by ID / Key ======
-  $("#btnFindId").onclick = async ()=>{
-    const id = $("#searchId").value.trim(); if(!id) return;
-    loading(true);
-    try{
-      const s = await get(ref(db,"users/"+id));
-      if(!s.exists()){ renderRows([]); toast("Tidak ditemukan."); return; }
-      renderRows([ normalizeNode(id, s.val()) ]);
-    }catch(e){ console.error(e); toast("Error mencari ID"); }
-    finally{ loading(false); }
-  };
-  $("#btnFindKey").onclick = async ()=>{
-    const k = $("#searchKey").value.trim(); if(!k) return;
-    loading(true);
-    try{
-      // cari objek dengan child "key" = k dan juga node string yang == k
-      const s1 = await get(query(ref(db,"users"), orderByChild("key"), equalTo(k)));
-      const list=[];
-      s1.forEach(ch=> list.push(normalizeNode(ch.key, ch.val())));
-      // Scan ringan untuk node string (limit 200 pertama dari keyspace)
-      const s2 = await get(query(ref(db,"users"), orderByKey(), startAt(""), limitToFirst(200)));
-      s2.forEach(ch=>{
-        if(typeof ch.val()==="string" || typeof ch.val()==="number"){
-          if(String(ch.val())===k) list.push(normalizeNode(ch.key, ch.val()));
+    async function loadTable(isPageNav=false){
+      clearTable("Memuat…");
+      try {
+        let q;
+        if (loadMode === "banned"){
+          // baca semua lalu filter (agar menangkap node bertipe string juga)
+          const snap = await get(ref(db, "users"));
+          if (!snap.exists()){ clearTable(); return; }
+          const all = snap.val();
+          const ids = Object.keys(all);
+          ids.sort();
+          const items = ids
+            .map(k=>({ id:k, v: all[k] }))
+            .filter(it => typeof it.v === "object" && it.v && (it.v.banned===true || it.v.banned==="true"));
+          const page = items.slice(0, PAGE);
+          renderRows(page);
+          return;
         }
+        if (loadMode === "prefix" && prefixFilter){
+          const start = prefixFilter;
+          const end = prefixFilter + "\uf8ff";
+          q = query(ref(db, "users"), orderByKey(), startAt(start), endAt(end), limitToFirst(PAGE));
+        } else {
+          if (!pagination.lastKey || pagination.dir==="fwd"){
+            q = query(ref(db, "users"), orderByKey(), limitToFirst(PAGE+1), startAt(pagination.lastKey || ""));
+          } else {
+            // fallback simple: always from beginning (Realtime DB tidak punya startAfter yang rapi)
+            q = query(ref(db, "users"), orderByKey(), limitToFirst(PAGE));
+          }
+        }
+        const snap = await get(q);
+        if (!snap.exists()){ clearTable(); return; }
+        const obj = snap.val();
+        const ids = Object.keys(obj);
+        if (pagination.lastKey && loadMode==="all"){
+          // drop dupe pertama jika menggunakan startAt(lastKey)
+          if (ids[0] === pagination.lastKey) ids.shift();
+        }
+        const sliceIds = ids.slice(0, PAGE);
+        pagination.firstKey = sliceIds[0] || null;
+        pagination.lastKey  = sliceIds[sliceIds.length-1] || null;
+
+        const items = sliceIds.map(k => ({ id:k, v: obj[k] }));
+        renderRows(items);
+      } catch (e){
+        clearTable("Gagal memuat data.");
+        console.error(e);
+      }
+    }
+
+    function renderRows(items){
+      if (!items || items.length===0){ clearTable(); return; }
+      tbody.innerHTML = items.map(it => rowHtml(it.id, it.v)).join("");
+      // klik untuk load ke editor
+      tbody.querySelectorAll(".link-id").forEach(a => {
+        a.addEventListener("click", async (ev)=>{
+          ev.preventDefault();
+          const id = ev.target.closest("tr").dataset.id;
+          const snap = await get(ref(db, "users/"+id));
+          if (snap.exists()){
+            const v = snap.val();
+            $("#f_id").value = id;
+            if (typeof v === "string"){ $("#f_key").value = v; $("#f_banned").value="false"; $("#f_until").value=""; $("#f_reason").value=""; }
+            else {
+              $("#f_key").value = v.key ?? "";
+              $("#f_banned").value = (v.banned===true) ? "true" : "false";
+              $("#f_until").value = (v.until ?? "");
+              $("#f_reason").value = (v.reason ?? "");
+            }
+          }
+        });
       });
-      renderRows(list);
-      if(list.length===0) toast("Key tidak ditemukan.");
-    }catch(e){ console.error(e); toast("Error mencari key"); }
-    finally{ loading(false); }
-  };
-  $("#btnClearFind").onclick = ()=>{ $("#searchId").value=""; $("#searchKey").value=""; doList({keepCursor:false}); };
+    }
 
-  // ====== Admin manage (owner only) ======
-  $("#btnGrant").onclick = async ()=>{
-    if(!curUser || !isOwner(curUser.uid)) return toast("Owner only.");
-    const uid = $("#fldAdminUid").value.trim(); if(!uid) return;
-    try{ await set(ref(db,"admins/"+uid), true); toast("Grant admin OK"); }
-    catch(e){ console.error(e); toast("Gagal grant"); }
-  };
-  $("#btnRevoke").onclick = async ()=>{
-    if(!curUser || !isOwner(curUser.uid)) return toast("Owner only.");
-    const uid = $("#fldAdminUid").value.trim(); if(!uid) return;
-    try{ await remove(ref(db,"admins/"+uid)); toast("Revoke admin OK"); }
-    catch(e){ console.error(e); toast("Gagal revoke"); }
-  };
+    // bulk actions
+    function selectedIds(){
+      return Array.from(tbody.querySelectorAll("input.sel:checked")).map(el => el.closest("tr").dataset.id);
+    }
+    $("#banSelBtn").onclick = async ()=>{
+      if(!state.isAdmin) return toast("Akses ditolak (bukan admin).");
+      const ids = selectedIds(); if(ids.length===0) return toast("Pilih data.");
+      const payload = {};
+      ids.forEach(id => payload["users/"+id+"/banned"] = true);
+      payload["users/"+ids[0]+"/updatedAt"] = Date.now(); // minimal sentuh salah satu; RTDB tidak support multi-serverTimestamp
+      await update(ref(db), payload);
+      toast("Dibanned.");
+      await loadTable();
+    };
+    $("#unbanSelBtn").onclick = async ()=>{
+      if(!state.isAdmin) return toast("Akses ditolak (bukan admin).");
+      const ids = selectedIds(); if(ids.length===0) return toast("Pilih data.");
+      const payload = {};
+      ids.forEach(id => payload["users/"+id+"/banned"] = false);
+      payload["users/"+ids[0]+"/updatedAt"] = Date.now();
+      await update(ref(db), payload);
+      toast("Di-unban.");
+      await loadTable();
+    };
+    $("#delSelBtn").onclick = async ()=>{
+      if(!state.isAdmin) return toast("Akses ditolak (bukan admin).");
+      const ids = selectedIds(); if(ids.length===0) return toast("Pilih data.");
+      if(!confirm("Hapus "+ids.length+" data?")) return;
+      const ops = ids.map(id => remove(ref(db, "users/"+id)));
+      await Promise.all(ops);
+      toast("Dihapus.");
+      await loadTable();
+    };
 
-  // ====== First load ======
-  doList();
-</script>
+    // Initial list (tanpa login pun bisa baca)
+    loadTable();
+  </script>
 </body>
 </html>
