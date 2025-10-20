@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1" />
-<title>GxMods Admin Panel</title>
+<title>GxMods Admin Panel — Mobile First</title>
 <style>
   :root{
     --bg:#0f141a;
@@ -20,20 +20,20 @@
     --ring:#27425e;
     --shadow:0 0 0 1px rgba(0,0,0,.05),0 10px 24px rgba(0,0,0,.25);
     --drawer-w: 280px;
-    --page-pad: clamp(12px, 4vw, 22px);
+    --pad: clamp(14px, 4.5vw, 24px);
+    --radius: 14px;
   }
-
   *{box-sizing:border-box}
   html,body{height:100%}
   html,body{max-width:100vw;overflow-x:hidden}
-
   body{
     margin:0;background:var(--bg);color:var(--text);
     font:16px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Inter,Helvetica,Arial;
-    -webkit-text-size-adjust:100%;text-size-adjust:100%;touch-action:manipulation;
+    -webkit-text-size-adjust:100%;text-size-adjust:100%;
+    touch-action:manipulation;
   }
 
-  /* Inputs & focus */
+  /* Inputs */
   body,button,input,select,textarea{color:var(--text)!important}
   label{display:block;margin:10px 2px 6px;color:#c3d3e6}
   input,select,textarea{
@@ -42,43 +42,27 @@
     appearance:none;-webkit-appearance:none;-moz-appearance:none;
   }
   input::placeholder,textarea::placeholder{color:#7089a3}
-  input:-webkit-autofill,
-  input:-webkit-autofill:hover,
-  input:-webkit-autofill:focus{
-    -webkit-text-fill-color:var(--text)!important;
-    box-shadow:0 0 0 1000px var(--input) inset!important;
-    border:1px solid var(--stroke)!important;caret-color:var(--text);
-  }
   input:focus-visible,select:focus-visible,textarea:focus-visible,.btn:focus-visible,.nav-btn:focus-visible{
     outline:2px solid var(--ring);outline-offset:2px;
   }
 
-  /* Layout shell */
-  .app{
-    display:grid;grid-template-columns:0 1fr;min-height:100dvh;
-    transition:grid-template-columns .22s ease;
-  }
-
-  /* Kunci body saat drawer terbuka: cegah lari-lari */
+  /* Shell */
+  .app{display:grid;grid-template-columns:0 1fr;min-height:100dvh}
   body.lock-scroll{position:fixed;inset:0;width:100vw;overflow:hidden}
 
+  /* Drawer */
   .drawer{
     position:fixed;inset:0 auto 0 0;width:var(--drawer-w);
     transform:translateX(-100%);transition:transform .22s ease;
     background:var(--muted);border-right:1px solid var(--stroke);z-index:30;
     display:flex;flex-direction:column;max-width:85vw;
   }
-  .drawer .brand{
-    padding:16px;border-bottom:1px solid var(--stroke);font-weight:700;letter-spacing:.2px
-  }
-  .drawer .menu{
-    padding:8px;display:flex;flex-direction:column;gap:6px;overflow:auto
-  }
+  .drawer .brand{padding:16px;border-bottom:1px solid var(--stroke);font-weight:700;letter-spacing:.2px}
+  .drawer .menu{padding:8px;display:flex;flex-direction:column;gap:6px;overflow:auto}
   .nav-btn{
     display:flex;align-items:center;gap:10px;
     background:transparent;border:1px solid transparent;color:var(--text);
-    padding:12px 12px;border-radius:12px;cursor:pointer;text-align:left;font-weight:600;
-    min-height:44px;
+    padding:12px;border-radius:12px;cursor:pointer;text-align:left;font-weight:600;min-height:44px
   }
   .nav-btn.active{background:#1a2230;border-color:var(--stroke)}
   .nav-group{margin:8px 8px 4px;color:#86a3c1;font-size:12px;text-transform:uppercase;letter-spacing:.8px}
@@ -91,110 +75,64 @@
   .app.drawer-open .drawer{transform:none}
   .app.drawer-open .overlay{opacity:1;pointer-events:auto}
 
+  /* Main */
   .main{min-width:0;display:flex;flex-direction:column}
-
-  /* Topbar */
   .topbar{
     position:sticky;top:0;z-index:10;display:flex;gap:10px;align-items:center;flex-wrap:wrap;
-    padding:calc(10px + env(safe-area-inset-top)) var(--page-pad) 10px;
-    background:linear-gradient(180deg,var(--bg) 70%,transparent);
+    padding:10px var(--pad);background:linear-gradient(180deg,var(--bg) 70%,transparent);
     border-bottom:1px solid rgba(255,255,255,.06);
   }
-  .hamb{
-    width:44px;height:44px;border-radius:12px;border:1px solid var(--stroke);
-    background:var(--chip);color:var(--text);cursor:pointer;font-size:18px;
-    display:grid;place-items:center;
-  }
-  .chip{background:var(--chip);border:1px solid var(--stroke);padding:10px 14px;border-radius:999px;font-size:14px;white-space:nowrap}
+  .hamb{width:44px;height:44px;border-radius:12px;border:1px solid var(--stroke);background:var(--chip);display:grid;place-items:center;cursor:pointer}
+  .chip{background:var(--chip);border:1px solid var(--stroke);padding:8px 10px;border-radius:999px;font-size:12px;white-space:nowrap}
   .chip.bad{background:#25181a;border-color:#3a2023;color:#ffb3b3}
-  .actions{display:flex;gap:10px;flex-wrap:wrap;margin-left:auto}
-  .btn{
-    border:none;border-radius:14px;padding:12px 18px;font-weight:600;color:#0b1117;background:var(--brand);
-    cursor:pointer;min-height:44px;transition:transform .05s ease;
-  }
-  .btn:active{transform:translateY(1px)}
+  .actions{display:flex;gap:8px;flex-wrap:wrap;margin-left:auto}
+  .btn{border:none;border-radius:14px;padding:11px 14px;font-weight:600;color:#0b1117;background:var(--brand);cursor:pointer;min-height:42px}
   .btn.gray{background:#34485f;color:#d2e3f5}
   .btn.ok{background:var(--ok);color:#07140a}
   .btn.danger{background:var(--danger);color:#220a0a}
-  .btn.small{padding:10px 14px;border-radius:12px;min-height:40px}
   .btn.block{width:100%}
-  .btn:disabled{opacity:.55;cursor:not-allowed}
+  .btn.small{padding:9px 12px;border-radius:12px;min-height:38px}
 
-  /* Content wrapper */
-  .wrap{max-width:1100px;margin:16px auto;padding:0 var(--page-pad);width:100%}
-  .card{background:var(--card);border:1px solid var(--stroke);border-radius:16px;padding:16px;box-shadow:var(--shadow)}
-  .card h2{margin:0 0 12px;font-size:clamp(16px,2.5vw,20px);letter-spacing:.2px}
-  .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  /* Content */
+  .wrap{max-width:920px;margin:14px auto;padding:0 var(--pad);width:100%}
+  .card{background:var(--card);border:1px solid var(--stroke);border-radius:12px;padding:12px;box-shadow:none}
+  .card h2{margin:0 0 10px;font-size:clamp(16px,2.5vw,20px);letter-spacing:.2px}
+  .row2{display:grid;grid-template-columns:1fr;gap:10px}
   .sep{height:10px}
   .empty{padding:12px;color:#9fb3c8}
   .pill{border-radius:999px;padding:10px 14px;border:1px solid var(--stroke);background:#0c1218}
   .hidden{display:none!important}
 
-  /* Table-ish list */
-  .th,.td{padding:12px 10px;text-align:left;font-size:14px}
-  .tr{
-    background:var(--muted);border:1px solid var(--stroke);border-radius:12px;overflow:hidden;
-    display:grid;grid-template-columns:1.4fr 1.3fr .9fr 1.2fr .8fr;align-items:center;
-  }
-  .th{color:#9fb3c8}
+  /* List */
+  .th,.td{padding:10px 12px;text-align:left;font-size:14px}
+  .tr{background:#131923;border:1px solid var(--stroke);border-radius:10px;overflow:hidden;display:grid;grid-template-columns:1fr}
+  .td{display:flex;gap:10px;align-items:center;justify-content:space-between;border-top:1px solid rgba(255,255,255,.04)}
+  .td:first-child{border-top:none}
 
-  /* Desktop */
-  @media (min-width:981px){
+  /* Force mobile for touch devices */
+  @media (hover: none) and (pointer: coarse){
+    .app{ grid-template-columns: 0 1fr !important; }
+    .drawer{ position: fixed !important; height: 100dvh !important; transform: translateX(-100%) !important; }
+    .overlay{ display: block !important; }
+    .hamb{ display: grid !important; }
+    .main{ padding-left: 0 !important; }
+  }
+
+  /* Desktop enhancement (opsional) */
+  @media (min-width: 980px){
     .app{grid-template-columns:var(--drawer-w) 1fr}
     .drawer{position:sticky;top:0;height:100dvh;transform:none}
     .overlay{display:none}
     .hamb{display:none}
+    .row2{grid-template-columns:1fr 1fr}
+    .tr{grid-template-columns:1.4fr 1.3fr .9fr 1.2fr .8fr}
+    .th{display:block;color:#9fb3c8}
+    .card{box-shadow:var(--shadow);border-radius:16px;padding:16px}
   }
-
-  /* Mobile tuning */
-  @media (max-width:560px){
-    body{font-size:15px}
-    .chip{padding:6px 10px;font-size:12px}
-    .actions{gap:8px;margin-left:0}
-    input,select,textarea{min-height:40px;border-radius:10px;padding:10px}
-    .btn{padding:11px 14px;border-radius:12px;min-height:42px}
-    .btn.small{padding:9px 12px;min-height:38px}
-    .wrap{padding:0 var(--page-pad);margin:12px auto}
-    .card{border-radius:12px;padding:12px;box-shadow:none}
-    .row2{grid-template-columns:1fr;gap:10px}
-    .th{display:none}
-    .tr{grid-template-columns:1fr;border-radius:10px}
-    .td{display:flex;gap:10px;align-items:center;justify-content:space-between;padding:10px 12px;border-top:1px solid rgba(255,255,255,.03)}
-    .td:first-child{border-top:none}
-    .pill{width:100%;text-align:center}
-  }
-
-  /* Hemat efek */
-  body.drawable .card{box-shadow:none}
-  body.drawable .topbar{background:var(--bg);backdrop-filter:none;border-bottom:1px solid var(--stroke)}
-  body.drawable .tr{background:#131923}
-  body.drawable .chip, body.drawable .pill{background:#111824}
-
-  @media (prefers-reduced-motion: reduce){
-    *{scroll-behavior:auto;transition:none!important;animation:none!important}
-  }
-
-  /* === FIX ANDROID: paksa mobile & padding sisi === */
-  .topbar{ padding-inline: var(--page-pad) !important; }
-  /* perangkat sentuh (coarse) selalu layout mobile */
-  @media (hover: none) and (pointer: coarse){
-    .app{ grid-template-columns: 0 1fr !important; }
-    .drawer{ position: fixed !important; height: 100dvh !important; transform: translateX(-100%) !important; }
-    .overlay{ display:block !important; }
-    .hamb{ display:grid !important; }
-  }
-
-  /* Fallback via class .force-mobile (set dari JS) */
-  .force-mobile .app{ grid-template-columns:0 1fr !important; }
-  .force-mobile .drawer{ position:fixed !important; height:100dvh !important; transform:translateX(-100%) !important; }
-  .force-mobile .overlay{ display:block !important; }
-  .force-mobile .hamb{ display:grid !important; }
 </style>
 </head>
-
 <body class="drawable">
   <div class="app" id="app">
-    <!-- Drawer -->
     <aside class="drawer" id="drawer" aria-label="Sisi navigasi">
       <div class="brand">☰ GxMods Panel</div>
       <div class="menu">
@@ -202,20 +140,16 @@
         <button class="nav-btn" data-screen="dashboard">📊 Dashboard</button>
         <button class="nav-btn" data-screen="edit">✍️ Buat / Ubah User</button>
         <button class="nav-btn" data-screen="list">👥 Users List</button>
-
         <div class="nav-group">App</div>
         <button class="nav-btn" data-screen="settings">⚙️ Settings</button>
-
         <div class="nav-group owner-only">Owner</div>
         <button class="nav-btn owner-only" data-screen="owner">👑 Owner</button>
       </div>
     </aside>
     <div class="overlay" id="overlay"></div>
 
-    <!-- Main -->
     <main class="main">
-      <!-- Topbar -->
-      <div class="topbar" id="topBadges">
+      <div class="topbar">
         <button class="hamb" id="btnHamburger" aria-label="Buka menu">☰</button>
         <span class="chip" id="uidChip">UID: -</span>
         <span class="chip" id="adminChip">Admin:false</span>
@@ -223,29 +157,24 @@
         <span class="chip bad hidden" id="warnDomain">Tambahkan domain Pages ke Auth → Authorized domains.</span>
 
         <div class="actions" id="loginRow">
-          <input id="email" type="email" placeholder="email admin" autocomplete="username" autocapitalize="none" spellcheck="false" style="min-width:200px">
-          <input id="password" type="password" placeholder="password" autocomplete="current-password" style="min-width:160px">
+          <input id="email" type="email" placeholder="email admin" autocomplete="username" autocapitalize="none" spellcheck="false" style="min-width:180px">
+          <input id="password" type="password" placeholder="password" autocomplete="current-password" style="min-width:150px">
           <button class="btn small" id="btnLogin">Login</button>
         </div>
         <button class="btn gray small hidden" id="btnLogout">Logout</button>
       </div>
 
-      <!-- Content screens -->
       <div class="wrap">
         <!-- DASHBOARD -->
         <section class="screen" id="screen-dashboard">
           <div class="card">
             <h2>Dashboard</h2>
-            <p style="color:#9fb3c8;margin:8px 2px 0">
-              Ringkasan cepat: status login, hak akses, dan aksi sering dipakai.
-            </p>
+            <p style="color:#9fb3c8;margin:8px 2px 0">Ringkasan cepat: status login, hak akses, dan aksi sering dipakai.</p>
             <div class="sep"></div>
             <div class="row2">
               <div class="card" style="padding:14px">
                 <h2 style="margin-bottom:6px">Status</h2>
-                <div id="dashStatus" style="color:#b8cbe0">
-                  Belum login.
-                </div>
+                <div id="dashStatus" style="color:#b8cbe0">Belum login.</div>
               </div>
               <div class="card" style="padding:14px">
                 <h2 style="margin-bottom:6px">Aksi Cepat</h2>
@@ -275,10 +204,7 @@
               </div>
               <div>
                 <label>Banned</label>
-                <select id="formBanned">
-                  <option>false</option>
-                  <option>true</option>
-                </select>
+                <select id="formBanned"><option>false</option><option>true</option></select>
               </div>
             </div>
             <div class="sep"></div>
@@ -310,12 +236,8 @@
             </div>
 
             <div class="sep"></div>
-            <div class="tr th" style="grid-template-columns:1.4fr 1.3fr .9fr 1.2fr .8fr">
-              <div class="th">Android ID</div>
-              <div class="th">Key</div>
-              <div class="th">Banned</div>
-              <div class="th">Until</div>
-              <div class="th">Aksi</div>
+            <div class="th hidden" id="tableHead">
+              <!-- header only appears on desktop via CSS -->
             </div>
             <div id="listArea"></div>
             <div style="display:flex;justify-content:center;margin-top:10px">
@@ -368,14 +290,14 @@
   </div>
 
 <script type="module">
-  /* Paksa mobile via class kalau device coarse pointer */
+  /* Paksa layout mobile untuk device touch */
   try{
     if (matchMedia('(hover:none) and (pointer:coarse)').matches) {
       document.documentElement.classList.add('force-mobile');
     }
   }catch(e){}
 
-  /* ===== Firebase ===== */
+  /* Firebase */
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
   import { getDatabase, ref, get, set, update, remove, query, orderByKey, limitToFirst, startAt, endAt } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-database.js";
   import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
@@ -397,7 +319,7 @@
   const db = getDatabase(app);
   const auth = getAuth(app);
 
-  /* ===== UI helpers ===== */
+  /* UI helpers */
   const el = (id)=>document.getElementById(id);
   const $$ = (sel,root=document)=>Array.from(root.querySelectorAll(sel));
   const appRoot = el("app");
@@ -405,13 +327,12 @@
   const overlay = el("overlay");
   const btnHamb = el("btnHamburger");
 
-  // Drawer toggle + kunci scroll body ketika drawer terbuka
   const closeDrawer = ()=>{ appRoot.classList.remove("drawer-open"); document.body.classList.remove("lock-scroll"); };
   const openDrawer  = ()=>{ appRoot.classList.add("drawer-open"); document.body.classList.add("lock-scroll"); };
   btnHamb?.addEventListener("click", openDrawer);
   overlay?.addEventListener("click", closeDrawer);
 
-  // Navigation (screens)
+  /* Screens */
   const screens = {
     dashboard: el("screen-dashboard"),
     edit:      el("screen-edit"),
@@ -422,27 +343,19 @@
   function showScreen(name){
     Object.entries(screens).forEach(([k,node])=>{
       if(!node) return;
-      if(k===name) node.classList.remove("hidden");
-      else node.classList.add("hidden");
+      node.classList.toggle("hidden", k!==name);
     });
     $$(".nav-btn").forEach(b=> b.classList.toggle("active", b.dataset.screen===name));
     closeDrawer();
     localStorage.setItem("gx_last_screen", name);
     if(name==="list"){ loadFirst(); }
   }
-  $$(".nav-btn").forEach(btn=>{
-    btn.addEventListener("click", ()=> showScreen(btn.dataset.screen));
-  });
-  $$("[data-screen-jump]").forEach(b=>{
-    b.addEventListener("click", ()=> showScreen(b.dataset.screenJump));
-  });
-
-  // Restore last screen
+  $$(".nav-btn").forEach(btn=> btn.addEventListener("click", ()=> showScreen(btn.dataset.screen)));
+  $$("[data-screen-jump]").forEach(b=> b.addEventListener("click", ()=> showScreen(b.dataset.screenJump)));
   const last = localStorage.getItem("gx_last_screen") || "dashboard";
   showScreen(last);
-  if(last==="list"){ loadFirst(); }
 
-  // Top chips & access gates
+  /* Top chips & access gates */
   const $uidChip=el("uidChip"), $adminChip=el("adminChip"), $ownerChip=el("ownerChip");
   const $loginRow=el("loginRow"), $btnLogout=el("btnLogout"), $btnLogout2=el("btnLogout2");
   let isAdmin=false, isOwner=false, cursor=null;
@@ -453,14 +366,11 @@
     isOwner=!!user && user.uid===OWNER_UID;
     $ownerChip.textContent="Owner:"+(isOwner?"true":"false");
 
-    if(user){ $loginRow.classList.add("hidden"); $btnLogout.classList.remove("hidden"); $btnLogout2.classList.remove("hidden"); }
-    else{ $loginRow.classList.remove("hidden"); $btnLogout.classList.add("hidden"); $btnLogout2.classList.add("hidden"); }
+    if(user){ $loginRow.classList.add("hidden"); $btnLogout.classList.remove("hidden"); $btnLogout2?.classList.remove("hidden"); }
+    else{ $loginRow.classList.remove("hidden"); $btnLogout.classList.add("hidden"); $btnLogout2?.classList.add("hidden"); }
 
     document.querySelectorAll(".needAdmin").forEach(c=> c.disabled=!admin);
-
-    $$(".owner-only").forEach(n=>{
-      if(isOwner){ n.style.display=""; } else { n.style.display="none"; }
-    });
+    $$(".owner-only").forEach(n=> n.style.display = isOwner ? "" : "none");
 
     const dash = el("dashStatus");
     if(dash){
@@ -470,15 +380,14 @@
     }
   }
 
-  /* ===== List & edit logic ===== */
+  /* List & edit */
   const $list=el("listArea"), $btnMore=el("btnMore");
   let PAGE = matchMedia("(max-width:560px)").matches ? 12 : 25;
   const prefPage = Number(localStorage.getItem("gx_page_size")||0);
   if(prefPage>0) PAGE = prefPage;
 
   let lastPrefix=""; let exactMode=null; let listEverLoaded=false;
-
-  function setLoadingList(msg){ if($list){ $list.innerHTML='<div class="empty">'+(msg||'Memuat...')+'</div>'; $btnMore.classList.add('hidden'); } }
+  function setLoadingList(msg){ if($list){ $list.innerHTML='<div class="empty">'+(msg||'Memuat...')+'</div>'; $btnMore.classList.add("hidden"); } }
   const fmt=v=>v==null?"":String(v);
   function getFormDataFromRow(row){
     return {
@@ -541,8 +450,8 @@
         $list.appendChild(rowNode(exactMode,snap.val())); $btnMore.classList.add("hidden"); return;
       }
       if(lastPrefix){
-        q = cursor ? query(base,orderByKey(),startAt(cursor),endAt(lastPrefix+"\uf8ff"),limitToFirst(PAGE+1))
-                   : query(base,orderByKey(),startAt(lastPrefix),endAt(lastPrefix+"\uf8ff"),limitToFirst(PAGE+1));
+        q = cursor ? query(base,orderByKey(),startAt(cursor),endAt(lastPrefix+"\\uf8ff"),limitToFirst(PAGE+1))
+                   : query(base,orderByKey(),startAt(lastPrefix),endAt(lastPrefix+"\\uf8ff"),limitToFirst(PAGE+1));
       }else{
         q = cursor ? query(base,orderByKey(),startAt(cursor),limitToFirst(PAGE+1))
                    : query(base,orderByKey(),limitToFirst(PAGE+1));
@@ -556,7 +465,6 @@
       if(keys.length>PAGE){ cursor = keys[PAGE]; $btnMore.classList.remove("hidden"); } else { cursor = null; $btnMore.classList.add("hidden"); }
     }catch(e){ console.error(e); if($list){ $list.innerHTML='<div class="empty">Gagal memuat data.</div>'; $btnMore.classList.add("hidden"); } }
   }
-
   el("btnMore")?.addEventListener("click", loadPage);
   el("btnSearch")?.addEventListener("click", async()=>{
     const exact=el("searchExact").value.trim();
@@ -565,7 +473,7 @@
     lastPrefix=pref; cursor=null; exactMode=null; setLoadingList(); await loadPage();
   });
 
-  // Top & auth
+  /* Auth */
   async function refreshAdmin(uid){
     if(!uid){ isAdmin=false; setTopBadges(null,false); return; }
     try{ const v=await get(ref(db,"admins/"+uid)); isAdmin=v.exists() && v.val()===true; }catch{ isAdmin=false; }
@@ -574,7 +482,6 @@
   }
   onAuthStateChanged(auth, async (user)=>{ await refreshAdmin(user?.uid||null); });
 
-  // Create / update / delete
   el("btnSave")?.addEventListener("click", async()=>{
     if(!isAdmin){ alert("Hanya admin."); return; }
     const id=el("formId").value.trim(), key=el("formKey").value.trim();
@@ -597,7 +504,7 @@
     if(!screens.list.classList.contains("hidden")) await loadFirst();
   });
 
-  // Owner actions
+  /* Owner actions */
   el("btnGrant")?.addEventListener("click", async()=>{
     if(!isOwner){ alert("Hanya owner."); return; }
     const uid=el("adminUid").value.trim(); if(!uid) return;
@@ -609,7 +516,7 @@
     await remove(ref(db,"admins/"+uid)); alert("Revoked.");
   });
 
-  // Auth
+  /* Login/Logout */
   el("btnLogin")?.addEventListener("click", async()=>{
     const email=el("email").value.trim(), pass=el("password").value.trim();
     if(!email||!pass){ alert("Isi email & password."); return; }
