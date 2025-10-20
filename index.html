@@ -20,12 +20,13 @@
     --ring:#27425e;
     --shadow:0 0 0 1px rgba(0,0,0,.05),0 10px 24px rgba(0,0,0,.25);
     --drawer-w: 280px;
-    /* NEW: padding halaman adaptif */
     --page-pad: clamp(12px, 4vw, 22px);
   }
+
   *{box-sizing:border-box}
   html,body{height:100%}
-  html,body{max-width:100vw;overflow-x:hidden} /* NEW: cegah “geser” horizontal */
+  html,body{max-width:100vw;overflow-x:hidden}
+
   body{
     margin:0;background:var(--bg);color:var(--text);
     font:16px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Inter,Helvetica,Arial;
@@ -57,7 +58,8 @@
     display:grid;grid-template-columns:0 1fr;min-height:100dvh;
     transition:grid-template-columns .22s ease;
   }
-  /* NEW: kunci body saat drawer terbuka */
+
+  /* Kunci body saat drawer terbuka: cegah lari-lari */
   body.lock-scroll{position:fixed;inset:0;width:100vw;overflow:hidden}
 
   .drawer{
@@ -89,16 +91,13 @@
   .app.drawer-open .drawer{transform:none}
   .app.drawer-open .overlay{opacity:1;pointer-events:auto}
 
-  .main{
-    min-width:0; /* fix overflow */
-    padding-left:0; /* mobile overlay */
-    display:flex;flex-direction:column;
-  }
+  .main{min-width:0;display:flex;flex-direction:column}
 
   /* Topbar */
   .topbar{
     position:sticky;top:0;z-index:10;display:flex;gap:10px;align-items:center;flex-wrap:wrap;
-    padding:10px 12px;background:linear-gradient(180deg,var(--bg) 70%,transparent);
+    padding:calc(10px + env(safe-area-inset-top)) var(--page-pad) 10px;
+    background:linear-gradient(180deg,var(--bg) 70%,transparent);
     border-bottom:1px solid rgba(255,255,255,.06);
   }
   .hamb{
@@ -122,7 +121,7 @@
   .btn:disabled{opacity:.55;cursor:not-allowed}
 
   /* Content wrapper */
-  .wrap{max-width:1100px;margin:16px auto;padding:0 14px;width:100%}
+  .wrap{max-width:1100px;margin:16px auto;padding:0 var(--page-pad);width:100%}
   .card{background:var(--card);border:1px solid var(--stroke);border-radius:16px;padding:16px;box-shadow:var(--shadow)}
   .card h2{margin:0 0 12px;font-size:clamp(16px,2.5vw,20px);letter-spacing:.2px}
   .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
@@ -145,21 +144,18 @@
     .drawer{position:sticky;top:0;height:100dvh;transform:none}
     .overlay{display:none}
     .hamb{display:none}
-    .main{padding-left:0}
   }
 
   /* Mobile tuning */
   @media (max-width:560px){
     body{font-size:15px}
-    .topbar{padding:8px 10px;gap:8px}
-    .chip{padding:6px 10px;font-size:12px}              /* NEW: chip mengecil */
+    .chip{padding:6px 10px;font-size:12px}
     .actions{gap:8px;margin-left:0}
-    input,select,textarea{min-height:40px;border-radius:10px;padding:10px} /* NEW */
+    input,select,textarea{min-height:40px;border-radius:10px;padding:10px}
     .btn{padding:11px 14px;border-radius:12px;min-height:42px}
     .btn.small{padding:9px 12px;min-height:38px}
-    .wrap{padding:0 10px;margin:12px auto}
+    .wrap{padding:0 var(--page-pad);margin:12px auto}
     .card{border-radius:12px;padding:12px;box-shadow:none}
-    .chip{padding:8px 10px;font-size:12px}
     .row2{grid-template-columns:1fr;gap:10px}
     .th{display:none}
     .tr{grid-template-columns:1fr;border-radius:10px}
@@ -168,7 +164,7 @@
     .pill{width:100%;text-align:center}
   }
 
-  /* Drawable (hemat efek) */
+  /* Hemat efek */
   body.drawable .card{box-shadow:none}
   body.drawable .topbar{background:var(--bg);backdrop-filter:none;border-bottom:1px solid var(--stroke)}
   body.drawable .tr{background:#131923}
@@ -178,29 +174,21 @@
     *{scroll-behavior:auto;transition:none!important;animation:none!important}
   }
 
-  /* === FIX ANDROID DPI KECIL: paksa mobile + padding sisi === */
+  /* === FIX ANDROID: paksa mobile & padding sisi === */
   .topbar{ padding-inline: var(--page-pad) !important; }
-  .wrap{ margin-inline:auto !important; padding-inline: var(--page-pad) !important; }
-
-  /* Perangkat sentuh (coarse pointer) dipaksa layout mobile meski lebar besar */
+  /* perangkat sentuh (coarse) selalu layout mobile */
   @media (hover: none) and (pointer: coarse){
     .app{ grid-template-columns: 0 1fr !important; }
-    .drawer{
-      position: fixed !important;
-      height: 100dvh !important;
-      transform: translateX(-100%) !important;
-    }
-    .overlay{ display: block !important; }
-    .hamb{ display: grid !important; }      /* munculkan tombol menu */
-    .main{ padding-left: 0 !important; }    /* hapus ruang kiri khusus desktop */
+    .drawer{ position: fixed !important; height: 100dvh !important; transform: translateX(-100%) !important; }
+    .overlay{ display:block !important; }
+    .hamb{ display:grid !important; }
   }
 
-  /* Fallback via class .force-mobile (di-set dari JS awal) */
+  /* Fallback via class .force-mobile (set dari JS) */
   .force-mobile .app{ grid-template-columns:0 1fr !important; }
   .force-mobile .drawer{ position:fixed !important; height:100dvh !important; transform:translateX(-100%) !important; }
   .force-mobile .overlay{ display:block !important; }
   .force-mobile .hamb{ display:grid !important; }
-  .force-mobile .main{ padding-left:0 !important; }
 </style>
 </head>
 
@@ -380,7 +368,7 @@
   </div>
 
 <script type="module">
-  /* === Hint awal: paksa mobile via class kalau device coarse pointer === */
+  /* Paksa mobile via class kalau device coarse pointer */
   try{
     if (matchMedia('(hover:none) and (pointer:coarse)').matches) {
       document.documentElement.classList.add('force-mobile');
