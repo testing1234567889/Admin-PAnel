@@ -18,10 +18,7 @@
     --chip:#1d2631;
     --input:#0c1218;
     --ring:#27425e;
-    --shadow:0 0 0 1px rgba(0,0,0,.05),0 10px 24px rgba(0,0,0,.25);
-    --drawer-w: 280px;
     --pad: clamp(14px, 4.5vw, 24px);
-    --radius: 14px;
   }
   *{box-sizing:border-box}
   html,body{height:100%}
@@ -46,19 +43,18 @@
     outline:2px solid var(--ring);outline-offset:2px;
   }
 
-  /* Shell */
-  .app{display:grid;grid-template-columns:0 1fr;min-height:100dvh}
-  body.lock-scroll{position:fixed;inset:0;width:100vw;overflow:hidden}
+  /* App shell */
+  .app{display:grid;grid-template-columns:1fr;min-height:100dvh}
 
-  /* Drawer */
+  /* Drawer — SELALU OVERLAY, default tertutup */
   .drawer{
-    position:fixed;inset:0 auto 0 0;width:var(--drawer-w);
+    position:fixed;inset:0 auto 0 0;width:min(85vw,320px);
     transform:translateX(-100%);transition:transform .22s ease;
     background:var(--muted);border-right:1px solid var(--stroke);z-index:30;
-    display:flex;flex-direction:column;max-width:85vw;
+    display:flex;flex-direction:column;
   }
   .drawer .brand{padding:16px;border-bottom:1px solid var(--stroke);font-weight:700;letter-spacing:.2px}
-  .drawer .menu{padding:8px;display:flex;flex-direction:column;gap:6px;overflow:auto}
+  .drawer .menu{padding:8px;display:flex;flex-direction:column;gap:6px;overflow:auto;max-height:calc(100dvh - 57px)}
   .nav-btn{
     display:flex;align-items:center;gap:10px;
     background:transparent;border:1px solid transparent;color:var(--text);
@@ -74,6 +70,7 @@
   }
   .app.drawer-open .drawer{transform:none}
   .app.drawer-open .overlay{opacity:1;pointer-events:auto}
+  body.lock-scroll{position:fixed;inset:0;width:100vw;overflow:hidden}
 
   /* Main */
   .main{min-width:0;display:flex;flex-direction:column}
@@ -82,20 +79,20 @@
     padding:10px var(--pad);background:linear-gradient(180deg,var(--bg) 70%,transparent);
     border-bottom:1px solid rgba(255,255,255,.06);
   }
-  .hamb{width:44px;height:44px;border-radius:12px;border:1px solid var(--stroke);background:var(--chip);display:grid;place-items:center;cursor:pointer}
-  .chip{background:var(--chip);border:1px solid var(--stroke);padding:8px 10px;border-radius:999px;font-size:12px;white-space:nowrap}
+  .hamb{width:44px;height:44px;border-radius:12px;border:1px solid var(--stroke);background:#1d2631;display:grid;place-items:center;cursor:pointer}
+  .chip{background:#1d2631;border:1px solid var(--stroke);padding:8px 10px;border-radius:999px;font-size:12px;white-space:nowrap}
   .chip.bad{background:#25181a;border-color:#3a2023;color:#ffb3b3}
   .actions{display:flex;gap:8px;flex-wrap:wrap;margin-left:auto}
-  .btn{border:none;border-radius:14px;padding:11px 14px;font-weight:600;color:#0b1117;background:var(--brand);cursor:pointer;min-height:42px}
+  .btn{border:none;border-radius:14px;padding:11px 14px;font-weight:600;color:#0b1117;background:#6aa3ff;cursor:pointer;min-height:42px}
   .btn.gray{background:#34485f;color:#d2e3f5}
-  .btn.ok{background:var(--ok);color:#07140a}
-  .btn.danger{background:var(--danger);color:#220a0a}
+  .btn.ok{background:#2ecc71;color:#07140a}
+  .btn.danger{background:#ff6b6b;color:#220a0a}
   .btn.block{width:100%}
   .btn.small{padding:9px 12px;border-radius:12px;min-height:38px}
 
   /* Content */
   .wrap{max-width:920px;margin:14px auto;padding:0 var(--pad);width:100%}
-  .card{background:var(--card);border:1px solid var(--stroke);border-radius:12px;padding:12px;box-shadow:none}
+  .card{background:#161c23;border:1px solid var(--stroke);border-radius:12px;padding:12px}
   .card h2{margin:0 0 10px;font-size:clamp(16px,2.5vw,20px);letter-spacing:.2px}
   .row2{display:grid;grid-template-columns:1fr;gap:10px}
   .sep{height:10px}
@@ -109,29 +106,14 @@
   .td{display:flex;gap:10px;align-items:center;justify-content:space-between;border-top:1px solid rgba(255,255,255,.04)}
   .td:first-child{border-top:none}
 
-  /* Force mobile for touch devices */
-  @media (hover: none) and (pointer: coarse){
-    .app{ grid-template-columns: 0 1fr !important; }
-    .drawer{ position: fixed !important; height: 100dvh !important; transform: translateX(-100%) !important; }
-    .overlay{ display: block !important; }
-    .hamb{ display: grid !important; }
-    .main{ padding-left: 0 !important; }
-  }
-
-  /* Desktop enhancement (opsional) */
+  /* Desktop – tetap overlay; hanya perbesar layout sedikit */
   @media (min-width: 980px){
-    .app{grid-template-columns:var(--drawer-w) 1fr}
-    .drawer{position:sticky;top:0;height:100dvh;transform:none}
-    .overlay{display:none}
-    .hamb{display:none}
     .row2{grid-template-columns:1fr 1fr}
-    .tr{grid-template-columns:1.4fr 1.3fr .9fr 1.2fr .8fr}
-    .th{display:block;color:#9fb3c8}
-    .card{box-shadow:var(--shadow);border-radius:16px;padding:16px}
+    .card{border-radius:16px;padding:16px}
   }
 </style>
 </head>
-<body class="drawable">
+<body>
   <div class="app" id="app">
     <aside class="drawer" id="drawer" aria-label="Sisi navigasi">
       <div class="brand">☰ GxMods Panel</div>
@@ -236,9 +218,7 @@
             </div>
 
             <div class="sep"></div>
-            <div class="th hidden" id="tableHead">
-              <!-- header only appears on desktop via CSS -->
-            </div>
+            <div class="th hidden" id="tableHead"></div>
             <div id="listArea"></div>
             <div style="display:flex;justify-content:center;margin-top:10px">
               <button id="btnMore" class="pill hidden">Muat lebih</button>
@@ -290,13 +270,6 @@
   </div>
 
 <script type="module">
-  /* Paksa layout mobile untuk device touch */
-  try{
-    if (matchMedia('(hover:none) and (pointer:coarse)').matches) {
-      document.documentElement.classList.add('force-mobile');
-    }
-  }catch(e){}
-
   /* Firebase */
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
   import { getDatabase, ref, get, set, update, remove, query, orderByKey, limitToFirst, startAt, endAt } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-database.js";
@@ -315,49 +288,46 @@
   const OWNER_UID = "SjEQCMqzEMb2PQclx8Iidde3reA3";
   document.getElementById("ownerId").textContent = OWNER_UID;
 
-  const app = initializeApp(firebaseConfig);
-  const db = getDatabase(app);
-  const auth = getAuth(app);
+  const appFb = initializeApp(firebaseConfig);
+  const db = getDatabase(appFb);
+  const auth = getAuth(appFb);
 
-  /* UI helpers */
-  const el = (id)=>document.getElementById(id);
-  const $$ = (sel,root=document)=>Array.from(root.querySelectorAll(sel));
-  const appRoot = el("app");
-  const drawer  = el("drawer");
-  const overlay = el("overlay");
-  const btnHamb = el("btnHamburger");
+  /* Basic helpers */
+  const $ = (id)=>document.getElementById(id);
+  const $$ = (s,root=document)=>Array.from(root.querySelectorAll(s));
+  const appRoot = $("app");
+  const overlay = $("overlay");
 
-  const closeDrawer = ()=>{ appRoot.classList.remove("drawer-open"); document.body.classList.remove("lock-scroll"); };
-  const openDrawer  = ()=>{ appRoot.classList.add("drawer-open"); document.body.classList.add("lock-scroll"); };
-  btnHamb?.addEventListener("click", openDrawer);
-  overlay?.addEventListener("click", closeDrawer);
+  /* Drawer toggling — always closed by default */
+  function openDrawer(){ appRoot.classList.add("drawer-open"); document.body.classList.add("lock-scroll"); }
+  function closeDrawer(){ appRoot.classList.remove("drawer-open"); document.body.classList.remove("lock-scroll"); }
+  $("btnHamburger").addEventListener("click", openDrawer);
+  overlay.addEventListener("click", closeDrawer);
+  window.addEventListener("keydown", (e)=>{ if(e.key==="Escape") closeDrawer(); });
+
+  /* Close drawer saat klik menu */
+  $$(".nav-btn").forEach(b=> b.addEventListener("click", ()=>{ showScreen(b.dataset.screen); closeDrawer(); }));
 
   /* Screens */
   const screens = {
-    dashboard: el("screen-dashboard"),
-    edit:      el("screen-edit"),
-    list:      el("screen-list"),
-    settings:  el("screen-settings"),
-    owner:     el("screen-owner"),
+    dashboard: $("screen-dashboard"),
+    edit:      $("screen-edit"),
+    list:      $("screen-list"),
+    settings:  $("screen-settings"),
+    owner:     $("screen-owner"),
   };
   function showScreen(name){
-    Object.entries(screens).forEach(([k,node])=>{
-      if(!node) return;
-      node.classList.toggle("hidden", k!==name);
-    });
+    Object.entries(screens).forEach(([k,node])=> node.classList.toggle("hidden", k!==name));
     $$(".nav-btn").forEach(b=> b.classList.toggle("active", b.dataset.screen===name));
-    closeDrawer();
     localStorage.setItem("gx_last_screen", name);
     if(name==="list"){ loadFirst(); }
   }
-  $$(".nav-btn").forEach(btn=> btn.addEventListener("click", ()=> showScreen(btn.dataset.screen)));
-  $$("[data-screen-jump]").forEach(b=> b.addEventListener("click", ()=> showScreen(b.dataset.screenJump)));
   const last = localStorage.getItem("gx_last_screen") || "dashboard";
   showScreen(last);
 
   /* Top chips & access gates */
-  const $uidChip=el("uidChip"), $adminChip=el("adminChip"), $ownerChip=el("ownerChip");
-  const $loginRow=el("loginRow"), $btnLogout=el("btnLogout"), $btnLogout2=el("btnLogout2");
+  const $uidChip=$("uidChip"), $adminChip=$("adminChip"), $ownerChip=$("ownerChip");
+  const $loginRow=$("loginRow"), $btnLogout=$("btnLogout"), $btnLogout2=$("btnLogout2");
   let isAdmin=false, isOwner=false, cursor=null;
 
   function setTopBadges(user,admin){
@@ -372,7 +342,7 @@
     document.querySelectorAll(".needAdmin").forEach(c=> c.disabled=!admin);
     $$(".owner-only").forEach(n=> n.style.display = isOwner ? "" : "none");
 
-    const dash = el("dashStatus");
+    const dash = $("dashStatus");
     if(dash){
       dash.innerHTML = user
         ? `Login sebagai <b>${user.email||user.uid}</b><br>Admin: <b>${admin}</b> · Owner: <b>${isOwner}</b>`
@@ -381,7 +351,7 @@
   }
 
   /* List & edit */
-  const $list=el("listArea"), $btnMore=el("btnMore");
+  const $list=$("listArea"), $btnMore=$("btnMore");
   let PAGE = matchMedia("(max-width:560px)").matches ? 12 : 25;
   const prefPage = Number(localStorage.getItem("gx_page_size")||0);
   if(prefPage>0) PAGE = prefPage;
@@ -465,10 +435,10 @@
       if(keys.length>PAGE){ cursor = keys[PAGE]; $btnMore.classList.remove("hidden"); } else { cursor = null; $btnMore.classList.add("hidden"); }
     }catch(e){ console.error(e); if($list){ $list.innerHTML='<div class="empty">Gagal memuat data.</div>'; $btnMore.classList.add("hidden"); } }
   }
-  el("btnMore")?.addEventListener("click", loadPage);
-  el("btnSearch")?.addEventListener("click", async()=>{
-    const exact=el("searchExact").value.trim();
-    const pref =el("searchPrefix").value.trim();
+  $("btnMore")?.addEventListener("click", loadPage);
+  $("btnSearch")?.addEventListener("click", async()=>{
+    const exact=$("searchExact").value.trim();
+    const pref =$("searchPrefix").value.trim();
     if(exact){ exactMode=exact; setLoadingList(); await loadPage(); return; }
     lastPrefix=pref; cursor=null; exactMode=null; setLoadingList(); await loadPage();
   });
@@ -482,49 +452,49 @@
   }
   onAuthStateChanged(auth, async (user)=>{ await refreshAdmin(user?.uid||null); });
 
-  el("btnSave")?.addEventListener("click", async()=>{
+  $("btnSave")?.addEventListener("click", async()=>{
     if(!isAdmin){ alert("Hanya admin."); return; }
-    const id=el("formId").value.trim(), key=el("formKey").value.trim();
+    const id=$("formId").value.trim(), key=$("formKey").value.trim();
     if(!id||!key){ alert("Android ID & Key wajib."); return; }
     const payload={ key,
-      banned:(el("formBanned").value==="true"),
-      until:el("formUntil").value.trim(),
-      reason:el("formReason").value.trim(),
+      banned:($("formBanned").value==="true"),
+      until:$("formUntil").value.trim(),
+      reason:$("formReason").value.trim(),
       updatedAt:Date.now()
     };
     await set(ref(db,"users/"+id),payload);
     alert("Tersimpan.");
     if(!screens.list.classList.contains("hidden")) await loadFirst();
   });
-  el("btnDelete")?.addEventListener("click", async()=>{
+  $("btnDelete")?.addEventListener("click", async()=>{
     if(!isAdmin){ alert("Hanya admin."); return; }
-    const id=el("formId").value.trim(); if(!id){ alert("Masukkan Android ID untuk hapus."); return; }
+    const id=$("formId").value.trim(); if(!id){ alert("Masukkan Android ID untuk hapus."); return; }
     if(!confirm("Hapus user "+id+" ?")) return; await remove(ref(db,"users/"+id));
     alert("Terhapus.");
     if(!screens.list.classList.contains("hidden")) await loadFirst();
   });
 
   /* Owner actions */
-  el("btnGrant")?.addEventListener("click", async()=>{
+  $("btnGrant")?.addEventListener("click", async()=>{
     if(!isOwner){ alert("Hanya owner."); return; }
-    const uid=el("adminUid").value.trim(); if(!uid) return;
+    const uid=$("adminUid").value.trim(); if(!uid) return;
     await set(ref(db,"admins/"+uid),true); alert("Granted.");
   });
-  el("btnRevoke")?.addEventListener("click", async()=>{
+  $("btnRevoke")?.addEventListener("click", async()=>{
     if(!isOwner){ alert("Hanya owner."); return; }
-    const uid=el("adminUid").value.trim(); if(!uid) return;
+    const uid=$("adminUid").value.trim(); if(!uid) return;
     await remove(ref(db,"admins/"+uid)); alert("Revoked.");
   });
 
   /* Login/Logout */
-  el("btnLogin")?.addEventListener("click", async()=>{
-    const email=el("email").value.trim(), pass=el("password").value.trim();
+  $("btnLogin")?.addEventListener("click", async()=>{
+    const email=$("email").value.trim(), pass=$("password").value.trim();
     if(!email||!pass){ alert("Isi email & password."); return; }
     try{ await signInWithEmailAndPassword(auth,email,pass); }catch(e){ alert("Login gagal: "+(e?.message||e)); console.error(e); }
   });
   async function doLogout(){ try{ await signOut(auth); }catch{} }
-  el("btnLogout")?.addEventListener("click", doLogout);
-  el("btnLogout2")?.addEventListener("click", doLogout);
+  $("btnLogout")?.addEventListener("click", doLogout);
+  $("btnLogout2")?.addEventListener("click", doLogout);
 </script>
 </body>
 </html>
