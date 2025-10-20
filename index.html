@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <title>GxMods Admin Panel</title>
 <style>
   :root{
@@ -17,8 +17,9 @@
     --stroke:#243140;
     --chip:#1d2631;
     --input:#0c1218;
-    --shadow:0 0 0 1px rgba(0,0,0,.05),0 10px 24px rgba(0,0,0,.25);
     --ring:#27425e;
+    --shadow:0 0 0 1px rgba(0,0,0,.05),0 10px 24px rgba(0,0,0,.25);
+    --drawer-w: 280px;
   }
   *{box-sizing:border-box}
   html,body{height:100%}
@@ -28,12 +29,11 @@
     -webkit-text-size-adjust:100%;text-size-adjust:100%;touch-action:manipulation;
   }
 
-  /* ===== Dark-force: input/select jelas di gelap (plus autofill) */
+  /* Inputs & focus */
   body,button,input,select,textarea{color:var(--text)!important}
   input,select,textarea{
-    width:100%;min-height:44px;
-    border-radius:12px;border:1px solid var(--stroke)!important;
-    padding:13px 12px;background:var(--input)!important;color:var(--text)!important;outline:none;
+    width:100%;min-height:44px;border-radius:12px;border:1px solid var(--stroke)!important;
+    padding:12px;background:var(--input)!important;color:var(--text)!important;outline:none;
     appearance:none;-webkit-appearance:none;-moz-appearance:none;
   }
   input::placeholder,textarea::placeholder{color:#7089a3}
@@ -44,32 +44,64 @@
     box-shadow:0 0 0 1000px var(--input) inset!important;
     border:1px solid var(--stroke)!important;caret-color:var(--text);
   }
-  input:focus-visible,select:focus-visible,textarea:focus-visible,.btn:focus-visible{
+  input:focus-visible,select:focus-visible,textarea:focus-visible,.btn:focus-visible,.nav-btn:focus-visible{
     outline:2px solid var(--ring);outline-offset:2px;
   }
 
-  .wrap{max-width:1100px;margin:24px auto;padding:0 14px;}
-  .row{display:grid;gap:18px;}
-  @media (min-width:980px){.row{grid-template-columns:1fr 1fr}}
+  /* Layout shell */
+  .app{
+    display:grid;grid-template-columns:0 1fr;min-height:100dvh;
+    transition:grid-template-columns .22s ease;
+  }
+  .drawer{
+    position:fixed;inset:0 auto 0 0;width:var(--drawer-w);
+    transform:translateX(-100%);transition:transform .22s ease;
+    background:var(--muted);border-right:1px solid var(--stroke);z-index:30;
+    display:flex;flex-direction:column;max-width:85vw;
+  }
+  .drawer .brand{
+    padding:16px;border-bottom:1px solid var(--stroke);font-weight:700;letter-spacing:.2px
+  }
+  .drawer .menu{
+    padding:8px;display:flex;flex-direction:column;gap:6px;overflow:auto
+  }
+  .nav-btn{
+    display:flex;align-items:center;gap:10px;
+    background:transparent;border:1px solid transparent;color:var(--text);
+    padding:12px 12px;border-radius:12px;cursor:pointer;text-align:left;font-weight:600;
+    min-height:44px;
+  }
+  .nav-btn.active{background:#1a2230;border-color:var(--stroke)}
+  .nav-group{margin:8px 8px 4px;color:#86a3c1;font-size:12px;text-transform:uppercase;letter-spacing:.8px}
+  .owner-only{display:none}
 
-  .card{background:var(--card);border:1px solid var(--stroke);border-radius:16px;padding:16px;box-shadow:var(--shadow)}
-  .card h2{margin:0 0 12px;font-size:clamp(16px,2.5vw,20px);letter-spacing:.2px}
+  .overlay{
+    position:fixed;inset:0;background:rgba(0,0,0,.35);backdrop-filter:saturate(1.1);
+    opacity:0;pointer-events:none;transition:opacity .2s ease;z-index:20;
+  }
+  .app.drawer-open .drawer{transform:none}
+  .app.drawer-open .overlay{opacity:1;pointer-events:auto}
 
-  .topbar{
-    position:sticky;top:0;z-index:10;
-    display:flex;gap:10px;align-items:center;flex-wrap:wrap;
-    margin-bottom:14px;
-    padding:10px 0 6px;
-    background:linear-gradient(180deg,var(--bg) 70%,transparent);
-    backdrop-filter:saturate(1.2);
+  .main{
+    min-width:0; /* fix overflow */
+    padding-left:0; /* mobile overlay */
+    display:flex;flex-direction:column;
   }
 
+  /* Topbar */
+  .topbar{
+    position:sticky;top:0;z-index:10;display:flex;gap:10px;align-items:center;flex-wrap:wrap;
+    padding:10px 12px;background:linear-gradient(180deg,var(--bg) 70%,transparent);
+    border-bottom:1px solid rgba(255,255,255,.06);
+  }
+  .hamb{
+    width:44px;height:44px;border-radius:12px;border:1px solid var(--stroke);
+    background:var(--chip);color:var(--text);cursor:pointer;font-size:18px;
+    display:grid;place-items:center;
+  }
   .chip{background:var(--chip);border:1px solid var(--stroke);padding:10px 14px;border-radius:999px;font-size:14px;white-space:nowrap}
   .chip.bad{background:#25181a;border-color:#3a2023;color:#ffb3b3}
-
-  label{display:block;font-size:13px;color:var(--sub);margin:8px 0 6px}
-  .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-
+  .actions{display:flex;gap:10px;flex-wrap:wrap;margin-left:auto}
   .btn{
     border:none;border-radius:14px;padding:12px 18px;font-weight:600;color:#0b1117;background:var(--brand);
     cursor:pointer;min-height:44px;transition:transform .05s ease;
@@ -78,158 +110,244 @@
   .btn.gray{background:#34485f;color:#d2e3f5}
   .btn.ok{background:var(--ok);color:#07140a}
   .btn.danger{background:var(--danger);color:#220a0a}
-  .btn.block{width:100%}
   .btn.small{padding:10px 14px;border-radius:12px;min-height:40px}
+  .btn.block{width:100%}
   .btn:disabled{opacity:.55;cursor:not-allowed}
 
-  .actions{display:flex;gap:10px;flex-wrap:wrap}
+  /* Content wrapper */
+  .wrap{max-width:1100px;margin:16px auto;padding:0 14px;width:100%}
+  .card{background:var(--card);border:1px solid var(--stroke);border-radius:16px;padding:16px;box-shadow:var(--shadow)}
+  .card h2{margin:0 0 12px;font-size:clamp(16px,2.5vw,20px);letter-spacing:.2px}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .sep{height:10px}
+  .empty{padding:12px;color:#9fb3c8}
+  .pill{border-radius:999px;padding:10px 14px;border:1px solid var(--stroke);background:#0c1218}
+  .hidden{display:none!important}
 
+  /* Table-ish list */
   .th,.td{padding:12px 10px;text-align:left;font-size:14px}
   .tr{
     background:var(--muted);border:1px solid var(--stroke);border-radius:12px;overflow:hidden;
     display:grid;grid-template-columns:1.4fr 1.3fr .9fr 1.2fr .8fr;align-items:center;
   }
   .th{color:#9fb3c8}
-  .empty{padding:12px;color:#9fb3c8}
-  .footer-actions{display:flex;justify-content:center;margin-top:10px}
-  .pill{border-radius:999px;padding:10px 14px;border:1px solid var(--stroke);background:#0c1218}
-  .hidden{display:none!important}
-  .sep{height:10px}
-  .logout-spot{display:flex;justify-content:flex-end;margin-bottom:12px}
-  .kiri .card{height:100%}
 
-  /* ===== Drawable mode (hemat efek) */
-  body.drawable .card{box-shadow:none}
-  body.drawable .topbar{
-    background:var(--bg);
-    backdrop-filter:none;
-    border-bottom:1px solid var(--stroke);
+  /* Mobile */
+  @media (max-width: 980px){
+    .main{padding-left:0}
   }
-  body.drawable .chip, body.drawable .pill{background:#111824}
-  body.drawable .btn{box-shadow:none}
-  body.drawable .tr{background:#131923}
-
-  /* ===== Mobile tweaks */
+  @media (min-width:981px){
+    .app{grid-template-columns:var(--drawer-w) 1fr}
+    .drawer{position:sticky;top:0;height:100dvh;transform:none}
+    .overlay{display:none}
+    .hamb{display:none}
+    .main{padding-left:0}
+  }
   @media (max-width:560px){
     body{font-size:15px}
-    .wrap{padding:0 10px;margin:18px auto}
-    .card{border-radius:12px;padding:12px;box-shadow:none} /* drawable by default di mobile */
+    .wrap{padding:0 10px;margin:12px auto}
+    .card{border-radius:12px;padding:12px;box-shadow:none}
     .chip{padding:8px 10px;font-size:12px}
     .row2{grid-template-columns:1fr;gap:10px}
-    .topbar .actions{width:100%}
-    .topbar .actions input{min-width:0;flex:1 1 120px}
-    .topbar .actions #btnLogin{flex:0 0 120px}
     .th{display:none}
     .tr{grid-template-columns:1fr;border-radius:10px}
     .td{display:flex;gap:10px;align-items:center;justify-content:space-between;padding:10px 12px;border-top:1px solid rgba(255,255,255,.03)}
     .td:first-child{border-top:none}
-    .td input,.td select{flex:1 1 auto;min-width:0}
     .actions{gap:8px}
     .btn.small{padding:9px 12px}
     .pill{width:100%;text-align:center}
   }
+
+  /* Drawable (hemat efek) */
+  body.drawable .card{box-shadow:none}
+  body.drawable .topbar{background:var(--bg);backdrop-filter:none;border-bottom:1px solid var(--stroke)}
+  body.drawable .tr{background:#131923}
+  body.drawable .chip, body.drawable .pill{background:#111824}
 
   @media (prefers-reduced-motion: reduce){
     *{scroll-behavior:auto;transition:none!important;animation:none!important}
   }
 </style>
 </head>
-<!-- aktifkan drawable mode -->
+
 <body class="drawable">
-  <div class="wrap">
-    <div class="topbar" id="topBadges">
-      <span class="chip" id="uidChip">UID: -</span>
-      <span class="chip" id="adminChip">Admin:false</span>
-      <span class="chip" id="ownerChip">Owner:false</span>
-      <span class="chip bad hidden" id="warnDomain">Tambahkan domain Pages ke Auth → Authorized domains.</span>
-      <div style="flex:1"></div>
-      <div class="actions" id="loginRow">
-        <input id="email" type="email" placeholder="email admin" autocomplete="username" autocapitalize="none" spellcheck="false" style="min-width:240px">
-        <input id="password" type="password" placeholder="password" autocomplete="current-password" style="min-width:180px">
-        <button class="btn small" id="btnLogin">Login</button>
-      </div>
-      <button class="btn gray small hidden" id="btnLogout">Logout</button>
-    </div>
+  <div class="app" id="app">
+    <!-- Drawer -->
+    <aside class="drawer" id="drawer" aria-label="Sisi navigasi">
+      <div class="brand">☰ GxMods Panel</div>
 
-    <div class="row">
-      <div class="kiri">
-        <div class="card">
-          <h2>Buat / Ubah User</h2>
-          <label>Android ID</label>
-          <input id="formId" placeholder="contoh: a1b2c3d4e5f6abcd" autocapitalize="none" autocorrect="off" spellcheck="false" />
-          <label>Key</label>
-          <input id="formKey" placeholder="contoh: ZXCV-5R3K-PAID" autocapitalize="characters" />
-          <label>Alasan (opsional)</label>
-          <input id="formReason" placeholder="Misal: Abuse" />
-          <div class="row2">
-            <div>
-              <label>Sampai (opsional, 25-12-2025 / 1735171200000)</label>
-              <input id="formUntil" inputmode="numeric" placeholder="dd-mm-yyyy ATAU epoch(ms)" />
-            </div>
-            <div>
-              <label>Banned</label>
-              <select id="formBanned">
-                <option>false</option>
-                <option>true</option>
-              </select>
-            </div>
-          </div>
-          <div class="sep"></div>
-          <div class="actions">
-            <button class="btn ok block" id="btnSave">Simpan</button>
-            <button class="btn danger block" id="btnDelete">Hapus</button>
-          </div>
-          <p style="color:#8aa3bd;margin:10px 2px 0">Kolom “Android ID” & “Key” wajib. Tanpa tombol copy & tanpa generate sesuai permintaan.</p>
+      <div class="menu">
+        <div class="nav-group">Main</div>
+        <button class="nav-btn" data-screen="dashboard">📊 Dashboard</button>
+        <button class="nav-btn" data-screen="edit">✍️ Buat / Ubah User</button>
+        <button class="nav-btn" data-screen="list">👥 Users List</button>
+
+        <div class="nav-group">App</div>
+        <button class="nav-btn" data-screen="settings">⚙️ Settings</button>
+
+        <div class="nav-group owner-only">Owner</div>
+        <button class="nav-btn owner-only" data-screen="owner">👑 Owner</button>
+      </div>
+    </aside>
+    <div class="overlay" id="overlay"></div>
+
+    <!-- Main -->
+    <main class="main">
+      <!-- Topbar -->
+      <div class="topbar" id="topBadges">
+        <button class="hamb" id="btnHamburger" aria-label="Buka menu">☰</button>
+        <span class="chip" id="uidChip">UID: -</span>
+        <span class="chip" id="adminChip">Admin:false</span>
+        <span class="chip" id="ownerChip">Owner:false</span>
+        <span class="chip bad hidden" id="warnDomain">Tambahkan domain Pages ke Auth → Authorized domains.</span>
+
+        <div class="actions" id="loginRow">
+          <input id="email" type="email" placeholder="email admin" autocomplete="username" autocapitalize="none" spellcheck="false" style="min-width:200px">
+          <input id="password" type="password" placeholder="password" autocomplete="current-password" style="min-width:160px">
+          <button class="btn small" id="btnLogin">Login</button>
         </div>
+        <button class="btn gray small hidden" id="btnLogout">Logout</button>
       </div>
 
-      <div>
-        <div class="card">
-          <div class="logout-spot"><button class="btn gray small hidden" id="btnLogout2">Logout</button></div>
-          <h2>Users List</h2>
-          <label>Pencarian (Android ID penuh)</label>
-          <input id="searchExact" placeholder="tempel Android ID untuk cari 1 user" autocapitalize="none" autocorrect="off" spellcheck="false" />
-          <div class="row2" style="margin-top:10px">
-            <div>
-              <label>Search Prefix</label>
-              <input id="searchPrefix" placeholder="misal: a1b2" autocapitalize="none" autocorrect="off" spellcheck="false">
+      <!-- Content screens -->
+      <div class="wrap">
+        <!-- DASHBOARD -->
+        <section class="screen" id="screen-dashboard">
+          <div class="card">
+            <h2>Dashboard</h2>
+            <p style="color:#9fb3c8;margin:8px 2px 0">
+              Ringkasan cepat: status login, hak akses, dan aksi sering dipakai.
+            </p>
+            <div class="sep"></div>
+            <div class="row2">
+              <div class="card" style="padding:14px">
+                <h2 style="margin-bottom:6px">Status</h2>
+                <div id="dashStatus" style="color:#b8cbe0">
+                  Belum login.
+                </div>
+              </div>
+              <div class="card" style="padding:14px">
+                <h2 style="margin-bottom:6px">Aksi Cepat</h2>
+                <div class="actions" style="margin-top:8px">
+                  <button class="btn ok" data-screen-jump="edit">Tambah User</button>
+                  <button class="btn" data-screen-jump="list">Lihat Users</button>
+                </div>
+              </div>
             </div>
-            <div style="align-self:end">
-              <button class="btn block" id="btnSearch">Search</button>
+          </div>
+        </section>
+
+        <!-- EDIT -->
+        <section class="screen hidden" id="screen-edit">
+          <div class="card">
+            <h2>Buat / Ubah User</h2>
+            <label>Android ID</label>
+            <input id="formId" placeholder="contoh: a1b2c3d4e5f6abcd" autocapitalize="none" autocorrect="off" spellcheck="false" />
+            <label>Key</label>
+            <input id="formKey" placeholder="contoh: ZXCV-5R3K-PAID" autocapitalize="characters" />
+            <label>Alasan (opsional)</label>
+            <input id="formReason" placeholder="Misal: Abuse" />
+            <div class="row2">
+              <div>
+                <label>Sampai (opsional, 25-12-2025 / 1735171200000)</label>
+                <input id="formUntil" inputmode="numeric" placeholder="dd-mm-yyyy ATAU epoch(ms)" />
+              </div>
+              <div>
+                <label>Banned</label>
+                <select id="formBanned">
+                  <option>false</option>
+                  <option>true</option>
+                </select>
+              </div>
+            </div>
+            <div class="sep"></div>
+            <div class="actions">
+              <button class="btn ok block needAdmin" id="btnSave">Simpan</button>
+              <button class="btn danger block needAdmin" id="btnDelete">Hapus</button>
+            </div>
+            <p style="color:#8aa3bd;margin:10px 2px 0">Kolom “Android ID” & “Key” wajib. Tanpa tombol copy & tanpa generate — sesuai permintaan.</p>
+          </div>
+        </section>
+
+        <!-- LIST -->
+        <section class="screen hidden" id="screen-list">
+          <div class="card">
+            <div style="display:flex;justify-content:flex-end;margin-bottom:12px">
+              <button class="btn gray small hidden" id="btnLogout2">Logout</button>
+            </div>
+            <h2>Users List</h2>
+            <label>Pencarian (Android ID penuh)</label>
+            <input id="searchExact" placeholder="tempel Android ID untuk cari 1 user" autocapitalize="none" autocorrect="off" spellcheck="false" />
+            <div class="row2" style="margin-top:10px">
+              <div>
+                <label>Search Prefix</label>
+                <input id="searchPrefix" placeholder="misal: a1b2" autocapitalize="none" autocorrect="off" spellcheck="false">
+              </div>
+              <div style="align-self:end">
+                <button class="btn block" id="btnSearch">Search</button>
+              </div>
+            </div>
+
+            <div class="sep"></div>
+            <div class="tr th" style="grid-template-columns:1.4fr 1.3fr .9fr 1.2fr .8fr">
+              <div class="th">Android ID</div>
+              <div class="th">Key</div>
+              <div class="th">Banned</div>
+              <div class="th">Until</div>
+              <div class="th">Aksi</div>
+            </div>
+            <div id="listArea"></div>
+            <div style="display:flex;justify-content:center;margin-top:10px">
+              <button id="btnMore" class="pill hidden">Muat lebih</button>
             </div>
           </div>
+        </section>
 
-          <div class="sep"></div>
-          <div class="tr th" style="grid-template-columns:1.4fr 1.3fr .9fr 1.2fr .8fr">
-            <div class="th">Android ID</div>
-            <div class="th">Key</div>
-            <div class="th">Banned</div>
-            <div class="th">Until</div>
-            <div class="th">Aksi</div>
+        <!-- SETTINGS -->
+        <section class="screen hidden" id="screen-settings">
+          <div class="card">
+            <h2>Settings</h2>
+            <p style="color:#9fb3c8;margin:8px 2px 0">Pengaturan tampilan (hemat efek untuk Android), dll.</p>
+            <div class="sep"></div>
+            <div class="row2">
+              <div class="card" style="padding:14px">
+                <label>Mode Drawable (hemat efek)</label>
+                <select id="optDrawable">
+                  <option value="on">ON (disarankan)</option>
+                  <option value="off">OFF</option>
+                </select>
+                <div class="sep"></div>
+                <button class="btn" id="btnApplySettings">Terapkan</button>
+              </div>
+              <div class="card" style="padding:14px">
+                <label>Ukuran halaman (list)</label>
+                <input id="optPageSize" inputmode="numeric" placeholder="Default: 12 (mobile) / 25 (desktop)">
+                <div class="sep"></div>
+                <button class="btn gray" id="btnApplyList">Simpan List Pref</button>
+              </div>
+            </div>
           </div>
-          <div id="listArea"></div>
-          <div class="footer-actions">
-            <button id="btnMore" class="pill hidden">Muat lebih</button>
-          </div>
-        </div>
+        </section>
 
-        <div class="sep"></div>
-
-        <div class="card">
-          <h2>Kelola Admin (Owner saja)</h2>
-          <label>UID</label>
-          <input id="adminUid" placeholder="tempel UID untuk grant / revoke" autocapitalize="none" autocorrect="off" spellcheck="false">
-          <div class="actions" style="margin-top:10px">
-            <button class="btn ok" id="btnGrant">Grant Admin</button>
-            <button class="btn danger" id="btnRevoke">Revoke Admin</button>
+        <!-- OWNER -->
+        <section class="screen hidden" id="screen-owner">
+          <div class="card">
+            <h2>Kelola Admin (Owner saja)</h2>
+            <label>UID</label>
+            <input id="adminUid" placeholder="tempel UID untuk grant / revoke" autocapitalize="none" autocorrect="off" spellcheck="false">
+            <div class="actions" style="margin-top:10px">
+              <button class="btn ok owner-only" id="btnGrant">Grant Admin</button>
+              <button class="btn danger owner-only" id="btnRevoke">Revoke Admin</button>
+            </div>
+            <p style="color:#8aa3bd;margin:10px 2px 0">Owner: <span id="ownerId"></span></p>
           </div>
-          <p style="color:#8aa3bd;margin:10px 2px 0">Owner: <span id="ownerId"></span></p>
-        </div>
+        </section>
       </div>
-    </div>
+    </main>
   </div>
 
 <script type="module">
+  /* ===== Firebase ===== */
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
   import { getDatabase, ref, get, set, update, remove, query, orderByKey, limitToFirst, startAt, endAt } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-database.js";
   import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
@@ -251,16 +369,96 @@
   const db = getDatabase(app);
   const auth = getAuth(app);
 
+  /* ===== UI helpers ===== */
   const el = (id)=>document.getElementById(id);
-  const $list=el("listArea"), $btnMore=el("btnMore"), $loginRow=el("loginRow");
-  const $btnLogout=el("btnLogout"), $btnLogout2=el("btnLogout2");
-  const $uidChip=el("uidChip"), $adminChip=el("adminChip"), $ownerChip=el("ownerChip");
+  const $$ = (sel,root=document)=>Array.from(root.querySelectorAll(sel));
+  const appRoot = el("app");
+  const drawer  = el("drawer");
+  const overlay = el("overlay");
+  const btnHamb = el("btnHamburger");
 
+  // Drawer toggle
+  const closeDrawer = ()=> appRoot.classList.remove("drawer-open");
+  const openDrawer  = ()=> appRoot.classList.add("drawer-open");
+  btnHamb?.addEventListener("click", openDrawer);
+  overlay?.addEventListener("click", closeDrawer);
+
+  // Navigation (screens)
+  const screens = {
+    dashboard: el("screen-dashboard"),
+    edit:      el("screen-edit"),
+    list:      el("screen-list"),
+    settings:  el("screen-settings"),
+    owner:     el("screen-owner"),
+  };
+  function showScreen(name){
+    Object.entries(screens).forEach(([k,node])=>{
+      if(!node) return;
+      if(k===name) node.classList.remove("hidden");
+      else node.classList.add("hidden");
+    });
+    // Active state
+    $$(".nav-btn").forEach(b=> b.classList.toggle("active", b.dataset.screen===name));
+    // Close drawer on mobile
+    closeDrawer();
+    // Persist last screen
+    localStorage.setItem("gx_last_screen", name);
+  }
+  // Nav click
+  $$(".nav-btn").forEach(btn=>{
+    btn.addEventListener("click", ()=> showScreen(btn.dataset.screen));
+  });
+  // Quick jump buttons
+  $$("[data-screen-jump]").forEach(b=>{
+    b.addEventListener("click", ()=> showScreen(b.dataset.screenJump));
+  });
+
+  // Restore last screen
+  const last = localStorage.getItem("gx_last_screen") || "dashboard";
+  showScreen(last);
+
+  // Top chips & access gates
+  const $uidChip=el("uidChip"), $adminChip=el("adminChip"), $ownerChip=el("ownerChip");
+  const $loginRow=el("loginRow"), $btnLogout=el("btnLogout"), $btnLogout2=el("btnLogout2");
   let isAdmin=false, isOwner=false, cursor=null;
+
+  function setTopBadges(user,admin){
+    $uidChip.textContent="UID: "+(user?user.uid:"-");
+    $adminChip.textContent="Admin:"+(admin?"true":"false");
+    isOwner=!!user && user.uid===OWNER_UID;
+    $ownerChip.textContent="Owner:"+(isOwner?"true":"false");
+
+    // Toggle login rows
+    if(user){ $loginRow.classList.add("hidden"); $btnLogout.classList.remove("hidden"); $btnLogout2.classList.remove("hidden"); }
+    else{ $loginRow.classList.remove("hidden"); $btnLogout.classList.add("hidden"); $btnLogout2.classList.add("hidden"); }
+
+    // Admin-gated controls
+    document.querySelectorAll(".needAdmin").forEach(c=> c.disabled=!admin);
+
+    // Owner-only menu & controls
+    $$(".owner-only").forEach(n=>{
+      if(isOwner){ n.style.display=""; } else { n.style.display="none"; }
+    });
+
+    // Dashboard summary
+    const dash = el("dashStatus");
+    if(dash){
+      dash.innerHTML = user
+        ? `Login sebagai <b>${user.email||user.uid}</b><br>Admin: <b>${admin}</b> · Owner: <b>${isOwner}</b>`
+        : `Belum login. Silakan login di kanan atas.`;
+    }
+  }
+
+  /* ===== List & edit logic (reused) ===== */
+  const $list=el("listArea"), $btnMore=el("btnMore");
   let PAGE = matchMedia("(max-width:560px)").matches ? 12 : 25;
+  // apply user pref
+  const prefPage = Number(localStorage.getItem("gx_page_size")||0);
+  if(prefPage>0) PAGE = prefPage;
+
   let lastPrefix=""; let exactMode=null;
 
-  function setLoadingList(msg){ $list.innerHTML='<div class="empty">'+(msg||'Memuat...')+'</div>'; $btnMore.classList.add('hidden'); }
+  function setLoadingList(msg){ if($list){ $list.innerHTML='<div class="empty">'+(msg||'Memuat...')+'</div>'; $btnMore.classList.add('hidden'); } }
   const fmt=v=>v==null?"":String(v);
   function getFormDataFromRow(row){
     return {
@@ -269,15 +467,6 @@
       until: row.querySelector(".inpUntil").value.trim(),
       reason: row.querySelector(".inpReason")?.value.trim()||"",
     };
-  }
-  function setTopBadges(user,admin){
-    $uidChip.textContent="UID: "+(user?user.uid:"-");
-    $adminChip.textContent="Admin:"+(admin?"true":"false");
-    isOwner=!!user && user.uid===OWNER_UID;
-    $ownerChip.textContent="Owner:"+(isOwner?"true":"false");
-    if(user){ $loginRow.classList.add("hidden"); $btnLogout.classList.remove("hidden"); $btnLogout2.classList.remove("hidden"); }
-    else{ $loginRow.classList.remove("hidden"); $btnLogout.classList.add("hidden"); $btnLogout2.classList.add("hidden"); }
-    document.querySelectorAll(".needAdmin").forEach(c=>c.disabled=!admin);
   }
   function rowNode(aid,data){
     const banned = data?.banned===true?"true":"false";
@@ -321,9 +510,10 @@
     return tr;
   }
 
-  async function loadFirst(){ exactMode=null; lastPrefix=""; cursor=null; setLoadingList(); await loadPage(); }
+  async function loadFirst(){ exactMode=null; lastPrefix=""; cursor=null; if($list) setLoadingList(); await loadPage(); }
   async function loadPage(){
     try{
+      if(!$list) return;
       const base=ref(db,"users"); let q;
       if(exactMode){
         const snap=await get(ref(db,"users/"+exactMode));
@@ -343,17 +533,19 @@
       if(keys.length===0 && !cursor){ $list.innerHTML='<div class="empty">Belum ada data user yang dimuat.</div>'; $btnMore.classList.add("hidden"); return; }
       keys.slice(0,PAGE).forEach(k=> $list.appendChild(rowNode(k,val[k])) );
       if(keys.length>PAGE){ cursor=keys[PAGE-1+1]; $btnMore.classList.remove("hidden"); } else { $btnMore.classList.add("hidden"); }
-    }catch(e){ console.error(e); $list.innerHTML='<div class="empty">Gagal memuat data.</div>'; $btnMore.classList.add("hidden"); }
+    }catch(e){ console.error(e); if($list){ $list.innerHTML='<div class="empty">Gagal memuat data.</div>'; $btnMore.classList.add("hidden"); } }
   }
 
-  el("btnMore").onclick=loadPage;
-  el("btnSearch").onclick=async()=>{
+  el("btnMore")?.addEventListener("click", loadPage);
+  el("btnSearch")?.addEventListener("click", async()=>{
     const exact=el("searchExact").value.trim();
     const pref =el("searchPrefix").value.trim();
     if(exact){ exactMode=exact; setLoadingList(); await loadPage(); return; }
     lastPrefix=pref; cursor=null; exactMode=null; setLoadingList(); await loadPage();
-  };
-  el("btnSave").onclick=async()=>{
+  });
+
+  // Create / update / delete (edit screen)
+  el("btnSave")?.addEventListener("click", async()=>{
     if(!isAdmin){ alert("Hanya admin."); return; }
     const id=el("formId").value.trim(), key=el("formKey").value.trim();
     if(!id||!key){ alert("Android ID & Key wajib."); return; }
@@ -363,41 +555,69 @@
       reason:el("formReason").value.trim(),
       updatedAt:Date.now()
     };
-    await set(ref(db,"users/"+id),payload); alert("Tersimpan."); await loadFirst();
-  };
-  el("btnDelete").onclick=async()=>{
+    await set(ref(db,"users/"+id),payload);
+    alert("Tersimpan.");
+    // refresh list bila user pindah ke tab list
+    if(!el("screen-list").classList.contains("hidden")) await loadFirst();
+  });
+  el("btnDelete")?.addEventListener("click", async()=>{
     if(!isAdmin){ alert("Hanya admin."); return; }
     const id=el("formId").value.trim(); if(!id){ alert("Masukkan Android ID untuk hapus."); return; }
-    if(!confirm("Hapus user "+id+" ?")) return; await remove(ref(db,"users/"+id)); alert("Terhapus."); await loadFirst();
-  };
+    if(!confirm("Hapus user "+id+" ?")) return; await remove(ref(db,"users/"+id));
+    alert("Terhapus.");
+    if(!el("screen-list").classList.contains("hidden")) await loadFirst();
+  });
 
-  el("btnGrant").onclick=async()=>{
+  // Owner actions
+  el("btnGrant")?.addEventListener("click", async()=>{
     if(!isOwner){ alert("Hanya owner."); return; }
     const uid=el("adminUid").value.trim(); if(!uid) return;
     await set(ref(db,"admins/"+uid),true); alert("Granted.");
-  };
-  el("btnRevoke").onclick=async()=>{
+  });
+  el("btnRevoke")?.addEventListener("click", async()=>{
     if(!isOwner){ alert("Hanya owner."); return; }
     const uid=el("adminUid").value.trim(); if(!uid) return;
     await remove(ref(db,"admins/"+uid)); alert("Revoked.");
-  };
+  });
 
-  el("btnLogin").onclick=async()=>{
+  // Auth
+  el("btnLogin")?.addEventListener("click", async()=>{
     const email=el("email").value.trim(), pass=el("password").value.trim();
     if(!email||!pass){ alert("Isi email & password."); return; }
     try{ await signInWithEmailAndPassword(auth,email,pass); }catch(e){ alert("Login gagal: "+(e?.message||e)); console.error(e); }
-  };
+  });
   async function doLogout(){ try{ await signOut(auth); }catch{} }
-  el("btnLogout").onclick=doLogout; el("btnLogout2").onclick=doLogout;
+  el("btnLogout")?.addEventListener("click", doLogout);
+  el("btnLogout2")?.addEventListener("click", doLogout);
 
   async function refreshAdmin(uid){
     if(!uid){ isAdmin=false; setTopBadges(null,false); return; }
     try{ const v=await get(ref(db,"admins/"+uid)); isAdmin=v.exists() && v.val()===true; }catch{ isAdmin=false; }
-    setTopBadges({uid},isAdmin);
+    setTopBadges({uid, email:auth.currentUser?.email||uid},isAdmin);
   }
-  onAuthStateChanged(auth, async (user)=>{ await refreshAdmin(user?.uid||null); await loadFirst(); });
+  onAuthStateChanged(auth, async (user)=>{
+    await refreshAdmin(user?.uid||null);
+    // auto-refresh list ketika masuk tab List
+    if(!el("screen-list").classList.contains("hidden")) await loadFirst();
+  });
 
-  // (opsional) Matikan drawable: document.body.classList.remove('drawable')
+  // Settings
+  const optDrawable=el("optDrawable");
+  const optPageSize=el("optPageSize");
+  // init settings
+  if(localStorage.getItem("gx_drawable")==="off"){ document.body.classList.remove("drawable"); optDrawable.value="off"; }
+  if(prefPage>0){ optPageSize.value = String(prefPage); }
+  el("btnApplySettings")?.addEventListener("click", ()=>{
+    const mode = optDrawable.value;
+    if(mode==="off"){ document.body.classList.remove("drawable"); localStorage.setItem("gx_drawable","off"); }
+    else{ document.body.classList.add("drawable"); localStorage.setItem("gx_drawable","on"); }
+    alert("Terapkan: OK");
+  });
+  el("btnApplyList")?.addEventListener("click", ()=>{
+    const n = Math.max(1, Number(optPageSize.value||0));
+    localStorage.setItem("gx_page_size", String(n));
+    alert("Page size disimpan. Muat ulang List untuk efek.");
+  });
 </script>
 </body>
 </html>
