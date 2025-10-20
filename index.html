@@ -20,6 +20,8 @@
     --ring:#27425e;
     --shadow:0 0 0 1px rgba(0,0,0,.05),0 10px 24px rgba(0,0,0,.25);
     --drawer-w: 280px;
+    /* NEW: padding halaman adaptif */
+    --page-pad: clamp(12px, 4vw, 22px);
   }
   *{box-sizing:border-box}
   html,body{height:100%}
@@ -175,6 +177,30 @@
   @media (prefers-reduced-motion: reduce){
     *{scroll-behavior:auto;transition:none!important;animation:none!important}
   }
+
+  /* === FIX ANDROID DPI KECIL: paksa mobile + padding sisi === */
+  .topbar{ padding-inline: var(--page-pad) !important; }
+  .wrap{ margin-inline:auto !important; padding-inline: var(--page-pad) !important; }
+
+  /* Perangkat sentuh (coarse pointer) dipaksa layout mobile meski lebar besar */
+  @media (hover: none) and (pointer: coarse){
+    .app{ grid-template-columns: 0 1fr !important; }
+    .drawer{
+      position: fixed !important;
+      height: 100dvh !important;
+      transform: translateX(-100%) !important;
+    }
+    .overlay{ display: block !important; }
+    .hamb{ display: grid !important; }      /* munculkan tombol menu */
+    .main{ padding-left: 0 !important; }    /* hapus ruang kiri khusus desktop */
+  }
+
+  /* Fallback via class .force-mobile (di-set dari JS awal) */
+  .force-mobile .app{ grid-template-columns:0 1fr !important; }
+  .force-mobile .drawer{ position:fixed !important; height:100dvh !important; transform:translateX(-100%) !important; }
+  .force-mobile .overlay{ display:block !important; }
+  .force-mobile .hamb{ display:grid !important; }
+  .force-mobile .main{ padding-left:0 !important; }
 </style>
 </head>
 
@@ -354,6 +380,13 @@
   </div>
 
 <script type="module">
+  /* === Hint awal: paksa mobile via class kalau device coarse pointer === */
+  try{
+    if (matchMedia('(hover:none) and (pointer:coarse)').matches) {
+      document.documentElement.classList.add('force-mobile');
+    }
+  }catch(e){}
+
   /* ===== Firebase ===== */
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
   import { getDatabase, ref, get, set, update, remove, query, orderByKey, limitToFirst, startAt, endAt } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-database.js";
