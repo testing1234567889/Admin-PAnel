@@ -18,6 +18,7 @@
     --chip:#1d2631;
     --input:#0c1218;
     --shadow:0 0 0 1px rgba(0,0,0,.05),0 10px 24px rgba(0,0,0,.25);
+    --ring:#27425e;
   }
   *{box-sizing:border-box}
   html,body{height:100%}
@@ -28,11 +29,35 @@
     text-size-adjust:100%;
     touch-action:manipulation;
   }
+
+  /* ===== Dark force: semua kontrol jelas di tema gelap (termasuk autofill) */
+  body, button, input, select, textarea{color:var(--text)!important}
+  input, select, textarea{
+    width:100%;border-radius:12px;border:1px solid var(--stroke)!important;
+    padding:13px 12px;background:var(--input)!important;color:var(--text)!important;outline:none;min-height:44px;
+    appearance:none;-webkit-appearance:none;-moz-appearance:none;
+  }
+  input::placeholder,textarea::placeholder{color:#7089a3}
+  /* Autofill Chrome/Edge/Brave */
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus{
+    -webkit-text-fill-color:var(--text)!important;
+    box-shadow:0 0 0 1000px var(--input) inset!important;
+    border:1px solid var(--stroke)!important;
+    caret-color:var(--text);
+  }
+  /* Focus ring halus agar konsisten */
+  input:focus-visible, select:focus-visible, textarea:focus-visible, .btn:focus-visible{
+    outline:2px solid var(--ring); outline-offset:2px;
+  }
+
   .wrap{max-width:1100px;margin:24px auto;padding:0 14px;}
   .row{display:grid;gap:18px;}
   @media (min-width: 980px){ .row{ grid-template-columns: 1fr 1fr; } }
   .card{background:var(--card);border:1px solid var(--stroke);border-radius:16px;padding:16px;box-shadow:var(--shadow)}
   .card h2{margin:0 0 12px;font-size:clamp(16px,2.5vw,20px);letter-spacing:.2px}
+
   .topbar{
     position:sticky;top:0;z-index:10;
     display:flex;gap:10px;align-items:center;flex-wrap:wrap;
@@ -40,27 +65,32 @@
     padding:10px 0 6px;background:linear-gradient(180deg,var(--bg) 70%,transparent);
     backdrop-filter:saturate(1.2);
   }
+
   .chip{background:var(--chip);border:1px solid var(--stroke);padding:10px 14px;border-radius:999px;color:var(--text);font-size:14px;white-space:nowrap}
   .chip.bad{background:#25181a;border-color:#3a2023;color:#ffb3b3}
-  input,select,textarea{
-    width:100%;border-radius:12px;border:1px solid var(--stroke);
-    padding:13px 12px;background:var(--input);color:var(--text);outline:none;
-    min-height:44px;
-  }
-  input::placeholder,textarea::placeholder{color:#7089a3}
+
   label{display:block;font-size:13px;color:var(--sub);margin:8px 0 6px}
   .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-  .btn{border:none;border-radius:14px;padding:12px 18px;font-weight:600;color:#0b1117;background:var(--brand);cursor:pointer;min-height:44px}
+
+  .btn{
+    border:none;border-radius:14px;padding:12px 18px;font-weight:600;color:#0b1117;background:var(--brand);
+    cursor:pointer;min-height:44px;transition:transform .05s ease;
+  }
+  .btn:active{transform:translateY(1px)}
   .btn.gray{background:#34485f;color:#d2e3f5}
   .btn.ok{background:var(--ok);color:#07140a}
   .btn.danger{background:var(--danger);color:#220a0a}
   .btn.block{width:100%}
   .btn.small{padding:10px 14px;border-radius:12px;min-height:40px}
   .btn:disabled{opacity:.55;cursor:not-allowed}
+
   .actions{display:flex;gap:10px;flex-wrap:wrap}
   .table{width:100%;border-collapse:separate;border-spacing:0 10px;margin-top:8px}
   .th,.td{padding:12px 10px;text-align:left;font-size:14px}
-  .tr{background:var(--muted);border:1px solid var(--stroke);border-radius:12px;overflow:hidden;display:grid;grid-template-columns: 1.4fr 1.3fr .9fr 1.2fr .8fr;align-items:center}
+  .tr{
+    background:var(--muted);border:1px solid var(--stroke);border-radius:12px;overflow:hidden;
+    display:grid;grid-template-columns: 1.4fr 1.3fr .9fr 1.2fr .8fr;align-items:center;
+  }
   .th{color:#9fb3c8}
   .empty{padding:12px;color:#9fb3c8}
   .footer-actions{display:flex;justify-content:center;margin-top:10px}
@@ -69,7 +99,8 @@
   .sep{height:10px}
   .logout-spot{display:flex;justify-content:flex-end;margin-bottom:12px}
   .kiri .card{height:100%}
-  /* ===== Mobile-first tweaks for small DPI / narrow screens ===== */
+
+  /* ===== Mobile-first tweaks untuk layar kecil */
   @media (max-width: 560px){
     body{font-size:15px}
     .wrap{padding:0 10px;margin:18px auto}
@@ -79,7 +110,7 @@
     .topbar .actions{width:100%}
     .topbar .actions input{min-width:0;flex:1 1 120px}
     .topbar .actions #btnLogin{flex:0 0 120px}
-    .th{display:none} /* hide header row */
+    .th{display:none}
     .tr{grid-template-columns:1fr;border-radius:10px}
     .td{display:flex;gap:10px;align-items:center;justify-content:space-between;padding:10px 12px;border-top:1px solid rgba(255,255,255,.03)}
     .td:first-child{border-top:none}
@@ -89,6 +120,7 @@
     .btn.small{padding:9px 12px}
     .pill{width:100%;text-align:center}
   }
+
   /* Respect reduced motion */
   @media (prefers-reduced-motion: reduce){
     *{scroll-behavior:auto;transition:none !important;animation:none !important}
@@ -227,9 +259,9 @@
   let isAdmin = false;
   let isOwner = false;
   let cursor = null;
-  let PAGE = window.matchMedia("(max-width: 560px)").matches ? 12 : 25; // lebih ringan di HP kecil
+  let PAGE = window.matchMedia("(max-width: 560px)").matches ? 12 : 25; // ringan di HP kecil
   let lastPrefix = "";
-  let exactMode = null; // if set, we show single user result
+  let exactMode = null; // jika di-set, tampil 1 user
 
   function setLoadingList(msg){
     $list.innerHTML = '<div class="empty">'+(msg||"Memuat...")+'</div>';
@@ -330,9 +362,9 @@
       }
       if(lastPrefix){ // prefix mode
         if(cursor){
-          q = query(base, orderByKey(), startAt(cursor), endAt(lastPrefix + "\\uf8ff"), limitToFirst(PAGE+1));
+          q = query(base, orderByKey(), startAt(cursor), endAt(lastPrefix + "\uf8ff"), limitToFirst(PAGE+1));
         } else {
-          q = query(base, orderByKey(), startAt(lastPrefix), endAt(lastPrefix + "\\uf8ff"), limitToFirst(PAGE+1));
+          q = query(base, orderByKey(), startAt(lastPrefix), endAt(lastPrefix + "\uf8ff"), limitToFirst(PAGE+1));
         }
       } else { // default listing
         if(cursor){
@@ -345,7 +377,7 @@
       const val = snap.val() || {};
       const keys = Object.keys(val);
       if(cursor && keys.length && keys[0]===cursor){ keys.shift(); } // buang duplikat
-      // Render
+
       if(!cursor){ $list.innerHTML = ""; }
       if(keys.length===0 && !cursor){
         $list.innerHTML = '<div class="empty">Belum ada data user yang dimuat.</div>';
@@ -356,7 +388,7 @@
         $list.appendChild(rowNode(k, val[k]));
       });
       if(keys.length > PAGE){
-        cursor = keys[PAGE-1+1]; // element terakhir yang tampil berikutnya dipakai sebagai startAt di panggilan selanjutnya
+        cursor = keys[PAGE-1+1];
         $btnMore.classList.remove("hidden");
       } else {
         $btnMore.classList.add("hidden");
@@ -450,15 +482,14 @@
 
   onAuthStateChanged(auth, async (user) => {
     await refreshAdmin(user?.uid || null);
-    // otomatis load list ketika sudah ada auth (agar read true pun tetap konsisten alur)
     await loadFirst();
   });
 
-  // hint domain untuk popup oauth (prevent noise); email/pw tetap jalan walau domain belum ditambah
+  // hint domain visual saja (tidak menghalangi email/pw)
   try{
     const host = location.hostname;
     const ok = [ "localhost", "127.0.0.1", "animeplay-738a4.firebaseapp.com" ];
-    if(!ok.includes(host)){ /* hanya info visual */ }
+    if(!ok.includes(host)){ /* info visual saja */ }
   }catch{}
 </script>
 </body>
